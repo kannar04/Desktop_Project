@@ -1,0 +1,9 @@
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.csproj.AssemblyReference.cache
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.exe.config
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.exe
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.pdb
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.Properties.Resources.resources
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.csproj.GenerateResource.cache
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.csproj.CoreCompileInputs.cache
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.exe
+D:\doandesktop\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.pdb
