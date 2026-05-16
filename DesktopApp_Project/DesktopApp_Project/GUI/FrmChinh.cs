@@ -8,24 +8,39 @@ namespace DesktopApp_Project.GUI
 {
     public partial class FrmChinh : Form
     {
-        private readonly ServiceFactory _services;
-        private readonly NguoiDungDTO _currentUser;
+        private ServiceFactory _services;
+        private NguoiDungDTO _currentUser;
+        private bool _runtimeLoaded;
 
         public FrmChinh()
         {
-            _services = null;
-            _currentUser = null;
             InitializeComponent();
-            _lblHeader.Text = "Quản lý lớp IELTS - Chế độ thiết kế";
         }
 
         public FrmChinh(ServiceFactory services, NguoiDungDTO currentUser)
+            : this()
         {
             _services = services;
             _currentUser = currentUser;
-            InitializeComponent();
+        }
 
-            _lblHeader.Text = "Quản lý lớp IELTS - Xin chào " + currentUser.HoTen + " (" + AppConstants.GetDisplayRole(currentUser.VaiTro) + ")";
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            if (_runtimeLoaded)
+            {
+                return;
+            }
+
+            _runtimeLoaded = true;
+            if (_services == null || _currentUser == null)
+            {
+                _lblHeader.Text = "Quản lý lớp IELTS";
+                return;
+            }
+
+            _lblHeader.Text = "Quản lý lớp IELTS - Xin chào " + _currentUser.HoTen + " (" + AppConstants.GetDisplayRole(_currentUser.VaiTro) + ")";
             OpenModule(new FrmHocVien(_services, _currentUser));
         }
 

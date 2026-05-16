@@ -10,14 +10,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
 
         public FrmBaiTap()
-            : base("Cập nhật và giao bài tập")
         {
             InitializeComponent();
         }
+
         public FrmBaiTap(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Cập nhật và giao bài tập")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
             _dtDeadline.Value = DateTime.Now.AddDays(7);
             LoadData();

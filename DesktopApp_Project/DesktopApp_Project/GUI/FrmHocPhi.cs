@@ -7,14 +7,18 @@ namespace DesktopApp_Project.GUI
     public partial class FrmHocPhi : ModuleFormBase
     {
         public FrmHocPhi()
-            : base("Thanh toán học phí")
         {
             InitializeComponent();
         }
+
         public FrmHocPhi(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Thanh toán học phí")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             _cboHocVien.DataSource = Services.HocVien.TimKiem(null);
             _cboHocVien.DisplayMember = "HoTen";
             _cboHocVien.ValueMember = "MaNguoiDung";

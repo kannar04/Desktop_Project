@@ -7,14 +7,18 @@ namespace DesktopApp_Project.GUI
     public partial class FrmDiemDanh : ModuleFormBase
     {
         public FrmDiemDanh()
-            : base("Điểm danh và báo cáo chuyên cần")
         {
             InitializeComponent();
         }
+
         public FrmDiemDanh(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Điểm danh và báo cáo chuyên cần")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
             LoadData();
         }

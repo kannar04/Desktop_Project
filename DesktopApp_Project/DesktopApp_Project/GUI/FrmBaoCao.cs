@@ -9,14 +9,18 @@ namespace DesktopApp_Project.GUI
     public partial class FrmBaoCao : ModuleFormBase
     {
         public FrmBaoCao()
-            : base("Tạo báo cáo")
         {
             InitializeComponent();
         }
+
         public FrmBaoCao(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Tạo báo cáo")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
         }
 

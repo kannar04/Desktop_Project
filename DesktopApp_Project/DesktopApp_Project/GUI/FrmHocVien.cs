@@ -10,14 +10,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
 
         public FrmHocVien()
-            : base("Quản lý hồ sơ học viên")
         {
             InitializeComponent();
         }
+
         public FrmHocVien(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Quản lý hồ sơ học viên")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             LoadData();
         }
 

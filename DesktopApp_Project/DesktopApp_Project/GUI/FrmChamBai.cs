@@ -8,14 +8,18 @@ namespace DesktopApp_Project.GUI
     public partial class FrmChamBai : ModuleFormBase
     {
         public FrmChamBai()
-            : base("Quản lý nộp bài và chấm bài")
         {
             InitializeComponent();
         }
+
         public FrmChamBai(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Quản lý nộp bài và chấm bài")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             LoadAssignments();
         }
 
