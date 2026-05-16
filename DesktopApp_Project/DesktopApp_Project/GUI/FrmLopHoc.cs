@@ -10,14 +10,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedClassId;
 
         public FrmLopHoc()
-            : base("Quản lý lớp học")
         {
             InitializeComponent();
         }
+
         public FrmLopHoc(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Quản lý lớp học")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             LoadClasses();
         }
 

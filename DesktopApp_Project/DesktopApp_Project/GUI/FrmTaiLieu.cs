@@ -10,14 +10,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
 
         public FrmTaiLieu()
-            : base("Cập nhật tài liệu giảng dạy")
         {
             InitializeComponent();
         }
+
         public FrmTaiLieu(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Cập nhật tài liệu giảng dạy")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
             UiHelpers.BindKyNang(_cboKyNang);
             LoadData();

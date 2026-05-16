@@ -9,14 +9,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedQuestionId;
 
         public FrmDeThi()
-            : base("Tạo đề thi IELTS")
         {
             InitializeComponent();
         }
+
         public FrmDeThi(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Tạo đề thi IELTS")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindKyNang(_cboKyNang);
             LoadData();
         }

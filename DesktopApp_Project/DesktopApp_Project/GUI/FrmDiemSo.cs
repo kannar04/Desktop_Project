@@ -7,14 +7,18 @@ namespace DesktopApp_Project.GUI
     public partial class FrmDiemSo : ModuleFormBase
     {
         public FrmDiemSo()
-            : base("Cập nhật điểm số IELTS")
         {
             InitializeComponent();
         }
+
         public FrmDiemSo(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Cập nhật điểm số IELTS")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
             LoadRoundsAndStudents();
         }

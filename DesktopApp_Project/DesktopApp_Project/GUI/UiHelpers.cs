@@ -252,86 +252,46 @@ namespace DesktopApp_Project.GUI
 
     public abstract class ModuleFormBase : Form
     {
-        protected readonly ServiceFactory Services;
-        protected readonly NguoiDungDTO CurrentUser;
-        private readonly TableLayoutPanel _shell;
-        private readonly Label _title;
-        private readonly Panel _contentHost;
+        protected ServiceFactory Services;
+        protected NguoiDungDTO CurrentUser;
+        private bool _runtimeLoaded;
 
         protected ModuleFormBase()
-            : this("Thiết kế")
         {
         }
 
         protected ModuleFormBase(string title)
-            : this(null, CreateDesignerUser(), title)
         {
+            Text = title;
         }
 
         protected ModuleFormBase(ServiceFactory services, NguoiDungDTO currentUser, string title)
+            : this(title)
+        {
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected void SetRuntimeContext(ServiceFactory services, NguoiDungDTO currentUser)
         {
             Services = services;
             CurrentUser = currentUser;
-            var designSurface = services == null || LicenseManager.UsageMode == LicenseUsageMode.Designtime;
-            Font = UiHelpers.DefaultFont;
-            Text = title;
-            Dock = designSurface ? DockStyle.None : DockStyle.Fill;
-            TopLevel = designSurface;
-            FormBorderStyle = designSurface ? FormBorderStyle.Sizable : FormBorderStyle.None;
-            BackColor = UiHelpers.AppBackgroundColor;
-
-            _shell = new TableLayoutPanel
-            {
-                Dock = DockStyle.Fill,
-                ColumnCount = 1,
-                RowCount = 2,
-                Margin = Padding.Empty,
-                Padding = Padding.Empty,
-                BackColor = UiHelpers.AppBackgroundColor
-            };
-            _shell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            _shell.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
-            _shell.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-
-            _title = new Label
-            {
-                Text = title,
-                Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Font = UiHelpers.TitleFont,
-                Padding = new Padding(12, 0, 0, 0),
-                Margin = Padding.Empty,
-                AutoEllipsis = true,
-                ForeColor = UiHelpers.TextColor,
-                BackColor = Color.FromArgb(248, 250, 252)
-            };
-
-            _contentHost = new Panel
-            {
-                Dock = DockStyle.Fill,
-                AutoScroll = true,
-                BackColor = UiHelpers.AppBackgroundColor,
-                Margin = Padding.Empty,
-                Padding = new Padding(10)
-            };
-
-            _shell.Controls.Add(_title, 0, 0);
-            _shell.Controls.Add(_contentHost, 0, 1);
-            Controls.Add(_shell);
         }
 
-        protected void AddContent(Control control)
+        protected override void OnLoad(EventArgs e)
         {
-            control.Dock = DockStyle.Fill;
-            control.MinimumSize = new Size(
-                0,
-                Math.Max(control.MinimumSize.Height, 560));
-            NormalizeScrollableLayout(control);
-            UiHelpers.ApplyPolish(control);
+            base.OnLoad(e);
 
-            _contentHost.AutoScrollMinSize = control.MinimumSize;
-            _contentHost.Controls.Clear();
-            _contentHost.Controls.Add(control);
+            if (_runtimeLoaded || !CanUseServices)
+            {
+                return;
+            }
+
+            _runtimeLoaded = true;
+            OnRuntimeLoad();
+        }
+
+        protected virtual void OnRuntimeLoad()
+        {
         }
 
         protected bool CanUseServices
@@ -352,64 +312,6 @@ namespace DesktopApp_Project.GUI
         protected void Info(string message)
         {
             MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        private static void NormalizeScrollableLayout(Control control)
-        {
-            var flow = control as FlowLayoutPanel;
-            if (flow != null)
-            {
-                flow.WrapContents = true;
-                flow.AutoSize = true;
-                flow.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-                AttachFlowPanelWidth(flow);
-            }
-
-            foreach (Control child in control.Controls)
-            {
-                NormalizeScrollableLayout(child);
-            }
-        }
-
-        private static void AttachFlowPanelWidth(FlowLayoutPanel flow)
-        {
-            EventHandler updateWidth = delegate { ConstrainFlowPanelWidth(flow); };
-
-            flow.ParentChanged += delegate
-            {
-                if (flow.Parent != null)
-                {
-                    flow.Parent.SizeChanged += updateWidth;
-                    ConstrainFlowPanelWidth(flow);
-                }
-            };
-
-            if (flow.Parent != null)
-            {
-                flow.Parent.SizeChanged += updateWidth;
-                ConstrainFlowPanelWidth(flow);
-            }
-        }
-
-        private static void ConstrainFlowPanelWidth(FlowLayoutPanel flow)
-        {
-            if (flow.Parent == null)
-            {
-                return;
-            }
-
-            var width = Math.Max(160, flow.Parent.ClientSize.Width - flow.Margin.Horizontal);
-            flow.MaximumSize = new Size(width, 0);
-        }
-
-        private static NguoiDungDTO CreateDesignerUser()
-        {
-            return new NguoiDungDTO
-            {
-                MaNguoiDung = 0,
-                HoTen = "Thiết kế",
-                VaiTro = AppConstants.RoleAdmin
-            };
         }
     }
 }

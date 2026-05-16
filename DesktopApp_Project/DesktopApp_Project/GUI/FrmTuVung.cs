@@ -9,14 +9,18 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
 
         public FrmTuVung()
-            : base("Cập nhật kho từ vựng")
         {
             InitializeComponent();
         }
+
         public FrmTuVung(ServiceFactory services, NguoiDungDTO currentUser)
-            : base(services, currentUser, "Cập nhật kho từ vựng")
+            : this()
         {
-            InitializeComponent();
+            SetRuntimeContext(services, currentUser);
+        }
+
+        protected override void OnRuntimeLoad()
+        {
             UiHelpers.BindLopHoc(_cboLop, Services);
             LoadData();
         }
