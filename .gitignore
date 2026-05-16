@@ -1,3 +1,17 @@
-/bin/
-/obj/
+# Build folders
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# User files
+*.user
+*.suo
+
+# Rider / VSCode
+.idea/
+.vscode/
+
+# Codex extracted files
 .codex_pdf_extract/
