@@ -73,6 +73,9 @@
     <Compile Include="GUI\FrmDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GUI\FrmDangNhap.Designer.cs">
+      <DependentUpon>FrmDangNhap.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\FrmHocVien.cs">
       <SubType>Form</SubType>
     </Compile>

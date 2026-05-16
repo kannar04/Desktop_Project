@@ -1,78 +1,26 @@
 using System;
-using System.Drawing;
-using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
-using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
-
     public partial class FrmTaiLieu : ModuleFormBase
     {
-        private readonly DataGridView _grid = UiHelpers.Grid();
-        private readonly ComboBox _cboLop = UiHelpers.ComboBox();
-        private readonly ComboBox _cboKyNang = UiHelpers.ComboBox();
-        private readonly TextBox _txtChuDe = UiHelpers.TextBox();
-        private readonly TextBox _txtMoTa = UiHelpers.TextBox();
-        private readonly TextBox _txtFile = UiHelpers.TextBox();
-        private readonly TextBox _txtVideo = UiHelpers.TextBox();
         private int _selectedId;
 
-        public FrmTaiLieu(ServiceFactory services, NguoiDungDTO currentUser) : base(services, currentUser, "Cập nhật tài liệu giảng dạy")
+        public FrmTaiLieu()
+            : base("Cập nhật tài liệu giảng dạy")
         {
             InitializeComponent();
-            var root = BuildDocumentLikeLayout("Tài liệu", Save, Delete, BrowseFile);
-            AddContent(root);
-            ReloadCombos();
-            _cboLop.SelectedIndexChanged += (s, e) => LoadData();
-            LoadData();
         }
-
-        private Control BuildDocumentLikeLayout(string label, EventHandler save, EventHandler delete, EventHandler browse)
+        public FrmTaiLieu(ServiceFactory services, NguoiDungDTO currentUser)
+            : base(services, currentUser, "Cập nhật tài liệu giảng dạy")
         {
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2 };
-            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var form = UiHelpers.FormGrid();
-            form.Controls.Add(UiHelpers.Label("Lớp"), 0, 0);
-            form.Controls.Add(_cboLop, 1, 0);
-            form.Controls.Add(UiHelpers.Label("Kỹ năng"), 2, 0);
-            form.Controls.Add(_cboKyNang, 3, 0);
-            form.Controls.Add(UiHelpers.Label("Chủ đề"), 0, 1);
-            form.Controls.Add(_txtChuDe, 1, 1);
-            form.Controls.Add(UiHelpers.Label("Mô tả"), 2, 1);
-            form.Controls.Add(_txtMoTa, 3, 1);
-            form.Controls.Add(UiHelpers.Label("Đường dẫn file"), 0, 2);
-            form.Controls.Add(_txtFile, 1, 2);
-            form.Controls.Add(UiHelpers.Label("Video link"), 2, 2);
-            form.Controls.Add(_txtVideo, 3, 2);
-            var buttons = new FlowLayoutPanel { AutoSize = true };
-            var btnMoi = UiHelpers.Button("Thêm mới");
-            var btnLuu = UiHelpers.Button("Lưu");
-            var btnXoa = UiHelpers.Button("Xóa");
-            var btnFile = UiHelpers.Button("Chọn file");
-            btnMoi.Click += (s, e) => ClearForm();
-            btnLuu.Click += save;
-            btnXoa.Click += delete;
-            btnFile.Click += browse;
-            buttons.Controls.Add(btnMoi);
-            buttons.Controls.Add(btnLuu);
-            buttons.Controls.Add(btnXoa);
-            buttons.Controls.Add(btnFile);
-            form.Controls.Add(buttons, 3, 3);
-            _grid.SelectionChanged += (s, e) => FillFromGrid();
-            root.Controls.Add(form, 0, 0);
-            root.Controls.Add(_grid, 0, 1);
-            return root;
-        }
-
-        private void ReloadCombos()
-        {
+            InitializeComponent();
             UiHelpers.BindLopHoc(_cboLop, Services);
             UiHelpers.BindKyNang(_cboKyNang);
+            LoadData();
         }
 
         private void LoadData()
@@ -85,6 +33,7 @@ namespace DesktopApp_Project.GUI
         {
             var item = UiHelpers.SelectedItem<TaiLieuDTO>(_grid);
             if (item == null) return;
+
             _selectedId = item.MaTaiLieu;
             _cboLop.SelectedValue = item.MaLopHoc;
             _cboKyNang.SelectedItem = item.NhanKyNang;
@@ -103,7 +52,12 @@ namespace DesktopApp_Project.GUI
             _txtVideo.Clear();
         }
 
-        private void Save(object sender, EventArgs e)
+        private void BtnMoi_Click(object sender, EventArgs e)
+        {
+            ClearForm();
+        }
+
+        private void BtnLuu_Click(object sender, EventArgs e)
         {
             var result = Services.TaiLieu.Luu(new TaiLieuDTO
             {
@@ -115,13 +69,15 @@ namespace DesktopApp_Project.GUI
                 VideoLink = _txtVideo.Text.Trim(),
                 NhanKyNang = Convert.ToString(_cboKyNang.SelectedItem)
             });
+
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();
         }
 
-        private void Delete(object sender, EventArgs e)
+        private void BtnXoa_Click(object sender, EventArgs e)
         {
             if (_selectedId == 0) return;
+
             var result = Services.TaiLieu.Xoa(_selectedId);
             UiHelpers.ShowResult(result);
             if (result.Success)
@@ -131,7 +87,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
-        private void BrowseFile(object sender, EventArgs e)
+        private void BtnFile_Click(object sender, EventArgs e)
         {
             using (var dialog = new OpenFileDialog { Filter = "Tài liệu|*.pdf;*.doc;*.docx|Tất cả|*.*" })
             {
@@ -140,6 +96,16 @@ namespace DesktopApp_Project.GUI
                     _txtFile.Text = dialog.FileName;
                 }
             }
+        }
+
+        private void Grid_SelectionChanged(object sender, EventArgs e)
+        {
+            FillFromGrid();
+        }
+
+        private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadData();
         }
     }
 }

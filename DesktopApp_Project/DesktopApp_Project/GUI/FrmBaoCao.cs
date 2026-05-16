@@ -1,52 +1,33 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
-using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
-
     public partial class FrmBaoCao : ModuleFormBase
     {
-        private readonly ComboBox _cboLoai = UiHelpers.ComboBox();
-        private readonly ComboBox _cboLop = UiHelpers.ComboBox();
-        private readonly TextBox _txtNoiDung = new TextBox { Dock = DockStyle.Fill, Multiline = true, ScrollBars = ScrollBars.Both, Font = UiHelpers.DefaultFont };
-
-        public FrmBaoCao(ServiceFactory services, NguoiDungDTO currentUser) : base(services, currentUser, "Tạo báo cáo")
+        public FrmBaoCao()
+            : base("Tạo báo cáo")
         {
             InitializeComponent();
-            var root = new TableLayoutPanel { Dock = DockStyle.Fill, RowCount = 2 };
-            root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            var top = new FlowLayoutPanel { Dock = DockStyle.Top, AutoSize = true, Padding = new Padding(8) };
-            _cboLoai.DataSource = new[] { "Điểm số", "Chuyên cần" };
-            var btnTao = UiHelpers.Button("Tạo báo cáo");
-            var btnXuat = UiHelpers.Button("Xuất file");
-            btnTao.Width = 130;
-            btnTao.Click += (s, e) => Generate();
-            btnXuat.Click += (s, e) => Export();
-            top.Controls.Add(UiHelpers.Label("Loại báo cáo"));
-            top.Controls.Add(_cboLoai);
-            top.Controls.Add(UiHelpers.Label("Lớp"));
-            top.Controls.Add(_cboLop);
-            top.Controls.Add(btnTao);
-            top.Controls.Add(btnXuat);
-            root.Controls.Add(top, 0, 0);
-            root.Controls.Add(_txtNoiDung, 0, 1);
-            AddContent(root);
+        }
+        public FrmBaoCao(ServiceFactory services, NguoiDungDTO currentUser)
+            : base(services, currentUser, "Tạo báo cáo")
+        {
+            InitializeComponent();
             UiHelpers.BindLopHoc(_cboLop, Services);
         }
 
-        private void Generate()
+        private void BtnTao_Click(object sender, EventArgs e)
         {
             var result = Services.BaoCao.TaoBaoCao(new BaoCaoDTO
             {
                 LoaiBaoCao = Convert.ToString(_cboLoai.SelectedItem),
                 MaLopHoc = UiHelpers.SelectedId(_cboLop)
             }, CurrentUser.MaNguoiDung);
+
             if (result.Success)
             {
                 _txtNoiDung.Text = result.Data;
@@ -54,7 +35,7 @@ namespace DesktopApp_Project.GUI
             UiHelpers.ShowResult(result);
         }
 
-        private void Export()
+        private void BtnXuat_Click(object sender, EventArgs e)
         {
             using (var dialog = new SaveFileDialog { Filter = "Tệp CSV hoặc văn bản|*.csv;*.txt|Tệp Word RTF|*.rtf", FileName = "BaoCaoIELTS.csv" })
             {

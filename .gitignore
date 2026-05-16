@@ -15,3 +15,5 @@ obj/
 
 # Codex extracted files
 .codex_pdf_extract/
+
+*temp.txt
