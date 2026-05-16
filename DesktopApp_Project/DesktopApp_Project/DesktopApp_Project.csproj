@@ -67,14 +67,83 @@
     <Compile Include="GUI\FrmChinh.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GUI\FrmChinh.Designer.cs">
+      <DependentUpon>FrmChinh.cs</DependentUpon>
+    </Compile>
     <Compile Include="GUI\FrmDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\ModuleForms.cs">
+    <Compile Include="GUI\FrmHocVien.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\ModuleForms2.cs">
+    <Compile Include="GUI\FrmHocVien.Designer.cs">
+      <DependentUpon>FrmHocVien.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmLopHoc.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmLopHoc.Designer.cs">
+      <DependentUpon>FrmLopHoc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmTaiLieu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmTaiLieu.Designer.cs">
+      <DependentUpon>FrmTaiLieu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmBaiTap.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmBaiTap.Designer.cs">
+      <DependentUpon>FrmBaiTap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmChamBai.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmChamBai.Designer.cs">
+      <DependentUpon>FrmChamBai.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmDiemDanh.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmDiemDanh.Designer.cs">
+      <DependentUpon>FrmDiemDanh.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmDiemSo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmDiemSo.Designer.cs">
+      <DependentUpon>FrmDiemSo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmDeThi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmDeThi.Designer.cs">
+      <DependentUpon>FrmDeThi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmBaoCao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmBaoCao.Designer.cs">
+      <DependentUpon>FrmBaoCao.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmTuVung.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmTuVung.Designer.cs">
+      <DependentUpon>FrmTuVung.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmThongBao.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmThongBao.Designer.cs">
+      <DependentUpon>FrmThongBao.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GUI\FrmHocPhi.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GUI\FrmHocPhi.Designer.cs">
+      <DependentUpon>FrmHocPhi.cs</DependentUpon>
     </Compile>
     <Compile Include="GUI\UiHelpers.cs" />
     <Compile Include="Program.cs" />

@@ -7,7 +7,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
-    public class FrmChinh : Form
+    public partial class FrmChinh : Form
     {
         private readonly ServiceFactory _services;
         private readonly NguoiDungDTO _currentUser;
@@ -15,6 +15,7 @@ namespace DesktopApp_Project.GUI
 
         public FrmChinh(ServiceFactory services, NguoiDungDTO currentUser)
         {
+            InitializeComponent();
             _services = services;
             _currentUser = currentUser;
 
