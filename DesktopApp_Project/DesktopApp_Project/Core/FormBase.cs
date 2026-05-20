@@ -20,6 +20,7 @@ namespace DesktopApp_Project
             this.Font = new Font("Segoe UI", 12, FontStyle.Regular);
             this.BackColor = Color.FromArgb(31, 30, 68);
             this.FormBorderStyle = FormBorderStyle.None;
+            this.ForeColor = Color.Gainsboro;
         }
     }
 }

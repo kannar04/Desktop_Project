@@ -13,3 +13,4 @@ E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopA
 E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\FontAwesome.Sharp.dll
 E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\GUI.csproj.Up2Date
 E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.exe.config
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.Forms.FrmDangNhap.resources

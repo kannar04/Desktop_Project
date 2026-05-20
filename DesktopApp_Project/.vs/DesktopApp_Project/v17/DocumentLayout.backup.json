@@ -3,16 +3,32 @@
   "WorkspaceRootPath": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmdangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmdangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmdangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmdangnhap.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmchinh.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
       "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmchinh.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmchinh.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmdangnhap.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmdangnhap.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\desktopapp_project\\forms\\frmchinh.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmchinh.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\core\\uihelpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\core\\uihelpers.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|e:\\dev\\study\u0027\\winform study\\trg\\doan\\desktop_project\\desktopapp_project\\desktopapp_project\\forms\\frmchinh.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8B0EEA37-F040-40D3-9671-3757041ABF01}|DesktopApp_Project\\GUI.csproj|solutionrelative:desktopapp_project\\forms\\frmchinh.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -26,33 +42,85 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "UiHelpers.cs",
-              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Core\\UiHelpers.cs",
-              "RelativeDocumentMoniker": "DesktopApp_Project\\Core\\UiHelpers.cs",
-              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Core\\UiHelpers.cs",
-              "RelativeToolTip": "DesktopApp_Project\\Core\\UiHelpers.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAEAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "FrmDangNhap.Designer.cs",
+              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.Designer.cs",
+              "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmDangNhap.Designer.cs",
+              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.Designer.cs",
+              "RelativeToolTip": "DesktopApp_Project\\Forms\\FrmDangNhap.Designer.cs",
+              "ViewState": "AgIAAN4AAAAAAAAAAAAowPEAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-05-20T10:27:04.021Z",
+              "WhenOpened": "2026-05-20T17:34:05.136Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Program.cs",
+              "RelativeDocumentMoniker": "DesktopApp_Project\\Program.cs",
+              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Program.cs",
+              "RelativeToolTip": "DesktopApp_Project\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAxAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T17:13:11.313Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "FrmDangNhap.cs",
+              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "RelativeToolTip": "DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T17:08:47.294Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "FrmDangNhap.cs [Design]",
+              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmDangNhap.cs",
+              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmDangNhap.cs [Design]",
+              "RelativeToolTip": "DesktopApp_Project\\Forms\\FrmDangNhap.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T17:06:52.812Z",
+              "EditorCaption": " [Design]"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "FrmChinh.Designer.cs",
+              "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmChinh.Designer.cs",
+              "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmChinh.Designer.cs",
+              "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmChinh.Designer.cs",
+              "RelativeToolTip": "DesktopApp_Project\\Forms\\FrmChinh.Designer.cs",
+              "ViewState": "AgIAAMMBAAAAAAAAAAAYwM8BAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-05-20T16:24:15.368Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
               "Title": "FrmChinh.cs",
               "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmChinh.cs",
               "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmChinh.cs",
               "ToolTip": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmChinh.cs",
               "RelativeToolTip": "DesktopApp_Project\\Forms\\FrmChinh.cs",
-              "ViewState": "AgIAALoAAAAAAAAAAAAqwNsAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAA1wDAAAABDAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-05-20T10:00:59.676Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 2,
               "Title": "FrmChinh.cs [Design]",
               "DocumentMoniker": "E:\\Dev\\Study\u0027\\WinForm Study\\Trg\\Doan\\Desktop_Project\\DesktopApp_Project\\DesktopApp_Project\\Forms\\FrmChinh.cs",
               "RelativeDocumentMoniker": "DesktopApp_Project\\Forms\\FrmChinh.cs",

@@ -60,6 +60,8 @@ namespace DesktopApp_Project.Forms
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
             this.MinimumSize = new Size(1366, 900);
+            this.ControlBox = false;
+            this.DoubleBuffered = true;
 
             // Khởi tạo panel làm đẹp bên trái nút
             leftBorderBtn = new Panel();
@@ -170,6 +172,10 @@ namespace DesktopApp_Project.Forms
                 leftBorderBtn.Location = new Point(0, currentBtn.Location.Y);
                 leftBorderBtn.Visible = true;
                 leftBorderBtn.BringToFront();
+                lblTitleChildForm.Text = currentBtn.Text; 
+                lblTitleChildForm.ForeColor = color; 
+                icoTittle.IconChar = currentBtn.IconChar;
+                icoTittle.IconColor = color; 
             }
         }
         private void DisableButton()
@@ -207,7 +213,7 @@ namespace DesktopApp_Project.Forms
             pnlDesktop.Tag = childForm; // Lưu trữ data form vào Tag của panel (dùng khi cần)
             childForm.BringToFront(); // Đưa form lên lớp trên cùng để không bị che
             childForm.Show(); // Hiển thị form
-            lblTitleChildForm.Text = childForm.Text; // Cập nhật tiêu đề của form con lên lblTitleChildForm
+            
 
         }
 
@@ -278,6 +284,20 @@ namespace DesktopApp_Project.Forms
         {
             ActivateButton(sender, RGBColors.color5);
             OpenChildForm(new FrmTuVung());
+        }
+
+        private void lblLogo_Click(object sender, EventArgs e)
+        {
+            if (currentChildForm != null)
+            {
+                currentChildForm.Close();
+            }
+            DisableButton();
+        }
+
+        private void btnSetting_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

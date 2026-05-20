@@ -16,7 +16,7 @@ namespace DesktopApp_Project
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Forms.FrmChinh());
+            Application.Run(new Forms.FrmDangNhap());
         }
     }
 }
