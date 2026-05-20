@@ -1,0 +1,15 @@
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.exe.config
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.exe
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\DesktopApp_Project.pdb
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\GUI.csproj.AssemblyReference.cache
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.FormBase.resources
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.Properties.Resources.resources
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\GUI.csproj.GenerateResource.cache
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\GUI.csproj.CoreCompileInputs.cache
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.exe
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.pdb
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.Forms.FrmChinh.resources
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.Forms.FrmTuVung.resources
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\bin\Debug\FontAwesome.Sharp.dll
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\GUI.csproj.Up2Date
+E:\Dev\Study'\WinForm Study\Trg\Doan\Desktop_Project\DesktopApp_Project\DesktopApp_Project\obj\Debug\DesktopApp_Project.exe.config
