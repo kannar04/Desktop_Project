@@ -17,3 +17,13 @@ obj/
 .codex_pdf_extract/
 
 *temp.txt
+
+legacy/
+
+*.nupkg
+*.snupkg
+*.psmdcp
+.signature.p7s
+[Content_Types].xml
+_rels/
+packages/

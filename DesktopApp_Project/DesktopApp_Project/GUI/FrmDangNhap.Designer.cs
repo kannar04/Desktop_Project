@@ -3,14 +3,6 @@ namespace DesktopApp_Project.GUI
     partial class FrmDangNhap
     {
         private System.ComponentModel.IContainer components = null;
-        private System.Windows.Forms.Label _lblDesigner2;
-        private System.Windows.Forms.Label _lblDesigner1;
-        private System.Windows.Forms.Label _lblHuongDan;
-        private System.Windows.Forms.Label title;
-        private System.Windows.Forms.TableLayoutPanel panel;
-        private System.Windows.Forms.Button btnDangNhap;
-        private System.Windows.Forms.TextBox _txtTaiKhoan;
-        private System.Windows.Forms.TextBox _txtMatKhau;
 
         protected override void Dispose(bool disposing)
         {
@@ -25,101 +17,257 @@ namespace DesktopApp_Project.GUI
 
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this._lblDesigner2 = new System.Windows.Forms.Label();
-            this._lblDesigner2.Text = "Mật khẩu";
-            this._lblDesigner2.AutoSize = true;
-            this._lblDesigner1 = new System.Windows.Forms.Label();
-            this._lblDesigner1.Text = "Tài khoản";
-            this._lblDesigner1.AutoSize = true;
-            this._lblHuongDan = new System.Windows.Forms.Label();
-            this._lblHuongDan.Text = "Tài khoản mẫu sau khi chạy Schema.sql: admin/admin hoặc giaovien/123456.";
-            this._lblHuongDan.AutoSize = true;
-            this._lblHuongDan.ForeColor = System.Drawing.Color.DimGray;
-            this._lblHuongDan.Padding = new System.Windows.Forms.Padding(0, 8, 0, 8);
-            this._txtTaiKhoan = new System.Windows.Forms.TextBox();
-            this._txtTaiKhoan.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._txtTaiKhoan.BackColor = System.Drawing.Color.White;
-            this._txtTaiKhoan.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._txtTaiKhoan.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this._txtTaiKhoan.ForeColor = System.Drawing.Color.FromArgb(31, 41, 55);
-            this._txtTaiKhoan.Margin = new System.Windows.Forms.Padding(4);
-            this._txtTaiKhoan.MinimumSize = new System.Drawing.Size(150, 0);
-            this._txtTaiKhoan.Width = 220;
-            this._txtMatKhau = new System.Windows.Forms.TextBox();
-            this._txtMatKhau.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._txtMatKhau.BackColor = System.Drawing.Color.White;
-            this._txtMatKhau.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this._txtMatKhau.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this._txtMatKhau.ForeColor = System.Drawing.Color.FromArgb(31, 41, 55);
-            this._txtMatKhau.Margin = new System.Windows.Forms.Padding(4);
-            this._txtMatKhau.MinimumSize = new System.Drawing.Size(150, 0);
-            this._txtMatKhau.Width = 220;
-            this.title = new System.Windows.Forms.Label();
-            this.panel = new System.Windows.Forms.TableLayoutPanel();
-            this.btnDangNhap = new System.Windows.Forms.Button();
-            this.btnDangNhap.AutoEllipsis = true;
-            this.btnDangNhap.BackColor = System.Drawing.Color.FromArgb(235, 242, 252);
-            this.btnDangNhap.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnDangNhap.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDangNhap.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnDangNhap.ForeColor = System.Drawing.Color.FromArgb(31, 41, 55);
-            this.btnDangNhap.Height = 34;
-            this.btnDangNhap.Margin = new System.Windows.Forms.Padding(4);
-            this.btnDangNhap.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.btnDangNhap.UseVisualStyleBackColor = false;
-            this.btnDangNhap.Width = 110;
-            this.btnDangNhap.Text = "Đăng nhập";
-            this.panel.SuspendLayout();
+            this.pnlLogin = new System.Windows.Forms.Panel();
+            this.btnLogin = new FontAwesome.Sharp.IconButton();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.icoShowPass = new FontAwesome.Sharp.IconPictureBox();
+            this.lblPassword = new System.Windows.Forms.Label();
+            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.pnlUnder2 = new System.Windows.Forms.Panel();
+            this.icoPassword = new FontAwesome.Sharp.IconPictureBox();
+            this.pnlUsername = new System.Windows.Forms.Panel();
+            this.lblUsername = new System.Windows.Forms.Label();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.pnlUnder1 = new System.Windows.Forms.Panel();
+            this.icoUsername = new FontAwesome.Sharp.IconPictureBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.pnlLogin.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoShowPass)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.icoPassword)).BeginInit();
+            this.pnlUsername.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).BeginInit();
             this.SuspendLayout();
-
-            this.Text = "Đăng nhập - Quản lý lớp IELTS";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.ClientSize = new System.Drawing.Size(430, 270);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.MaximizeBox = false;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.BackColor = System.Drawing.Color.FromArgb(246, 248, 251);
-
-            this.title.Text = "QUẢN LÝ LỚP IELTS";
-            this.title.Dock = System.Windows.Forms.DockStyle.Top;
-            this.title.Height = 58;
-            this.title.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Bold);
-            this.title.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.title.ForeColor = System.Drawing.Color.White;
-            this.title.BackColor = System.Drawing.Color.FromArgb(37, 99, 235);
-
-            this.panel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel.Padding = new System.Windows.Forms.Padding(28, 18, 28, 12);
-            this.panel.BackColor = System.Drawing.Color.White;
-            this.panel.ColumnCount = 2;
-            this.panel.RowCount = 4;
-            this.panel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.AutoSize));
-            this.panel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-
-            this._txtMatKhau.PasswordChar = '*';
-            this._txtTaiKhoan.Text = "admin";
-
-            this.btnDangNhap.Width = 140;
-            this.btnDangNhap.Click += this.BtnDangNhap_Click;
-            this.AcceptButton = btnDangNhap;
-
-            this.panel.Controls.Add(this._lblDesigner1, 0, 0);
-            this.panel.Controls.Add(this._txtTaiKhoan, 1, 0);
-            this.panel.Controls.Add(this._lblDesigner2, 0, 1);
-            this.panel.Controls.Add(this._txtMatKhau, 1, 1);
-            this.panel.Controls.Add(this._lblHuongDan, 1, 2);
-            this.panel.Controls.Add(this.btnDangNhap, 1, 3);
-
-            this.Controls.Add(this.panel);
-            this.Controls.Add(this.title);
-            this.Name = "FrmDangNhap";
+            // 
+            // pnlLogin
+            // 
+            this.pnlLogin.Controls.Add(this.btnLogin);
+            this.pnlLogin.Controls.Add(this.panel1);
+            this.pnlLogin.Controls.Add(this.pnlUsername);
+            this.pnlLogin.Controls.Add(this.label3);
+            this.pnlLogin.Location = new System.Drawing.Point(375, 25);
+            this.pnlLogin.Name = "pnlLogin";
+            this.pnlLogin.Size = new System.Drawing.Size(400, 500);
+            this.pnlLogin.TabIndex = 0;
+            // 
+            // btnLogin
+            // 
+            this.btnLogin.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(95)))), ((int)(((byte)(77)))), ((int)(((byte)(221)))));
+            this.btnLogin.FlatAppearance.BorderSize = 0;
+            this.btnLogin.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnLogin.IconChar = FontAwesome.Sharp.IconChar.SignIn;
+            this.btnLogin.IconColor = System.Drawing.Color.Gainsboro;
+            this.btnLogin.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.btnLogin.Location = new System.Drawing.Point(152, 340);
+            this.btnLogin.Name = "btnLogin";
+            this.btnLogin.Size = new System.Drawing.Size(97, 46);
+            this.btnLogin.TabIndex = 3;
+            this.btnLogin.UseVisualStyleBackColor = false;
+            this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.icoShowPass);
+            this.panel1.Controls.Add(this.lblPassword);
+            this.panel1.Controls.Add(this.txtPassword);
+            this.panel1.Controls.Add(this.pnlUnder2);
+            this.panel1.Controls.Add(this.icoPassword);
+            this.panel1.Location = new System.Drawing.Point(26, 231);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(350, 70);
+            this.panel1.TabIndex = 0;
+            // 
+            // icoShowPass
+            // 
+            this.icoShowPass.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.icoShowPass.ForeColor = System.Drawing.Color.Gainsboro;
+            this.icoShowPass.IconChar = FontAwesome.Sharp.IconChar.Eye;
+            this.icoShowPass.IconColor = System.Drawing.Color.Gainsboro;
+            this.icoShowPass.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.icoShowPass.IconSize = 25;
+            this.icoShowPass.Location = new System.Drawing.Point(312, 28);
+            this.icoShowPass.Name = "icoShowPass";
+            this.icoShowPass.Size = new System.Drawing.Size(25, 25);
+            this.icoShowPass.TabIndex = 4;
+            this.icoShowPass.TabStop = false;
+            this.icoShowPass.Click += new System.EventHandler(this.icoShowPass_Click);
+            // 
+            // lblPassword
+            // 
+            this.lblPassword.BackColor = System.Drawing.Color.Transparent;
+            this.lblPassword.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.lblPassword.Location = new System.Drawing.Point(67, 28);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(81, 27);
+            this.lblPassword.TabIndex = 2;
+            this.lblPassword.Text = "Password";
+            this.lblPassword.Click += new System.EventHandler(this.lblPassword_Click);
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtPassword.ForeColor = System.Drawing.Color.Gainsboro;
+            this.txtPassword.Location = new System.Drawing.Point(67, 28);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.PasswordChar = '*';
+            this.txtPassword.Size = new System.Drawing.Size(270, 22);
+            this.txtPassword.TabIndex = 2;
+            this.txtPassword.UseSystemPasswordChar = true;
+            this.txtPassword.Enter += new System.EventHandler(this.txtPassword_Enter);
+            this.txtPassword.Leave += new System.EventHandler(this.txtPassword_Leave);
+            // 
+            // pnlUnder2
+            // 
+            this.pnlUnder2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.pnlUnder2.Location = new System.Drawing.Point(67, 56);
+            this.pnlUnder2.Name = "pnlUnder2";
+            this.pnlUnder2.Size = new System.Drawing.Size(270, 4);
+            this.pnlUnder2.TabIndex = 0;
+            // 
+            // icoPassword
+            // 
+            this.icoPassword.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.icoPassword.ForeColor = System.Drawing.Color.Gainsboro;
+            this.icoPassword.IconChar = FontAwesome.Sharp.IconChar.Key;
+            this.icoPassword.IconColor = System.Drawing.Color.Gainsboro;
+            this.icoPassword.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.icoPassword.IconSize = 48;
+            this.icoPassword.Location = new System.Drawing.Point(13, 11);
+            this.icoPassword.Name = "icoPassword";
+            this.icoPassword.Size = new System.Drawing.Size(48, 48);
+            this.icoPassword.TabIndex = 0;
+            this.icoPassword.TabStop = false;
+            // 
+            // pnlUsername
+            // 
+            this.pnlUsername.Controls.Add(this.lblUsername);
+            this.pnlUsername.Controls.Add(this.txtUsername);
+            this.pnlUsername.Controls.Add(this.pnlUnder1);
+            this.pnlUsername.Controls.Add(this.icoUsername);
+            this.pnlUsername.Location = new System.Drawing.Point(26, 142);
+            this.pnlUsername.Name = "pnlUsername";
+            this.pnlUsername.Size = new System.Drawing.Size(350, 70);
+            this.pnlUsername.TabIndex = 0;
+            // 
+            // lblUsername
+            // 
+            this.lblUsername.BackColor = System.Drawing.Color.Transparent;
+            this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.lblUsername.Location = new System.Drawing.Point(67, 28);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(81, 27);
+            this.lblUsername.TabIndex = 0;
+            this.lblUsername.Text = "Username";
+            this.lblUsername.Click += new System.EventHandler(this.lblUsername_Click);
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtUsername.ForeColor = System.Drawing.Color.Gainsboro;
+            this.txtUsername.Location = new System.Drawing.Point(67, 28);
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(270, 22);
+            this.txtUsername.TabIndex = 1;
+            this.txtUsername.Enter += new System.EventHandler(this.txtUsername_Enter);
+            this.txtUsername.Leave += new System.EventHandler(this.txtUsername_Leave);
+            // 
+            // pnlUnder1
+            // 
+            this.pnlUnder1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.pnlUnder1.Location = new System.Drawing.Point(67, 56);
+            this.pnlUnder1.Name = "pnlUnder1";
+            this.pnlUnder1.Size = new System.Drawing.Size(270, 4);
+            this.pnlUnder1.TabIndex = 0;
+            // 
+            // icoUsername
+            // 
+            this.icoUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.icoUsername.ForeColor = System.Drawing.Color.Gainsboro;
+            this.icoUsername.IconChar = FontAwesome.Sharp.IconChar.User;
+            this.icoUsername.IconColor = System.Drawing.Color.Gainsboro;
+            this.icoUsername.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.icoUsername.IconSize = 48;
+            this.icoUsername.Location = new System.Drawing.Point(13, 11);
+            this.icoUsername.Name = "icoUsername";
+            this.icoUsername.Size = new System.Drawing.Size(48, 48);
+            this.icoUsername.TabIndex = 0;
+            this.icoUsername.TabStop = false;
+            // 
+            // label3
+            // 
+            this.label3.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(3, 37);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(394, 60);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Đăng nhập";
+            this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // label1
+            // 
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(30, 167);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(229, 60);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Chào mừng";
+            this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // label2
+            // 
+            this.label2.BackColor = System.Drawing.Color.Transparent;
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(30, 252);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(220, 74);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Đây là hệ thống quản lý lớp IELTS";
+            // 
+            // FrmDangNhap
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-
-            this.panel.ResumeLayout(false);
-            this.panel.PerformLayout();
+            this.ClientSize = new System.Drawing.Size(800, 550);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.pnlLogin);
+            this.Name = "FrmDangNhap";
+            this.Text = "FrmDangNhap";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.FrmDangNhap_Paint);
+            this.pnlLogin.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoShowPass)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.icoPassword)).EndInit();
+            this.pnlUsername.ResumeLayout(false);
+            this.pnlUsername.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).EndInit();
             this.ResumeLayout(false);
+
         }
+
         #endregion
+
+        private System.Windows.Forms.Panel pnlLogin;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Panel pnlUsername;
+        private FontAwesome.Sharp.IconPictureBox icoUsername;
+        private System.Windows.Forms.Panel pnlUnder1;
+        private System.Windows.Forms.TextBox txtUsername;
+        private System.Windows.Forms.Label lblUsername;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label lblPassword;
+        private System.Windows.Forms.TextBox txtPassword;
+        private System.Windows.Forms.Panel pnlUnder2;
+        private FontAwesome.Sharp.IconPictureBox icoPassword;
+        private FontAwesome.Sharp.IconPictureBox icoShowPass;
+        private FontAwesome.Sharp.IconButton btnLogin;
     }
 }
