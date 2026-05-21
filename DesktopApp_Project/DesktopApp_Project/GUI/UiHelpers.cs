@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Reflection;
 using System.Linq;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
@@ -14,13 +15,14 @@ namespace DesktopApp_Project.GUI
     {
         public static readonly Font DefaultFont = new Font("Segoe UI", 9F, FontStyle.Regular);
         public static readonly Font TitleFont = new Font("Segoe UI", 13F, FontStyle.Bold);
-        public static readonly Color AccentColor = Color.FromArgb(37, 99, 235);
-        public static readonly Color AccentSoftColor = Color.FromArgb(219, 234, 254);
-        public static readonly Color AppBackgroundColor = Color.FromArgb(246, 248, 251);
-        public static readonly Color SurfaceColor = Color.White;
-        public static readonly Color BorderColor = Color.FromArgb(213, 220, 230);
-        public static readonly Color TextColor = Color.FromArgb(31, 41, 55);
-        public static readonly Color MutedTextColor = Color.FromArgb(100, 116, 139);
+        public static readonly Color AccentColor = Color.FromArgb(95, 77, 221);
+        public static readonly Color AccentSoftColor = Color.FromArgb(54, 48, 104);
+        public static readonly Color AppBackgroundColor = Color.FromArgb(31, 30, 68);
+        public static readonly Color SurfaceColor = Color.FromArgb(37, 36, 81);
+        public static readonly Color SurfaceAltColor = Color.FromArgb(26, 25, 62);
+        public static readonly Color BorderColor = Color.FromArgb(55, 54, 92);
+        public static readonly Color TextColor = Color.Gainsboro;
+        public static readonly Color MutedTextColor = Color.FromArgb(174, 174, 196);
 
         public static Button Button(string text)
         {
@@ -31,7 +33,7 @@ namespace DesktopApp_Project.GUI
                 Height = 34,
                 Width = 110,
                 Font = DefaultFont,
-                BackColor = Color.FromArgb(235, 242, 252),
+                BackColor = SurfaceColor,
                 ForeColor = TextColor,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(4),
@@ -47,7 +49,7 @@ namespace DesktopApp_Project.GUI
         {
             button.FlatAppearance.BorderColor = BorderColor;
             button.FlatAppearance.MouseOverBackColor = AccentSoftColor;
-            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(191, 219, 254);
+            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(77, 68, 140);
         }
 
         public static Label Label(string text)
@@ -71,7 +73,7 @@ namespace DesktopApp_Project.GUI
                 Anchor = AnchorStyles.Left | AnchorStyles.Right,
                 Font = DefaultFont,
                 ForeColor = TextColor,
-                BackColor = SurfaceColor,
+                BackColor = SurfaceAltColor,
                 BorderStyle = BorderStyle.FixedSingle,
                 Margin = new Padding(4)
             };
@@ -86,7 +88,7 @@ namespace DesktopApp_Project.GUI
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = DefaultFont,
                 ForeColor = TextColor,
-                BackColor = SurfaceColor,
+                BackColor = SurfaceAltColor,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(4),
                 Anchor = AnchorStyles.Left | AnchorStyles.Right
@@ -104,7 +106,7 @@ namespace DesktopApp_Project.GUI
                 ReadOnly = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                BackgroundColor = Color.White,
+                BackgroundColor = AppBackgroundColor,
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
                 Font = DefaultFont,
                 BorderStyle = BorderStyle.None,
@@ -180,60 +182,131 @@ namespace DesktopApp_Project.GUI
 
         public static void ApplyPolish(Control root)
         {
+            ApplyDarkTheme(root);
+        }
+
+        public static void ApplyDarkTheme(Control root)
+        {
+            if (root == null)
+            {
+                return;
+            }
+
             foreach (Control control in EnumerateControls(root))
             {
-                control.Font = DefaultFont;
+                ApplyControlTheme(control);
+            }
+        }
 
-                var button = control as Button;
-                if (button != null)
-                {
-                    ApplyButtonStyle(button);
-                }
+        private static void ApplyControlTheme(Control control)
+        {
+            if (control is Form)
+            {
+                control.BackColor = AppBackgroundColor;
+                control.ForeColor = TextColor;
+            }
 
-                if (control is TableLayoutPanel || control is FlowLayoutPanel)
-                {
-                    control.BackColor = SurfaceColor;
-                }
+            if (control is TableLayoutPanel || control is FlowLayoutPanel)
+            {
+                control.BackColor = control.Parent is Form ? AppBackgroundColor : SurfaceColor;
+            }
 
-                var grid = control as DataGridView;
-                if (grid != null)
-                {
-                    ApplyGridStyle(grid);
-                }
+            var panel = control as Panel;
+            if (panel != null)
+            {
+                panel.BackColor = panel.Parent is Form ? AppBackgroundColor : SurfaceColor;
+            }
 
-                var date = control as DateTimePicker;
-                if (date != null)
+            var label = control as Label;
+            if (label != null)
+            {
+                label.ForeColor = TextColor;
+                if (label.Dock == DockStyle.Top || label.Height >= 40)
                 {
-                    date.Font = DefaultFont;
+                    label.BackColor = SurfaceAltColor;
                 }
+                else if (label.BackColor != Color.Transparent)
+                {
+                    label.BackColor = Color.Transparent;
+                }
+            }
 
-                var numeric = control as NumericUpDown;
-                if (numeric != null)
-                {
-                    numeric.Font = DefaultFont;
-                    numeric.BorderStyle = BorderStyle.FixedSingle;
-                }
+            var button = control as Button;
+            if (button != null)
+            {
+                button.Font = DefaultFont;
+                button.BackColor = SurfaceColor;
+                button.ForeColor = TextColor;
+                button.FlatStyle = FlatStyle.Flat;
+                ApplyButtonStyle(button);
+            }
 
-                var textBox = control as TextBox;
-                if (textBox != null)
-                {
-                    textBox.BorderStyle = BorderStyle.FixedSingle;
-                }
+            var textBox = control as TextBox;
+            if (textBox != null)
+            {
+                textBox.Font = DefaultFont;
+                textBox.BackColor = SurfaceAltColor;
+                textBox.ForeColor = TextColor;
+                textBox.BorderStyle = BorderStyle.FixedSingle;
+            }
+
+            var comboBox = control as ComboBox;
+            if (comboBox != null)
+            {
+                comboBox.Font = DefaultFont;
+                comboBox.BackColor = SurfaceAltColor;
+                comboBox.ForeColor = TextColor;
+                comboBox.FlatStyle = FlatStyle.Flat;
+            }
+
+            var date = control as DateTimePicker;
+            if (date != null)
+            {
+                date.Font = DefaultFont;
+                date.BackColor = SurfaceAltColor;
+                date.ForeColor = TextColor;
+                date.CalendarMonthBackground = SurfaceAltColor;
+                date.CalendarForeColor = TextColor;
+                date.CalendarTitleBackColor = SurfaceColor;
+                date.CalendarTitleForeColor = TextColor;
+            }
+
+            var numeric = control as NumericUpDown;
+            if (numeric != null)
+            {
+                numeric.Font = DefaultFont;
+                numeric.BackColor = SurfaceAltColor;
+                numeric.ForeColor = TextColor;
+                numeric.BorderStyle = BorderStyle.FixedSingle;
+            }
+
+            var checkBox = control as CheckBox;
+            if (checkBox != null)
+            {
+                checkBox.ForeColor = TextColor;
+            }
+
+            var grid = control as DataGridView;
+            if (grid != null)
+            {
+                ApplyGridStyle(grid);
             }
         }
 
         private static void ApplyGridStyle(DataGridView grid)
         {
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(238, 242, 247);
+            grid.BackgroundColor = AppBackgroundColor;
+            grid.GridColor = BorderColor;
+            grid.ColumnHeadersDefaultCellStyle.BackColor = SurfaceAltColor;
             grid.ColumnHeadersDefaultCellStyle.ForeColor = TextColor;
             grid.ColumnHeadersDefaultCellStyle.Font = new Font(DefaultFont, FontStyle.Bold);
-            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(238, 242, 247);
+            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = SurfaceAltColor;
             grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = TextColor;
             grid.DefaultCellStyle.BackColor = SurfaceColor;
             grid.DefaultCellStyle.ForeColor = TextColor;
             grid.DefaultCellStyle.SelectionBackColor = AccentSoftColor;
             grid.DefaultCellStyle.SelectionForeColor = TextColor;
-            grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(249, 250, 251);
+            grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(41, 40, 84);
         }
 
         private static IEnumerable<Control> EnumerateControls(Control root)
@@ -246,6 +319,20 @@ namespace DesktopApp_Project.GUI
                 {
                     yield return descendant;
                 }
+            }
+        }
+
+        public static void EnableDoubleBuffering(Control control)
+        {
+            if (control == null)
+            {
+                return;
+            }
+
+            var property = typeof(Control).GetProperty("DoubleBuffered", BindingFlags.Instance | BindingFlags.NonPublic);
+            if (property != null)
+            {
+                property.SetValue(control, true, null);
             }
         }
     }
@@ -280,6 +367,11 @@ namespace DesktopApp_Project.GUI
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            if (!IsInDesignMode)
+            {
+                UiHelpers.ApplyDarkTheme(this);
+            }
 
             if (_runtimeLoaded || !CanUseServices)
             {
