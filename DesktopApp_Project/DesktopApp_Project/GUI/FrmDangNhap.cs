@@ -1,9 +1,10 @@
+using DesktopApp_Project.BUS;
+using FontAwesome.Sharp;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using DesktopApp_Project.BUS;
-using FontAwesome.Sharp;
 
 namespace DesktopApp_Project.GUI
 {
@@ -11,11 +12,24 @@ namespace DesktopApp_Project.GUI
     {
         private readonly ServiceFactory _services = new ServiceFactory();
 
+        private const int WM_NCHITTEST = 0x0084;
+        private const int ResizeAreaSize = 10;
+
+        private const int HTCLIENT = 1;
+        private const int HTCAPTION = 2;
+        private const int HTLEFT = 10;
+        private const int HTRIGHT = 11;
+        private const int HTTOP = 12;
+        private const int HTTOPLEFT = 13;
+        private const int HTTOPRIGHT = 14;
+        private const int HTBOTTOM = 15;
+        private const int HTBOTTOMLEFT = 16;
+        private const int HTBOTTOMRIGHT = 17;
+
         public FrmDangNhap()
         {
             InitializeComponent();
             ApplyBaseStyle();
-            txtUsername.Focus();
             AcceptButton = btnLogin;
         }
 
@@ -52,6 +66,69 @@ namespace DesktopApp_Project.GUI
         private void FrmDangNhap_Paint(object sender, PaintEventArgs e)
         {
             DrawGradientBackground(sender, e);
+        }
+
+        [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        private static extern void ReleaseCapture();
+
+        [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        private static extern void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (m.Msg == WM_NCHITTEST && (int)m.Result == HTCLIENT)
+            {
+                var screenPoint = new Point(m.LParam.ToInt32());
+                var clientPoint = PointToClient(screenPoint);
+
+                if (clientPoint.Y <= ResizeAreaSize)
+                {
+                    if (clientPoint.X <= ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTTOPLEFT;
+                    }
+                    else if (clientPoint.X < Size.Width - ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTTOP;
+                    }
+                    else
+                    {
+                        m.Result = (IntPtr)HTTOPRIGHT;
+                    }
+                }
+                else if (clientPoint.Y <= Size.Height - ResizeAreaSize)
+                {
+                    if (clientPoint.X <= ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTLEFT;
+                    }
+                    else if (clientPoint.X > Width - ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTRIGHT;
+                    }
+                    else if (clientPoint.Y <= 40)
+                    {
+                        m.Result = (IntPtr)HTCAPTION;
+                    }
+                }
+                else
+                {
+                    if (clientPoint.X <= ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTBOTTOMLEFT;
+                    }
+                    else if (clientPoint.X < Size.Width - ResizeAreaSize)
+                    {
+                        m.Result = (IntPtr)HTBOTTOM;
+                    }
+                    else
+                    {
+                        m.Result = (IntPtr)HTBOTTOMRIGHT;
+                    }
+                }
+            }
         }
 
         private void lblUsername_Click(object sender, EventArgs e)
@@ -159,6 +236,22 @@ namespace DesktopApp_Project.GUI
                 frm.ShowDialog(this);
             }
             Close();
+        }
+
+        private void pnlMovingForm_MouseDown(object sender, MouseEventArgs e)
+        {
+            ReleaseCapture();
+            SendMessage(Handle, 0x112, 0xf012, 0);
+        }
+
+        private void btnMinimize_Click(object sender, EventArgs e)
+        {
+            WindowState = FormWindowState.Minimized;
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }
