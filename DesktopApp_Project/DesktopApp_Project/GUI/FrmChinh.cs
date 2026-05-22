@@ -415,6 +415,7 @@ namespace DesktopApp_Project.GUI
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
+
         }
     }
 }
