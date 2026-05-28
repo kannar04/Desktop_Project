@@ -1,7 +1,8 @@
 using System;
-using System.IO;
+using System.Diagnostics;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
@@ -21,6 +22,7 @@ namespace DesktopApp_Project.GUI
 
         protected override void OnRuntimeLoad()
         {
+            _cboLoai.DataSource = AppConstants.ReportTypes;
             UiHelpers.BindLopHoc(_cboLop, Services);
         }
 
@@ -41,14 +43,18 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXuat_Click(object sender, EventArgs e)
         {
-            using (var dialog = new SaveFileDialog { Filter = "Tệp CSV hoặc văn bản|*.csv;*.txt|Tệp Word RTF|*.rtf", FileName = "BaoCaoIELTS.csv" })
+            using (var dialog = new SaveFileDialog { Filter = "HTML report|*.html", FileName = "BaoCaoIELTS.html" })
             {
-                if (dialog.ShowDialog() == DialogResult.OK)
+                if (dialog.ShowDialog() != DialogResult.OK)
                 {
-                    var content = Path.GetExtension(dialog.FileName).Equals(".rtf", StringComparison.OrdinalIgnoreCase)
-                        ? "{\\rtf1\\ansi " + _txtNoiDung.Text.Replace(Environment.NewLine, "\\line ") + "}"
-                        : _txtNoiDung.Text;
-                    UiHelpers.ShowResult(Services.BaoCao.XuatBaoCao(content, dialog.FileName));
+                    return;
+                }
+
+                var result = Services.BaoCao.XuatBaoCao(_txtNoiDung.Text, dialog.FileName);
+                UiHelpers.ShowResult(result);
+                if (result.Success)
+                {
+                    Process.Start(dialog.FileName);
                 }
             }
         }

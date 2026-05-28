@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
@@ -8,6 +9,9 @@ namespace DesktopApp_Project.GUI
     public partial class FrmHocVien : ModuleFormBase
     {
         private int _selectedId;
+        private TextBox _txtLienHe;
+        private ComboBox _cboLopFilter;
+        private ComboBox _cboTrangThaiFilter;
 
         public FrmHocVien()
         {
@@ -22,12 +26,56 @@ namespace DesktopApp_Project.GUI
 
         protected override void OnRuntimeLoad()
         {
+            ConfigureFilters();
             LoadData();
+        }
+
+        private void ConfigureFilters()
+        {
+            _lblDesigner1.Text = "Tên";
+            _txtLienHe = UiHelpers.TextBox();
+            _txtLienHe.Width = 180;
+            _cboLopFilter = UiHelpers.ComboBox();
+            _cboLopFilter.Width = 180;
+            _cboTrangThaiFilter = UiHelpers.ComboBox();
+            _cboTrangThaiFilter.Width = 150;
+
+            var lopHoc = Services.LopHoc.LayDanhSach();
+            lopHoc.Insert(0, new LopHocDTO { MaLopHoc = 0, TenLop = AppConstants.FilterAll });
+            _cboLopFilter.DisplayMember = "TenLop";
+            _cboLopFilter.ValueMember = "MaLopHoc";
+            _cboLopFilter.DataSource = lopHoc;
+            _cboTrangThaiFilter.DataSource = AppConstants.StudentStatusFilters;
+
+            search.Controls.SetChildIndex(btnTim, search.Controls.Count - 1);
+            search.Controls.Add(UiHelpers.Label("SĐT/Email"));
+            search.Controls.Add(_txtLienHe);
+            search.Controls.Add(UiHelpers.Label("Lớp"));
+            search.Controls.Add(_cboLopFilter);
+            search.Controls.Add(UiHelpers.Label("Trạng thái"));
+            search.Controls.Add(_cboTrangThaiFilter);
+            search.Controls.SetChildIndex(btnTim, search.Controls.Count - 1);
         }
 
         private void LoadData()
         {
-            _grid.DataSource = Services.HocVien.TimKiem(_txtTim.Text);
+            int? maLopHoc = null;
+            if (_cboLopFilter != null && _cboLopFilter.SelectedValue != null)
+            {
+                int parsed;
+                if (int.TryParse(_cboLopFilter.SelectedValue.ToString(), out parsed) && parsed > 0)
+                {
+                    maLopHoc = parsed;
+                }
+            }
+
+            _grid.DataSource = Services.HocVien.TimKiem(new HocVienSearchCriteriaDTO
+            {
+                HoTen = _txtTim.Text,
+                LienHe = _txtLienHe == null ? null : _txtLienHe.Text,
+                MaLopHoc = maLopHoc,
+                TrangThai = _cboTrangThaiFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboTrangThaiFilter.SelectedItem)
+            });
         }
 
         private void FillFromGrid()

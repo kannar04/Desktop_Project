@@ -34,6 +34,7 @@ namespace DesktopApp_Project.BUS
             TuVung = new TuVungService(_repository);
             ThongBao = new ThongBaoService(_repository);
             HocPhi = new HocPhiService(_repository);
+            Dashboard = new DashboardService(_repository);
         }
 
         public AuthService Auth { get; private set; }
@@ -49,6 +50,7 @@ namespace DesktopApp_Project.BUS
         public TuVungService TuVung { get; private set; }
         public ThongBaoService ThongBao { get; private set; }
         public HocPhiService HocPhi { get; private set; }
+        public DashboardService Dashboard { get; private set; }
     }
 
     public abstract class ServiceBase
@@ -127,6 +129,11 @@ namespace DesktopApp_Project.BUS
         public List<NguoiDungDTO> TimKiem(string keyword)
         {
             return Repository.SearchHocVien(keyword);
+        }
+
+        public List<NguoiDungDTO> TimKiem(HocVienSearchCriteriaDTO criteria)
+        {
+            return Repository.SearchHocVien(criteria);
         }
 
         public ServiceResult Luu(NguoiDungDTO dto)
@@ -407,7 +414,7 @@ namespace DesktopApp_Project.BUS
                 }
 
                 var maBuoiHoc = Repository.GetOrCreateBuoiHoc(maLopHoc, ngayHoc);
-                var hocVien = Repository.GetHocVienTrongLop(maLopHoc);
+                var hocVien = Repository.GetHocVienLop(maLopHoc, true);
                 var daDiemDanh = Repository.GetDiemDanh(maBuoiHoc).ToDictionary(x => x.MaNguoiDung);
                 var result = new List<DiemDanhDTO>();
 
@@ -423,6 +430,12 @@ namespace DesktopApp_Project.BUS
                             HoTen = hv.HoTen,
                             TrangThai = "Có mặt"
                         };
+                        dto.CoMat = false;
+                        dto.TrangThai = AppConstants.AttendanceAbsent;
+                    }
+                    else
+                    {
+                        dto.CoMat = dto.TrangThai == AppConstants.AttendancePresent || dto.TrangThai == AppConstants.AttendanceLate;
                     }
 
                     dto.TiLeChuyenCan = Repository.TinhTiLeChuyenCan(hv.MaNguoiDung, maLopHoc);
@@ -437,6 +450,7 @@ namespace DesktopApp_Project.BUS
         {
             return Try(() =>
             {
+                dto.TrangThai = dto.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
                 if (!AppConstants.AttendanceStatuses.Contains(dto.TrangThai))
                 {
                     return ServiceResult.Fail("Vui lòng chọn trạng thái điểm danh hợp lệ.");
@@ -444,6 +458,31 @@ namespace DesktopApp_Project.BUS
 
                 Repository.LuuDiemDanh(dto);
                 return ServiceResult.Ok("Lưu điểm danh thành công.");
+            });
+        }
+
+        public ServiceResult LuuTatCa(IEnumerable<DiemDanhDTO> danhSach)
+        {
+            return Try(() =>
+            {
+                var rows = (danhSach ?? Enumerable.Empty<DiemDanhDTO>()).ToList();
+                if (rows.Count == 0)
+                {
+                    return ServiceResult.Fail("Không có học viên để lưu điểm danh.");
+                }
+
+                foreach (var row in rows)
+                {
+                    row.TrangThai = row.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
+                    row.LyDoVang = row.CoMat ? string.Empty : row.LyDoVang;
+                    if (row.MaNguoiDung <= 0 || row.MaBuoiHoc <= 0)
+                    {
+                        return ServiceResult.Fail("Dữ liệu điểm danh không hợp lệ.");
+                    }
+                }
+
+                Repository.LuuDiemDanh(rows);
+                return ServiceResult.Ok("Đã lưu điểm danh cho toàn bộ lớp.");
             });
         }
     }
@@ -520,6 +559,30 @@ namespace DesktopApp_Project.BUS
             return Repository.GetCauHoi(keyword);
         }
 
+        public ServiceResult<List<CauHoiDTO>> LayCauHoi(CauHoiSearchCriteriaDTO criteria)
+        {
+            return Try(() =>
+            {
+                criteria = criteria ?? new CauHoiSearchCriteriaDTO();
+                if (criteria.BandTu.HasValue && !ValidationHelper.IsValidIeltsScore(criteria.BandTu))
+                {
+                    return ServiceResult<List<CauHoiDTO>>.Fail("Band bắt đầu không hợp lệ.");
+                }
+
+                if (criteria.BandDen.HasValue && !ValidationHelper.IsValidIeltsScore(criteria.BandDen))
+                {
+                    return ServiceResult<List<CauHoiDTO>>.Fail("Band kết thúc không hợp lệ.");
+                }
+
+                if (criteria.BandTu.HasValue && criteria.BandDen.HasValue && criteria.BandTu.Value > criteria.BandDen.Value)
+                {
+                    return ServiceResult<List<CauHoiDTO>>.Fail("Band bắt đầu không được lớn hơn band kết thúc.");
+                }
+
+                return ServiceResult<List<CauHoiDTO>>.Ok(Repository.SearchCauHoi(criteria), "Tải câu hỏi thành công.");
+            });
+        }
+
         public ServiceResult<int> TaoDeThi(DeThiDTO dto)
         {
             return Try(() =>
@@ -541,6 +604,11 @@ namespace DesktopApp_Project.BUS
                 if (ValidationHelper.IsBlank(dto.NoiDung) || !ValidationHelper.IsValidSkill(dto.NhanKyNang))
                 {
                     return ServiceResult.Fail("Nội dung câu hỏi và nhãn kỹ năng không hợp lệ.");
+                }
+
+                if (!ValidationHelper.IsValidIeltsScore(dto.BandLevel))
+                {
+                    return ServiceResult.Fail("Band câu hỏi phải nằm trong khoảng 0 đến 9 và theo bước 0.5.");
                 }
 
                 if (dto.MaCauHoi == 0)
@@ -586,6 +654,18 @@ namespace DesktopApp_Project.BUS
         {
             return Try(() =>
             {
+                if (AppConstants.ReportTypes.Contains(dto.LoaiBaoCao))
+                {
+                    var htmlResult = TaoBaoCaoHtml(dto);
+                    if (!htmlResult.Success)
+                    {
+                        return htmlResult;
+                    }
+
+                    Repository.GhiNhatKyBaoCao(maNguoiDungLapBaoCao, dto.LoaiBaoCao, "MaLopHoc=" + dto.MaLopHoc);
+                    return ServiceResult<string>.Ok(htmlResult.Data, "Tạo báo cáo HTML thành công.");
+                }
+
                 var builder = new StringBuilder();
                 builder.AppendLine("BÁO CÁO QUẢN LÝ LỚP IELTS");
                 builder.AppendLine("Loại báo cáo: " + dto.LoaiBaoCao);
@@ -629,6 +709,76 @@ namespace DesktopApp_Project.BUS
             });
         }
 
+        private ServiceResult<string> TaoBaoCaoHtml(BaoCaoDTO dto)
+        {
+            if ((dto.LoaiBaoCao == "Chuyên cần" || dto.LoaiBaoCao == "Cuối kỳ") && (!dto.MaLopHoc.HasValue || dto.MaLopHoc.Value <= 0))
+            {
+                return ServiceResult<string>.Fail("Vui lòng chọn lớp cho báo cáo này.");
+            }
+
+            var builder = new StringBuilder();
+            builder.AppendLine("<!doctype html><html><head><meta charset=\"utf-8\"><title>Báo cáo IELTS</title>");
+            builder.AppendLine("<style>body{font-family:Segoe UI,Arial,sans-serif;margin:24px;color:#222}table{border-collapse:collapse;width:100%;margin-top:16px}th,td{border:1px solid #ddd;padding:8px;text-align:left}th{background:#2A2A3E;color:#EAEAEA}.muted{color:#666}</style>");
+            builder.AppendLine("</head><body>");
+            builder.AppendLine("<h1>Báo cáo quản lý lớp IELTS</h1>");
+            builder.AppendLine("<p class=\"muted\">Loại báo cáo: " + Html(dto.LoaiBaoCao) + " | Thời gian tạo: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm") + "</p>");
+
+            if (dto.LoaiBaoCao == "Điểm số")
+            {
+                builder.AppendLine("<table><tr><th>Lớp</th><th>Học viên</th><th>Đợt kiểm tra</th><th>Điểm</th><th>Band estimate</th><th>Nhận xét</th></tr>");
+                foreach (var row in Repository.GetBaoCaoDiem(dto.MaLopHoc))
+                {
+                    builder.AppendLine("<tr><td>" + Html(row.TenLop) + "</td><td>" + Html(row.HoTen) + "</td><td>" + Html(row.TenDotKiemTra) + "</td><td>" + Html(FormatScore(row.DiemTong)) + "</td><td>" + Html(FormatScore(row.DiemTong)) + "</td><td>" + Html(row.NhanXet) + "</td></tr>");
+                }
+                builder.AppendLine("</table>");
+            }
+            else if (dto.LoaiBaoCao == "Bài tập")
+            {
+                builder.AppendLine("<table><tr><th>Học viên</th><th>Bài tập</th><th>Hạn nộp</th><th>Trạng thái</th></tr>");
+                foreach (var row in Repository.GetBaoCaoBaiTap(dto.MaLopHoc))
+                {
+                    builder.AppendLine("<tr><td>" + Html(row.HoTen) + "</td><td>" + Html(row.TieuDe) + "</td><td>" + row.Deadline.ToString("dd/MM/yyyy") + "</td><td>" + Html(row.TrangThaiNop) + "</td></tr>");
+                }
+                builder.AppendLine("</table>");
+            }
+            else if (dto.LoaiBaoCao == "Chuyên cần")
+            {
+                builder.AppendLine("<table><tr><th>Học viên</th><th>Có mặt</th><th>Vắng</th><th>Tỉ lệ</th></tr>");
+                foreach (var row in Repository.GetBaoCaoChuyenCan(dto.MaLopHoc.Value))
+                {
+                    builder.AppendLine("<tr><td>" + Html(row.HoTen) + "</td><td>" + row.SoBuoiCoMat + "</td><td>" + row.SoBuoiVang + "</td><td>" + row.TiLeChuyenCan.ToString("0.##") + "%</td></tr>");
+                }
+                builder.AppendLine("</table>");
+            }
+            else if (dto.LoaiBaoCao == "Cuối kỳ")
+            {
+                builder.AppendLine("<table><tr><th>Học viên</th><th>Đợt kiểm tra</th><th>Điểm</th><th>Trung bình</th><th>Nhận xét giáo viên</th></tr>");
+                foreach (var row in Repository.GetBaoCaoCuoiKy(dto.MaLopHoc.Value))
+                {
+                    builder.AppendLine("<tr><td>" + Html(row.HoTen) + "</td><td>" + Html(row.TenDotKiemTra) + "</td><td>" + Html(FormatScore(row.DiemTong)) + "</td><td>" + Html(FormatScore(row.DiemTrungBinh)) + "</td><td>" + Html(row.NhanXet) + "</td></tr>");
+                }
+                builder.AppendLine("</table>");
+            }
+
+            builder.AppendLine("</body></html>");
+            return ServiceResult<string>.Ok(builder.ToString(), "OK");
+        }
+
+        private static string FormatScore(decimal? score)
+        {
+            return score.HasValue ? score.Value.ToString("0.0") : string.Empty;
+        }
+
+        private static string Html(string value)
+        {
+            if (value == null)
+            {
+                return string.Empty;
+            }
+
+            return value.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;").Replace("\"", "&quot;");
+        }
+
         public ServiceResult XuatBaoCao(string noiDung, string filePath)
         {
             return Try(() =>
@@ -653,15 +803,35 @@ namespace DesktopApp_Project.BUS
             return Repository.GetTuVung(maLopHoc);
         }
 
+        public List<TuVungDTO> TimKiem(TuVungSearchCriteriaDTO criteria)
+        {
+            return Repository.SearchTuVung(criteria);
+        }
+
         public ServiceResult Luu(TuVungDTO dto)
         {
             return Try(() =>
             {
+                if (ValidationHelper.IsBlank(dto.CapDo))
+                {
+                    dto.CapDo = "B1";
+                }
+
+                if (ValidationHelper.IsBlank(dto.ChuDe))
+                {
+                    dto.ChuDe = "Academic/IELTS General";
+                }
+
                 if (dto.MaLopHoc <= 0 || ValidationHelper.IsBlank(dto.TuTiengAnh) ||
                     ValidationHelper.IsBlank(dto.TuLoai) || ValidationHelper.IsBlank(dto.PhienAm) ||
                     ValidationHelper.IsBlank(dto.Nghia))
                 {
                     return ServiceResult.Fail("Vui lòng nhập đầy đủ thông tin từ vựng.");
+                }
+
+                if (!AppConstants.CefrLevels.Contains(dto.CapDo))
+                {
+                    return ServiceResult.Fail("Cấp độ CEFR không hợp lệ.");
                 }
 
                 if (Repository.ExistsTuVungTrongLop(dto.TuTiengAnh.Trim(), dto.MaLopHoc, dto.MaTuVung))
@@ -742,6 +912,71 @@ namespace DesktopApp_Project.BUS
             return Repository.GetHocPhi();
         }
 
+        public List<ThanhToanHocPhiDTO> LayDanhSach(int? maLopHoc)
+        {
+            return Repository.GetHocPhi(maLopHoc, null, null);
+        }
+
+        public ServiceResult<List<HocPhiTinhDTO>> TinhTheoLop(int maLopHoc, decimal soTienGoc)
+        {
+            return Try(() =>
+            {
+                if (maLopHoc <= 0)
+                {
+                    return ServiceResult<List<HocPhiTinhDTO>>.Fail("Vui lòng chọn lớp.");
+                }
+
+                if (soTienGoc <= 0)
+                {
+                    return ServiceResult<List<HocPhiTinhDTO>>.Fail("Số tiền gốc phải lớn hơn 0.");
+                }
+
+                var rows = TinhHocPhi(maLopHoc, soTienGoc);
+                return ServiceResult<List<HocPhiTinhDTO>>.Ok(rows, "Đã tính học phí cho lớp.");
+            });
+        }
+
+        public ServiceResult TaoYeuCauTheoLop(int maLopHoc, decimal soTienGoc, string thongTinNganHang)
+        {
+            return Try(() =>
+            {
+                if (maLopHoc <= 0)
+                {
+                    return ServiceResult.Fail("Vui lòng chọn lớp.");
+                }
+
+                if (soTienGoc <= 0 || ValidationHelper.IsBlank(thongTinNganHang))
+                {
+                    return ServiceResult.Fail("Vui lòng nhập số tiền gốc và thông tin ngân hàng.");
+                }
+
+                var rows = TinhHocPhi(maLopHoc, soTienGoc);
+                if (rows.Count == 0)
+                {
+                    return ServiceResult.Fail("Lớp không có học viên đang học để tạo học phí.");
+                }
+
+                var now = DateTime.Now;
+                var payments = rows.Select(x => new ThanhToanHocPhiDTO
+                {
+                    MaNguoiDung = x.MaNguoiDung,
+                    MaLopHoc = x.MaLopHoc,
+                    SoTien = x.SoTienCuoi,
+                    SoTienGoc = x.SoTienGoc,
+                    PhanTramGiam = x.PhanTramGiam,
+                    SoTienGiam = x.SoTienGiam,
+                    SoTienCuoi = x.SoTienCuoi,
+                    ThongTinNganHang = thongTinNganHang.Trim(),
+                    NgayTao = now,
+                    HanThanhToan = now.AddDays(AppConstants.HocPhiDeadlineDays),
+                    TrangThai = AppConstants.PaymentPending
+                }).ToList();
+
+                Repository.InsertHocPhiBulk(payments);
+                return ServiceResult.Ok("Đã tạo phiếu học phí cho " + payments.Count + " học viên.");
+            });
+        }
+
         public ServiceResult TaoYeuCau(ThanhToanHocPhiDTO dto)
         {
             return Try(() =>
@@ -754,6 +989,9 @@ namespace DesktopApp_Project.BUS
                 dto.NgayTao = DateTime.Now;
                 dto.HanThanhToan = DateTime.Now.AddDays(AppConstants.HocPhiDeadlineDays);
                 dto.TrangThai = "Chờ thanh toán";
+                dto.SoTienGoc = dto.SoTienGoc ?? dto.SoTien;
+                dto.SoTienCuoi = dto.SoTienCuoi ?? dto.SoTien;
+                dto.TrangThai = AppConstants.PaymentPending;
                 Repository.InsertHocPhi(dto);
                 return ServiceResult.Ok("Tạo yêu cầu thanh toán học phí thành công. Hạn thanh toán là 10 ngày.");
             });
@@ -763,7 +1001,7 @@ namespace DesktopApp_Project.BUS
         {
             return Try(() =>
             {
-                if (ValidationHelper.IsBlank(trangThai))
+                if (ValidationHelper.IsBlank(trangThai) || !AppConstants.PaymentStatuses.Contains(trangThai))
                 {
                     return ServiceResult.Fail("Trạng thái học phí không hợp lệ.");
                 }
@@ -771,6 +1009,51 @@ namespace DesktopApp_Project.BUS
                 Repository.UpdateTrangThaiHocPhi(maThanhToan, trangThai);
                 return ServiceResult.Ok("Cập nhật trạng thái học phí thành công.");
             });
+        }
+
+        private List<HocPhiTinhDTO> TinhHocPhi(int maLopHoc, decimal soTienGoc)
+        {
+            var today = DateTime.Today;
+            return Repository.GetHocVienLop(maLopHoc, true).Select(hv =>
+            {
+                var discount = hv.NgayVaoLop.Date <= today.AddYears(-AppConstants.LongTermTuitionDiscountYears)
+                    ? AppConstants.LongTermTuitionDiscountPercent
+                    : 0m;
+                var discountAmount = Math.Round(soTienGoc * discount / 100m, 0);
+                return new HocPhiTinhDTO
+                {
+                    MaNguoiDung = hv.MaNguoiDung,
+                    MaLopHoc = hv.MaLopHoc,
+                    HoTen = hv.HoTen,
+                    NgayVaoLop = hv.NgayVaoLop,
+                    SoTienGoc = soTienGoc,
+                    PhanTramGiam = discount,
+                    SoTienGiam = discountAmount,
+                    SoTienCuoi = soTienGoc - discountAmount,
+                    TrangThai = hv.TrangThai,
+                    GhiChu = discount > 0 ? "Giảm 20% do học trên 2 năm" : string.Empty
+                };
+            }).ToList();
+        }
+    }
+
+    public class DashboardService : ServiceBase
+    {
+        public DashboardService(IQuanLyIeltsRepository repository) : base(repository) { }
+
+        public ServiceResult<DashboardSummaryDTO> LayTongQuan()
+        {
+            return Try(() => ServiceResult<DashboardSummaryDTO>.Ok(Repository.GetDashboardSummary(DateTime.Today), "Tải tổng quan thành công."));
+        }
+
+        public ServiceResult<List<MonthlyRevenueDTO>> LayDoanhThuThang(int soThang)
+        {
+            return Try(() => ServiceResult<List<MonthlyRevenueDTO>>.Ok(Repository.GetRevenueByMonth(soThang, DateTime.Today), "Tải doanh thu thành công."));
+        }
+
+        public ServiceResult<List<WeeklyScheduleDTO>> LayLichHocTuan()
+        {
+            return Try(() => ServiceResult<List<WeeklyScheduleDTO>>.Ok(Repository.GetWeeklySchedule(DateTime.Today), "Tải lịch học tuần thành công."));
         }
     }
 }

@@ -80,6 +80,54 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public List<NguoiDungDTO> SearchHocVien(HocVienSearchCriteriaDTO criteria)
+        {
+            using (var db = _factory.Create())
+            {
+                criteria = criteria ?? new HocVienSearchCriteriaDTO();
+                var query = db.NguoiDungs.Where(x => x.VaiTro == AppConstants.RoleStudent);
+
+                if (!string.IsNullOrWhiteSpace(criteria.HoTen))
+                {
+                    var keyword = criteria.HoTen.Trim();
+                    query = query.Where(x => x.HoTen.Contains(keyword));
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.LienHe))
+                {
+                    var lienHe = criteria.LienHe.Trim();
+                    query = query.Where(x => x.SDT.Contains(lienHe) || x.Email.Contains(lienHe));
+                }
+
+                if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
+                {
+                    var maLopHoc = criteria.MaLopHoc.Value;
+                    query = query.Where(x => db.ChiTietLopHocs.Any(ct => ct.MaNguoiDung == x.MaNguoiDung && ct.MaLopHoc == maLopHoc));
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.TrangThai) && criteria.TrangThai != AppConstants.FilterAll)
+                {
+                    var trangThai = criteria.TrangThai.Trim();
+                    if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
+                    {
+                        var maLopHoc = criteria.MaLopHoc.Value;
+                        query = query.Where(x => db.ChiTietLopHocs.Any(ct =>
+                            ct.MaNguoiDung == x.MaNguoiDung
+                            && ct.MaLopHoc == maLopHoc
+                            && ct.TrangThai == trangThai));
+                    }
+                    else
+                    {
+                        query = query.Where(x => db.ChiTietLopHocs.Any(ct =>
+                            ct.MaNguoiDung == x.MaNguoiDung
+                            && ct.TrangThai == trangThai));
+                    }
+                }
+
+                return query.OrderBy(x => x.HoTen).AsEnumerable().Select(DtoMapper.ToDto).ToList();
+            }
+        }
+
         public int InsertNguoiDung(NguoiDungDTO dto)
         {
             using (var db = _factory.Create())
@@ -228,6 +276,40 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public List<HocVienLopDTO> GetHocVienLop(int maLopHoc, bool onlyActive)
+        {
+            using (var db = _factory.Create())
+            {
+                var query =
+                    from ct in db.ChiTietLopHocs
+                    join nd in db.NguoiDungs on ct.MaNguoiDung equals nd.MaNguoiDung
+                    where ct.MaLopHoc == maLopHoc && nd.VaiTro == AppConstants.RoleStudent
+                    select new
+                    {
+                        ct,
+                        nd
+                    };
+
+                if (onlyActive)
+                {
+                    query = query.Where(x => x.ct.TrangThai == AppConstants.EnrollmentActive && x.ct.NgayNghiHoc == null);
+                }
+
+                return query.AsEnumerable().Select(x => new HocVienLopDTO
+                {
+                    MaNguoiDung = x.nd.MaNguoiDung,
+                    MaLopHoc = x.ct.MaLopHoc,
+                    HoTen = x.nd.HoTen,
+                    SDT = x.nd.SDT,
+                    Email = x.nd.Email,
+                    NgayVaoLop = x.ct.NgayVaoLop,
+                    NgayNghiHoc = x.ct.NgayNghiHoc,
+                    TrangThai = x.ct.TrangThai,
+                    DangHoc = x.ct.TrangThai == AppConstants.EnrollmentActive && !x.ct.NgayNghiHoc.HasValue
+                }).OrderBy(x => x.HoTen).ToList();
+            }
+        }
+
         public List<NguoiDungDTO> GetHocVienChuaTrongLop(int maLopHoc)
         {
             using (var db = _factory.Create())
@@ -249,7 +331,13 @@ namespace DesktopApp_Project.DAL
             {
                 if (!db.ChiTietLopHocs.Any(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc))
                 {
-                    db.ChiTietLopHocs.InsertOnSubmit(new ChiTietLopHocEntity { MaNguoiDung = maNguoiDung, MaLopHoc = maLopHoc });
+                    db.ChiTietLopHocs.InsertOnSubmit(new ChiTietLopHocEntity
+                    {
+                        MaNguoiDung = maNguoiDung,
+                        MaLopHoc = maLopHoc,
+                        NgayVaoLop = DateTime.Today,
+                        TrangThai = AppConstants.EnrollmentActive
+                    });
                     db.SubmitChanges();
                 }
             }
@@ -488,6 +576,7 @@ namespace DesktopApp_Project.DAL
                         MaNguoiDung = dd.MaNguoiDung,
                         MaBuoiHoc = dd.MaBuoiHoc,
                         HoTen = nd.HoTen,
+                        CoMat = dd.TrangThai == AppConstants.AttendancePresent || dd.TrangThai == AppConstants.AttendanceLate,
                         TrangThai = dd.TrangThai,
                         LyDoVang = dd.LyDoVang
                     };
@@ -513,6 +602,31 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public void LuuDiemDanh(IEnumerable<DiemDanhDTO> danhSach)
+        {
+            using (var db = _factory.Create())
+            {
+                foreach (var dto in danhSach)
+                {
+                    var entity = db.ChiTietDiemDanhs.FirstOrDefault(x => x.MaNguoiDung == dto.MaNguoiDung && x.MaBuoiHoc == dto.MaBuoiHoc);
+                    if (entity == null)
+                    {
+                        entity = new ChiTietDiemDanhEntity
+                        {
+                            MaNguoiDung = dto.MaNguoiDung,
+                            MaBuoiHoc = dto.MaBuoiHoc
+                        };
+                        db.ChiTietDiemDanhs.InsertOnSubmit(entity);
+                    }
+
+                    entity.TrangThai = dto.TrangThai;
+                    entity.LyDoVang = dto.LyDoVang;
+                }
+
+                db.SubmitChanges();
+            }
+        }
+
         public decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc)
         {
             using (var db = _factory.Create())
@@ -521,6 +635,15 @@ namespace DesktopApp_Project.DAL
                 if (buoiIds.Count == 0)
                 {
                     return 0m;
+                }
+
+                var soBuoiCoMatTheoHangSo = db.ChiTietDiemDanhs.Count(x =>
+                    x.MaNguoiDung == maNguoiDung
+                    && buoiIds.Contains(x.MaBuoiHoc)
+                    && (x.TrangThai == AppConstants.AttendancePresent || x.TrangThai == AppConstants.AttendanceLate));
+                if (soBuoiCoMatTheoHangSo >= 0)
+                {
+                    return Math.Round(soBuoiCoMatTheoHangSo * 100m / buoiIds.Count, 2);
                 }
 
                 var soBuoiCoMat = db.ChiTietDiemDanhs.Count(x =>
@@ -565,11 +688,48 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public List<CauHoiDTO> SearchCauHoi(CauHoiSearchCriteriaDTO criteria)
+        {
+            using (var db = _factory.Create())
+            {
+                criteria = criteria ?? new CauHoiSearchCriteriaDTO();
+                var query = db.CauHois.AsQueryable();
+
+                if (!string.IsNullOrWhiteSpace(criteria.NhanKyNang) && criteria.NhanKyNang != AppConstants.FilterAll)
+                {
+                    var skill = criteria.NhanKyNang.Trim();
+                    query = query.Where(x => x.NhanKyNang == skill);
+                }
+
+                if (criteria.BandTu.HasValue)
+                {
+                    query = query.Where(x => x.BandLevel.HasValue && x.BandLevel.Value >= criteria.BandTu.Value);
+                }
+
+                if (criteria.BandDen.HasValue)
+                {
+                    query = query.Where(x => x.BandLevel.HasValue && x.BandLevel.Value <= criteria.BandDen.Value);
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.Keyword))
+                {
+                    var keyword = criteria.Keyword.Trim();
+                    query = query.Where(x => x.NoiDung.Contains(keyword) || x.DapAn.Contains(keyword));
+                }
+
+                return query.OrderBy(x => x.NhanKyNang)
+                    .ThenBy(x => x.BandLevel)
+                    .AsEnumerable()
+                    .Select(DtoMapper.ToDto)
+                    .ToList();
+            }
+        }
+
         public int InsertCauHoi(CauHoiDTO dto)
         {
             using (var db = _factory.Create())
             {
-                var entity = new CauHoiEntity { NoiDung = dto.NoiDung, DapAn = dto.DapAn, NhanKyNang = dto.NhanKyNang };
+                var entity = new CauHoiEntity { NoiDung = dto.NoiDung, DapAn = dto.DapAn, NhanKyNang = dto.NhanKyNang, BandLevel = dto.BandLevel };
                 db.CauHois.InsertOnSubmit(entity);
                 db.SubmitChanges();
                 return entity.MaCauHoi;
@@ -584,6 +744,7 @@ namespace DesktopApp_Project.DAL
                 entity.NoiDung = dto.NoiDung;
                 entity.DapAn = dto.DapAn;
                 entity.NhanKyNang = dto.NhanKyNang;
+                entity.BandLevel = dto.BandLevel;
                 db.SubmitChanges();
             }
         }
@@ -706,6 +867,52 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public List<TuVungDTO> SearchTuVung(TuVungSearchCriteriaDTO criteria)
+        {
+            using (var db = _factory.Create())
+            {
+                criteria = criteria ?? new TuVungSearchCriteriaDTO();
+                var query = db.TuVungs.AsQueryable();
+
+                if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
+                {
+                    query = query.Where(x => x.MaLopHoc == criteria.MaLopHoc.Value);
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.Keyword))
+                {
+                    var keyword = criteria.Keyword.Trim();
+                    query = query.Where(x => x.TuTiengAnh.Contains(keyword) || x.Nghia.Contains(keyword));
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.TuLoai) && criteria.TuLoai != AppConstants.FilterAll)
+                {
+                    var tuLoai = criteria.TuLoai.Trim();
+                    query = query.Where(x => x.TuLoai == tuLoai);
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.CapDo) && criteria.CapDo != AppConstants.FilterAll)
+                {
+                    var capDo = criteria.CapDo.Trim();
+                    query = query.Where(x => x.CapDo == capDo);
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.ChuDe) && criteria.ChuDe != AppConstants.FilterAll)
+                {
+                    var chuDe = criteria.ChuDe.Trim();
+                    query = query.Where(x => x.ChuDe == chuDe);
+                }
+
+                if (!string.IsNullOrWhiteSpace(criteria.ChuCaiDau) && criteria.ChuCaiDau != AppConstants.FilterAll)
+                {
+                    var chuCaiDau = criteria.ChuCaiDau.Trim();
+                    query = query.Where(x => x.TuTiengAnh.StartsWith(chuCaiDau));
+                }
+
+                return query.OrderBy(x => x.TuTiengAnh).AsEnumerable().Select(DtoMapper.ToDto).ToList();
+            }
+        }
+
         public bool ExistsTuVungTrongLop(string tuTiengAnh, int maLopHoc, int exceptId)
         {
             using (var db = _factory.Create())
@@ -724,7 +931,9 @@ namespace DesktopApp_Project.DAL
                     TuTiengAnh = dto.TuTiengAnh,
                     TuLoai = dto.TuLoai,
                     PhienAm = dto.PhienAm,
-                    Nghia = dto.Nghia
+                    Nghia = dto.Nghia,
+                    CapDo = dto.CapDo,
+                    ChuDe = dto.ChuDe
                 };
                 db.TuVungs.InsertOnSubmit(entity);
                 db.SubmitChanges();
@@ -742,6 +951,8 @@ namespace DesktopApp_Project.DAL
                 entity.TuLoai = dto.TuLoai;
                 entity.PhienAm = dto.PhienAm;
                 entity.Nghia = dto.Nghia;
+                entity.CapDo = dto.CapDo;
+                entity.ChuDe = dto.ChuDe;
                 db.SubmitChanges();
             }
         }
@@ -829,25 +1040,53 @@ namespace DesktopApp_Project.DAL
 
         public List<ThanhToanHocPhiDTO> GetHocPhi()
         {
+            return GetHocPhi(null, null, null);
+        }
+
+        public List<ThanhToanHocPhiDTO> GetHocPhi(int? maLopHoc, DateTime? tuNgay, DateTime? denNgay)
+        {
             using (var db = _factory.Create())
             {
                 var query =
                     from hp in db.ThanhToanHocPhis
                     join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
-                    orderby hp.HanThanhToan descending
+                    join lop in db.LopHocs on hp.MaLopHoc equals (int?)lop.MaLopHoc into lopJoin
+                    from lop in lopJoin.DefaultIfEmpty()
                     select new ThanhToanHocPhiDTO
                     {
                         MaThanhToan = hp.MaThanhToan,
                         MaNguoiDung = hp.MaNguoiDung,
+                        MaLopHoc = hp.MaLopHoc,
                         HoTen = nd.HoTen,
+                        TenLop = lop == null ? string.Empty : lop.TenLop,
                         SoTien = hp.SoTien,
+                        SoTienGoc = hp.SoTienGoc,
+                        PhanTramGiam = hp.PhanTramGiam,
+                        SoTienGiam = hp.SoTienGiam,
+                        SoTienCuoi = hp.SoTienCuoi,
                         ThongTinNganHang = hp.ThongTinNganHang,
                         NgayTao = hp.NgayTao,
                         HanThanhToan = hp.HanThanhToan,
                         TrangThai = hp.TrangThai
                     };
 
-                return query.ToList();
+                if (maLopHoc.HasValue && maLopHoc.Value > 0)
+                {
+                    query = query.Where(x => x.MaLopHoc == maLopHoc.Value);
+                }
+
+                if (tuNgay.HasValue)
+                {
+                    query = query.Where(x => x.NgayTao >= tuNgay.Value.Date);
+                }
+
+                if (denNgay.HasValue)
+                {
+                    var den = denNgay.Value.Date.AddDays(1);
+                    query = query.Where(x => x.NgayTao < den);
+                }
+
+                return query.OrderByDescending(x => x.HanThanhToan).ToList();
             }
         }
 
@@ -858,7 +1097,12 @@ namespace DesktopApp_Project.DAL
                 var entity = new ThanhToanHocPhiEntity
                 {
                     MaNguoiDung = dto.MaNguoiDung,
+                    MaLopHoc = dto.MaLopHoc,
                     SoTien = dto.SoTien,
+                    SoTienGoc = dto.SoTienGoc,
+                    PhanTramGiam = dto.PhanTramGiam,
+                    SoTienGiam = dto.SoTienGiam,
+                    SoTienCuoi = dto.SoTienCuoi,
                     ThongTinNganHang = dto.ThongTinNganHang,
                     NgayTao = DateTime.Now,
                     HanThanhToan = dto.HanThanhToan,
@@ -870,6 +1114,32 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public void InsertHocPhiBulk(IEnumerable<ThanhToanHocPhiDTO> danhSach)
+        {
+            using (var db = _factory.Create())
+            {
+                foreach (var dto in danhSach)
+                {
+                    db.ThanhToanHocPhis.InsertOnSubmit(new ThanhToanHocPhiEntity
+                    {
+                        MaNguoiDung = dto.MaNguoiDung,
+                        MaLopHoc = dto.MaLopHoc,
+                        SoTien = dto.SoTien,
+                        SoTienGoc = dto.SoTienGoc,
+                        PhanTramGiam = dto.PhanTramGiam,
+                        SoTienGiam = dto.SoTienGiam,
+                        SoTienCuoi = dto.SoTienCuoi,
+                        ThongTinNganHang = dto.ThongTinNganHang,
+                        NgayTao = dto.NgayTao,
+                        HanThanhToan = dto.HanThanhToan,
+                        TrangThai = dto.TrangThai
+                    });
+                }
+
+                db.SubmitChanges();
+            }
+        }
+
         public void UpdateTrangThaiHocPhi(int maThanhToan, string trangThai)
         {
             using (var db = _factory.Create())
@@ -877,6 +1147,217 @@ namespace DesktopApp_Project.DAL
                 var entity = db.ThanhToanHocPhis.First(x => x.MaThanhToan == maThanhToan);
                 entity.TrangThai = trangThai;
                 db.SubmitChanges();
+            }
+        }
+
+        public DashboardSummaryDTO GetDashboardSummary(DateTime today)
+        {
+            using (var db = _factory.Create())
+            {
+                var start = new DateTime(today.Year, today.Month, 1);
+                var end = start.AddMonths(1);
+                var paidThisMonth = db.ThanhToanHocPhis
+                    .Where(x => x.TrangThai == AppConstants.PaymentPaid && x.NgayTao >= start && x.NgayTao < end)
+                    .AsEnumerable()
+                    .Sum(x => x.SoTienCuoi.HasValue ? x.SoTienCuoi.Value : x.SoTien);
+
+                return new DashboardSummaryDTO
+                {
+                    TongHocVien = db.NguoiDungs.Count(x => x.VaiTro == AppConstants.RoleStudent),
+                    HocVienDangHoc = db.ChiTietLopHocs
+                        .Where(x => x.TrangThai == AppConstants.EnrollmentActive && x.NgayNghiHoc == null)
+                        .Select(x => x.MaNguoiDung)
+                        .Distinct()
+                        .Count(),
+                    DoanhThuThangNay = paidThisMonth,
+                    TongLopHoc = db.LopHocs.Count()
+                };
+            }
+        }
+
+        public List<MonthlyRevenueDTO> GetRevenueByMonth(int months, DateTime today)
+        {
+            using (var db = _factory.Create())
+            {
+                months = Math.Max(1, months);
+                var firstMonth = new DateTime(today.Year, today.Month, 1).AddMonths(-(months - 1));
+                var paid = db.ThanhToanHocPhis
+                    .Where(x => x.TrangThai == AppConstants.PaymentPaid && x.NgayTao >= firstMonth)
+                    .AsEnumerable()
+                    .GroupBy(x => new { x.NgayTao.Year, x.NgayTao.Month })
+                    .ToDictionary(
+                        x => x.Key.Year + "-" + x.Key.Month,
+                        x => x.Sum(item => item.SoTienCuoi.HasValue ? item.SoTienCuoi.Value : item.SoTien));
+
+                var result = new List<MonthlyRevenueDTO>();
+                for (var i = 0; i < months; i++)
+                {
+                    var month = firstMonth.AddMonths(i);
+                    var key = month.Year + "-" + month.Month;
+                    decimal total;
+                    paid.TryGetValue(key, out total);
+                    result.Add(new MonthlyRevenueDTO
+                    {
+                        Nam = month.Year,
+                        Thang = month.Month,
+                        Nhan = month.ToString("MM/yyyy"),
+                        TongTien = total
+                    });
+                }
+
+                return result;
+            }
+        }
+
+        public List<WeeklyScheduleDTO> GetWeeklySchedule(DateTime weekStart)
+        {
+            using (var db = _factory.Create())
+            {
+                var monday = weekStart.Date.AddDays(-(((int)weekStart.DayOfWeek + 6) % 7));
+                var result = new List<WeeklyScheduleDTO>();
+                foreach (var lop in db.LopHocs.OrderBy(x => x.TenLop).ToList())
+                {
+                    AddScheduleRows(result, lop, monday);
+                }
+
+                return result.OrderBy(x => x.NgayHoc).ThenBy(x => x.TenLop).ToList();
+            }
+        }
+
+        public List<BaoCaoDiemDTO> GetBaoCaoDiem(int? maLopHoc)
+        {
+            using (var db = _factory.Create())
+            {
+                var query =
+                    from ds in db.ChiTietDiemSos
+                    join dot in db.DotKiemTras on ds.MaDotKiemTra equals dot.MaDotKiemTra
+                    join lop in db.LopHocs on dot.MaLopHoc equals lop.MaLopHoc
+                    join nd in db.NguoiDungs on ds.MaNguoiDung equals nd.MaNguoiDung
+                    select new BaoCaoDiemDTO
+                    {
+                        TenLop = lop.TenLop,
+                        HoTen = nd.HoTen,
+                        TenDotKiemTra = dot.TenDotKiemTra,
+                        DiemTong = ds.DiemTong,
+                        NhanXet = ds.NhanXet
+                    };
+
+                if (maLopHoc.HasValue && maLopHoc.Value > 0)
+                {
+                    var lopId = maLopHoc.Value;
+                    query =
+                        from ds in db.ChiTietDiemSos
+                        join dot in db.DotKiemTras on ds.MaDotKiemTra equals dot.MaDotKiemTra
+                        join lop in db.LopHocs on dot.MaLopHoc equals lop.MaLopHoc
+                        join nd in db.NguoiDungs on ds.MaNguoiDung equals nd.MaNguoiDung
+                        where dot.MaLopHoc == lopId
+                        select new BaoCaoDiemDTO
+                        {
+                            TenLop = lop.TenLop,
+                            HoTen = nd.HoTen,
+                            TenDotKiemTra = dot.TenDotKiemTra,
+                            DiemTong = ds.DiemTong,
+                            NhanXet = ds.NhanXet
+                        };
+                }
+
+                return query.OrderBy(x => x.TenLop).ThenBy(x => x.HoTen).ThenBy(x => x.TenDotKiemTra).ToList();
+            }
+        }
+
+        public List<BaoCaoBaiTapDTO> GetBaoCaoBaiTap(int? maLopHoc)
+        {
+            using (var db = _factory.Create())
+            {
+                var lopIds = maLopHoc.HasValue && maLopHoc.Value > 0
+                    ? new List<int> { maLopHoc.Value }
+                    : db.LopHocs.Select(x => x.MaLopHoc).ToList();
+                var result = new List<BaoCaoBaiTapDTO>();
+
+                foreach (var lopId in lopIds)
+                {
+                    var hocVien = GetHocVienLop(lopId, true);
+                    var baiTap = db.BaiTaps.Where(x => x.MaLopHoc == lopId).ToList();
+                    var baiTapIds = baiTap.Select(x => x.MaBaiTap).ToList();
+                    var nopBai = db.ChiTietNopBais.Where(x => baiTapIds.Contains(x.MaBaiTap)).ToList();
+
+                    foreach (var bt in baiTap)
+                    {
+                        foreach (var hv in hocVien)
+                        {
+                            var nop = nopBai.FirstOrDefault(x => x.MaBaiTap == bt.MaBaiTap && x.MaNguoiDung == hv.MaNguoiDung);
+                            result.Add(new BaoCaoBaiTapDTO
+                            {
+                                HoTen = hv.HoTen,
+                                TieuDe = bt.TieuDe,
+                                Deadline = bt.Deadline,
+                                TrangThaiNop = nop == null ? "Chưa nộp" : nop.TrangThaiNop
+                            });
+                        }
+                    }
+                }
+
+                return result.OrderBy(x => x.HoTen).ThenBy(x => x.TieuDe).ToList();
+            }
+        }
+
+        public List<BaoCaoChuyenCanDTO> GetBaoCaoChuyenCan(int maLopHoc)
+        {
+            using (var db = _factory.Create())
+            {
+                var hocVien = GetHocVienLop(maLopHoc, true);
+                var buoiIds = db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc).Select(x => x.MaBuoiHoc).ToList();
+                var diemDanh = db.ChiTietDiemDanhs.Where(x => buoiIds.Contains(x.MaBuoiHoc)).ToList();
+                var result = new List<BaoCaoChuyenCanDTO>();
+
+                foreach (var hv in hocVien)
+                {
+                    var soCoMat = diemDanh.Count(x => x.MaNguoiDung == hv.MaNguoiDung
+                        && (x.TrangThai == AppConstants.AttendancePresent || x.TrangThai == AppConstants.AttendanceLate));
+                    var soVang = Math.Max(0, buoiIds.Count - soCoMat);
+                    result.Add(new BaoCaoChuyenCanDTO
+                    {
+                        MaNguoiDung = hv.MaNguoiDung,
+                        HoTen = hv.HoTen,
+                        SoBuoiCoMat = soCoMat,
+                        SoBuoiVang = soVang,
+                        TiLeChuyenCan = buoiIds.Count == 0 ? 0m : Math.Round(soCoMat * 100m / buoiIds.Count, 2)
+                    });
+                }
+
+                return result.OrderBy(x => x.HoTen).ToList();
+            }
+        }
+
+        public List<BaoCaoCuoiKyDTO> GetBaoCaoCuoiKy(int maLopHoc)
+        {
+            using (var db = _factory.Create())
+            {
+                var hocVien = GetHocVienLop(maLopHoc, true);
+                var dot = db.DotKiemTras.Where(x => x.MaLopHoc == maLopHoc).OrderBy(x => x.NgayKiemTra).ToList();
+                var dotIds = dot.Select(x => x.MaDotKiemTra).ToList();
+                var diem = db.ChiTietDiemSos.Where(x => dotIds.Contains(x.MaDotKiemTra)).ToList();
+                var result = new List<BaoCaoCuoiKyDTO>();
+
+                foreach (var hv in hocVien)
+                {
+                    var diemHocVien = diem.Where(x => x.MaNguoiDung == hv.MaNguoiDung && x.DiemTong.HasValue).ToList();
+                    decimal? trungBinh = diemHocVien.Count == 0 ? (decimal?)null : Math.Round(diemHocVien.Average(x => x.DiemTong.Value), 2);
+                    foreach (var d in dot)
+                    {
+                        var diemDot = diem.FirstOrDefault(x => x.MaNguoiDung == hv.MaNguoiDung && x.MaDotKiemTra == d.MaDotKiemTra);
+                        result.Add(new BaoCaoCuoiKyDTO
+                        {
+                            HoTen = hv.HoTen,
+                            TenDotKiemTra = d.TenDotKiemTra,
+                            DiemTong = diemDot == null ? null : diemDot.DiemTong,
+                            DiemTrungBinh = trungBinh,
+                            NhanXet = diemDot == null ? string.Empty : diemDot.NhanXet
+                        });
+                    }
+                }
+
+                return result.OrderBy(x => x.HoTen).ThenBy(x => x.TenDotKiemTra).ToList();
             }
         }
 
@@ -892,6 +1373,41 @@ namespace DesktopApp_Project.DAL
                     ThoiGianTao = DateTime.Now
                 });
                 db.SubmitChanges();
+            }
+        }
+
+        private static void AddScheduleRows(List<WeeklyScheduleDTO> result, LopHocEntity lop, DateTime monday)
+        {
+            var labels = new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật" };
+            var matched = false;
+            var lichHoc = lop.LichHoc ?? string.Empty;
+
+            for (var i = 0; i < labels.Length; i++)
+            {
+                if (lichHoc.IndexOf(labels[i], StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    matched = true;
+                    result.Add(new WeeklyScheduleDTO
+                    {
+                        MaLopHoc = lop.MaLopHoc,
+                        TenLop = lop.TenLop,
+                        LichHoc = lop.LichHoc,
+                        NgayHoc = monday.AddDays(i),
+                        ThuTrongTuan = labels[i]
+                    });
+                }
+            }
+
+            if (!matched)
+            {
+                result.Add(new WeeklyScheduleDTO
+                {
+                    MaLopHoc = lop.MaLopHoc,
+                    TenLop = lop.TenLop,
+                    LichHoc = lop.LichHoc,
+                    NgayHoc = monday,
+                    ThuTrongTuan = "Chưa rõ"
+                });
             }
         }
     }

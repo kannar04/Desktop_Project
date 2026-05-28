@@ -1,11 +1,16 @@
 using System;
+using System.ComponentModel;
 using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
     public partial class FrmHocPhi : ModuleFormBase
     {
+        private System.Windows.Forms.Button _btnTaoPhieu;
+        private BindingList<HocPhiTinhDTO> _previewRows = new BindingList<HocPhiTinhDTO>();
+
         public FrmHocPhi()
         {
             InitializeComponent();
@@ -19,28 +24,54 @@ namespace DesktopApp_Project.GUI
 
         protected override void OnRuntimeLoad()
         {
-            _cboHocVien.DataSource = Services.HocVien.TimKiem(null);
-            _cboHocVien.DisplayMember = "HoTen";
-            _cboHocVien.ValueMember = "MaNguoiDung";
+            ConfigureClassTuitionMode();
+            UiHelpers.BindLopHoc(_cboHocVien, Services);
             LoadData();
+        }
+
+        private void ConfigureClassTuitionMode()
+        {
+            _lblDesigner1.Text = "Lớp";
+            _lblDesigner2.Text = "Số tiền gốc";
+            btnTao.Text = "Tính học phí";
+            btnTao.Width = 130;
+            _cboTrangThai.DataSource = AppConstants.PaymentStatuses;
+
+            _btnTaoPhieu = UiHelpers.Button("Tạo phiếu");
+            _btnTaoPhieu.Width = 120;
+            _btnTaoPhieu.Click += BtnTaoPhieu_Click;
+            buttons.Controls.Add(_btnTaoPhieu);
         }
 
         private void LoadData()
         {
-            _grid.DataSource = Services.HocPhi.LayDanhSach();
+            _grid.DataSource = Services.HocPhi.LayDanhSach(UiHelpers.SelectedId(_cboHocVien));
         }
 
         private void BtnTao_Click(object sender, EventArgs e)
         {
-            var result = Services.HocPhi.TaoYeuCau(new ThanhToanHocPhiDTO
+            var result = Services.HocPhi.TinhTheoLop(UiHelpers.SelectedId(_cboHocVien), _numSoTien.Value);
+            if (result.Success)
             {
-                MaNguoiDung = UiHelpers.SelectedId(_cboHocVien),
-                SoTien = _numSoTien.Value,
-                ThongTinNganHang = _txtNganHang.Text.Trim()
-            });
+                _previewRows = new BindingList<HocPhiTinhDTO>(result.Data);
+                _grid.DataSource = _previewRows;
+            }
 
             UiHelpers.ShowResult(result);
-            if (result.Success) LoadData();
+        }
+
+        private void BtnTaoPhieu_Click(object sender, EventArgs e)
+        {
+            var result = Services.HocPhi.TaoYeuCauTheoLop(
+                UiHelpers.SelectedId(_cboHocVien),
+                _numSoTien.Value,
+                _txtNganHang.Text.Trim());
+
+            UiHelpers.ShowResult(result);
+            if (result.Success)
+            {
+                LoadData();
+            }
         }
 
         private void BtnCapNhat_Click(object sender, EventArgs e)

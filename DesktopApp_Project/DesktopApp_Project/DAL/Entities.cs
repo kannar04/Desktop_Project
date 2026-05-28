@@ -36,6 +36,9 @@ namespace DesktopApp_Project.DAL
     {
         [Column(IsPrimaryKey = true)] public int MaNguoiDung { get; set; }
         [Column(IsPrimaryKey = true)] public int MaLopHoc { get; set; }
+        [Column] public DateTime NgayVaoLop { get; set; }
+        [Column] public DateTime? NgayNghiHoc { get; set; }
+        [Column] public string TrangThai { get; set; }
     }
 
     [Table(Name = "dbo.TaiLieu")]
@@ -118,6 +121,7 @@ namespace DesktopApp_Project.DAL
         [Column] public string NoiDung { get; set; }
         [Column] public string DapAn { get; set; }
         [Column] public string NhanKyNang { get; set; }
+        [Column] public decimal? BandLevel { get; set; }
     }
 
     [Table(Name = "dbo.ChiTiet_DeThi")]
@@ -163,6 +167,8 @@ namespace DesktopApp_Project.DAL
         [Column] public string TuLoai { get; set; }
         [Column] public string PhienAm { get; set; }
         [Column] public string Nghia { get; set; }
+        [Column] public string CapDo { get; set; }
+        [Column] public string ChuDe { get; set; }
     }
 
     [Table(Name = "dbo.TienTrinh_Flashcard")]
@@ -201,7 +207,12 @@ namespace DesktopApp_Project.DAL
         public int MaThanhToan { get; set; }
 
         [Column] public int MaNguoiDung { get; set; }
+        [Column] public int? MaLopHoc { get; set; }
         [Column] public decimal SoTien { get; set; }
+        [Column] public decimal? SoTienGoc { get; set; }
+        [Column] public decimal PhanTramGiam { get; set; }
+        [Column] public decimal SoTienGiam { get; set; }
+        [Column] public decimal? SoTienCuoi { get; set; }
         [Column] public string ThongTinNganHang { get; set; }
         [Column] public DateTime NgayTao { get; set; }
         [Column] public DateTime HanThanhToan { get; set; }

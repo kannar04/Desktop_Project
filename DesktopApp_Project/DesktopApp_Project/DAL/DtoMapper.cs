@@ -96,7 +96,8 @@ namespace DesktopApp_Project.DAL
                 MaCauHoi = entity.MaCauHoi,
                 NoiDung = entity.NoiDung,
                 DapAn = entity.DapAn,
-                NhanKyNang = entity.NhanKyNang
+                NhanKyNang = entity.NhanKyNang,
+                BandLevel = entity.BandLevel
             };
         }
 
@@ -123,7 +124,9 @@ namespace DesktopApp_Project.DAL
                 TuTiengAnh = entity.TuTiengAnh,
                 TuLoai = entity.TuLoai,
                 PhienAm = entity.PhienAm,
-                Nghia = entity.Nghia
+                Nghia = entity.Nghia,
+                CapDo = entity.CapDo,
+                ChuDe = entity.ChuDe
             };
         }
 

@@ -8,6 +8,7 @@ namespace DesktopApp_Project.GUI
     public partial class FrmTaiLieu : ModuleFormBase
     {
         private int _selectedId;
+        private bool _isFilling;
 
         public FrmTaiLieu()
         {
@@ -38,13 +39,24 @@ namespace DesktopApp_Project.GUI
             var item = UiHelpers.SelectedItem<TaiLieuDTO>(_grid);
             if (item == null) return;
 
-            _selectedId = item.MaTaiLieu;
-            _cboLop.SelectedValue = item.MaLopHoc;
-            _cboKyNang.SelectedItem = item.NhanKyNang;
-            _txtChuDe.Text = item.TenChuDe;
-            _txtMoTa.Text = item.NoiDungMoTa;
-            _txtFile.Text = item.DuongDanFile;
-            _txtVideo.Text = item.VideoLink;
+            _isFilling = true;
+            try
+            {
+                _selectedId = item.MaTaiLieu;
+                if (!string.IsNullOrEmpty(_cboLop.ValueMember))
+                {
+                    _cboLop.SelectedValue = item.MaLopHoc;
+                }
+                _cboKyNang.SelectedItem = item.NhanKyNang;
+                _txtChuDe.Text = item.TenChuDe;
+                _txtMoTa.Text = item.NoiDungMoTa;
+                _txtFile.Text = item.DuongDanFile;
+                _txtVideo.Text = item.VideoLink;
+            }
+            finally
+            {
+                _isFilling = false;
+            }
         }
 
         private void ClearForm()
@@ -109,6 +121,11 @@ namespace DesktopApp_Project.GUI
 
         private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_isFilling)
+            {
+                return;
+            }
+
             LoadData();
         }
     }

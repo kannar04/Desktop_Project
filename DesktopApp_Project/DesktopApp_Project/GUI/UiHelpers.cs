@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,18 +12,134 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
+    public static class AppTheme
+    {
+        private static readonly Color[] AccentPalette =
+        {
+            Color.FromArgb(124, 92, 191),
+            Color.FromArgb(76, 175, 137),
+            Color.FromArgb(232, 168, 56),
+            Color.FromArgb(73, 145, 220)
+        };
+
+        public static readonly string[] AccentNames =
+        {
+            "Tím",
+            "Xanh ngọc",
+            "Hổ phách",
+            "Xanh dương"
+        };
+
+        static AppTheme()
+        {
+            DarkMode = true;
+            AccentIndex = 0;
+            Load();
+        }
+
+        public static bool DarkMode { get; private set; }
+        public static int AccentIndex { get; private set; }
+        public static string Language { get; private set; }
+
+        public static Color BackgroundColor { get { return DarkMode ? Color.FromArgb(30, 30, 46) : Color.FromArgb(245, 247, 250); } }
+        public static Color SurfaceColor { get { return DarkMode ? Color.FromArgb(42, 42, 62) : Color.White; } }
+        public static Color SurfaceAltColor { get { return DarkMode ? Color.FromArgb(36, 36, 54) : Color.FromArgb(232, 236, 244); } }
+        public static Color BorderColor { get { return DarkMode ? Color.FromArgb(58, 58, 82) : Color.FromArgb(205, 213, 225); } }
+        public static Color TextColor { get { return DarkMode ? Color.FromArgb(234, 234, 234) : Color.FromArgb(31, 41, 55); } }
+        public static Color MutedTextColor { get { return DarkMode ? Color.FromArgb(154, 154, 176) : Color.FromArgb(94, 104, 120); } }
+        public static Color AccentColor { get { return AccentPalette[Math.Max(0, Math.Min(AccentIndex, AccentPalette.Length - 1))]; } }
+        public static Color AccentSoftColor { get { return DarkMode ? Color.FromArgb(59, 49, 88) : Color.FromArgb(230, 222, 247); } }
+        public static Color SuccessColor { get { return Color.FromArgb(76, 175, 137); } }
+        public static Color WarningColor { get { return Color.FromArgb(232, 168, 56); } }
+
+        public static void Apply(bool darkMode, int accentIndex, string language)
+        {
+            DarkMode = darkMode;
+            AccentIndex = Math.Max(0, Math.Min(accentIndex, AccentPalette.Length - 1));
+            Language = string.IsNullOrWhiteSpace(language) ? "Vietnamese" : language;
+            Save();
+        }
+
+        public static void Load()
+        {
+            Language = "Vietnamese";
+            var path = SettingsPath;
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
+            foreach (var line in File.ReadAllLines(path))
+            {
+                var parts = line.Split(new[] { '=' }, 2);
+                if (parts.Length != 2)
+                {
+                    continue;
+                }
+
+                var key = parts[0].Trim();
+                var value = parts[1].Trim();
+                if (key == "Theme")
+                {
+                    DarkMode = !string.Equals(value, "Light", StringComparison.OrdinalIgnoreCase);
+                }
+                else if (key == "Accent")
+                {
+                    int index;
+                    if (int.TryParse(value, out index))
+                    {
+                        AccentIndex = Math.Max(0, Math.Min(index, AccentPalette.Length - 1));
+                    }
+                }
+                else if (key == "Language")
+                {
+                    Language = value;
+                }
+            }
+        }
+
+        private static void Save()
+        {
+            var dir = Path.GetDirectoryName(SettingsPath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir);
+            }
+
+            File.WriteAllLines(SettingsPath, new[]
+            {
+                "Theme=" + (DarkMode ? "Dark" : "Light"),
+                "Accent=" + AccentIndex,
+                "Language=" + Language
+            });
+        }
+
+        private static string SettingsPath
+        {
+            get
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "QuanLyLopIELTS",
+                    "settings.ini");
+            }
+        }
+    }
+
     public static class UiHelpers
     {
         public static readonly Font DefaultFont = new Font("Segoe UI", 9F, FontStyle.Regular);
         public static readonly Font TitleFont = new Font("Segoe UI", 13F, FontStyle.Bold);
-        public static readonly Color AccentColor = Color.FromArgb(95, 77, 221);
-        public static readonly Color AccentSoftColor = Color.FromArgb(54, 48, 104);
-        public static readonly Color AppBackgroundColor = Color.FromArgb(31, 30, 68);
-        public static readonly Color SurfaceColor = Color.FromArgb(37, 36, 81);
-        public static readonly Color SurfaceAltColor = Color.FromArgb(26, 25, 62);
-        public static readonly Color BorderColor = Color.FromArgb(55, 54, 92);
-        public static readonly Color TextColor = Color.Gainsboro;
-        public static readonly Color MutedTextColor = Color.FromArgb(174, 174, 196);
+        public static Color AccentColor { get { return AppTheme.AccentColor; } }
+        public static Color AccentSoftColor { get { return AppTheme.AccentSoftColor; } }
+        public static Color AppBackgroundColor { get { return AppTheme.BackgroundColor; } }
+        public static Color SurfaceColor { get { return AppTheme.SurfaceColor; } }
+        public static Color SurfaceAltColor { get { return AppTheme.SurfaceAltColor; } }
+        public static Color BorderColor { get { return AppTheme.BorderColor; } }
+        public static Color TextColor { get { return AppTheme.TextColor; } }
+        public static Color MutedTextColor { get { return AppTheme.MutedTextColor; } }
+        public static Color SuccessColor { get { return AppTheme.SuccessColor; } }
+        public static Color WarningColor { get { return AppTheme.WarningColor; } }
 
         public static Button Button(string text)
         {
@@ -49,7 +166,7 @@ namespace DesktopApp_Project.GUI
         {
             button.FlatAppearance.BorderColor = BorderColor;
             button.FlatAppearance.MouseOverBackColor = AccentSoftColor;
-            button.FlatAppearance.MouseDownBackColor = Color.FromArgb(77, 68, 140);
+            button.FlatAppearance.MouseDownBackColor = AccentColor;
         }
 
         public static Label Label(string text)
@@ -150,10 +267,12 @@ namespace DesktopApp_Project.GUI
 
         public static void BindLopHoc(ComboBox combo, ServiceFactory services)
         {
+            combo.BeginUpdate();
             combo.DataSource = null;
-            combo.DataSource = services.LopHoc.LayDanhSach();
             combo.DisplayMember = "TenLop";
             combo.ValueMember = "MaLopHoc";
+            combo.DataSource = services.LopHoc.LayDanhSach();
+            combo.EndUpdate();
         }
 
         public static void BindKyNang(ComboBox combo)
@@ -306,7 +425,7 @@ namespace DesktopApp_Project.GUI
             grid.DefaultCellStyle.ForeColor = TextColor;
             grid.DefaultCellStyle.SelectionBackColor = AccentSoftColor;
             grid.DefaultCellStyle.SelectionForeColor = TextColor;
-            grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(41, 40, 84);
+            grid.AlternatingRowsDefaultCellStyle.BackColor = SurfaceAltColor;
         }
 
         private static IEnumerable<Control> EnumerateControls(Control root)

@@ -8,6 +8,7 @@ namespace DesktopApp_Project.GUI
     public partial class FrmBaiTap : ModuleFormBase
     {
         private int _selectedId;
+        private bool _isFilling;
 
         public FrmBaiTap()
         {
@@ -38,12 +39,23 @@ namespace DesktopApp_Project.GUI
             var item = UiHelpers.SelectedItem<BaiTapDTO>(_grid);
             if (item == null) return;
 
-            _selectedId = item.MaBaiTap;
-            _cboLop.SelectedValue = item.MaLopHoc;
-            _txtTieuDe.Text = item.TieuDe;
-            _txtMoTa.Text = item.MoTa;
-            _txtFile.Text = item.FileDinhKem;
-            _dtDeadline.Value = item.Deadline;
+            _isFilling = true;
+            try
+            {
+                _selectedId = item.MaBaiTap;
+                if (!string.IsNullOrEmpty(_cboLop.ValueMember))
+                {
+                    _cboLop.SelectedValue = item.MaLopHoc;
+                }
+                _txtTieuDe.Text = item.TieuDe;
+                _txtMoTa.Text = item.MoTa;
+                _txtFile.Text = item.FileDinhKem;
+                _dtDeadline.Value = item.Deadline;
+            }
+            finally
+            {
+                _isFilling = false;
+            }
         }
 
         private void ClearForm()
@@ -107,6 +119,11 @@ namespace DesktopApp_Project.GUI
 
         private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (_isFilling)
+            {
+                return;
+            }
+
             LoadData();
         }
     }

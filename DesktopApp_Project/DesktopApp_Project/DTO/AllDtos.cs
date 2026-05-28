@@ -28,6 +28,9 @@ namespace DesktopApp_Project.DTO
     {
         public int MaNguoiDung { get; set; }
         public int MaLopHoc { get; set; }
+        public DateTime NgayVaoLop { get; set; }
+        public DateTime? NgayNghiHoc { get; set; }
+        public string TrangThai { get; set; }
     }
 
     public class TaiLieuDTO
@@ -77,6 +80,7 @@ namespace DesktopApp_Project.DTO
         public int MaNguoiDung { get; set; }
         public int MaBuoiHoc { get; set; }
         public string HoTen { get; set; }
+        public bool CoMat { get; set; }
         public string TrangThai { get; set; }
         public string LyDoVang { get; set; }
         public decimal TiLeChuyenCan { get; set; }
@@ -96,6 +100,7 @@ namespace DesktopApp_Project.DTO
         public string NoiDung { get; set; }
         public string DapAn { get; set; }
         public string NhanKyNang { get; set; }
+        public decimal? BandLevel { get; set; }
     }
 
     public class DotKiemTraDTO
@@ -128,6 +133,8 @@ namespace DesktopApp_Project.DTO
         public string TuLoai { get; set; }
         public string PhienAm { get; set; }
         public string Nghia { get; set; }
+        public string CapDo { get; set; }
+        public string ChuDe { get; set; }
     }
 
     public class FlashcardTienTrinhDTO
@@ -151,8 +158,14 @@ namespace DesktopApp_Project.DTO
     {
         public int MaThanhToan { get; set; }
         public int MaNguoiDung { get; set; }
+        public int? MaLopHoc { get; set; }
         public string HoTen { get; set; }
+        public string TenLop { get; set; }
         public decimal SoTien { get; set; }
+        public decimal? SoTienGoc { get; set; }
+        public decimal PhanTramGiam { get; set; }
+        public decimal SoTienGiam { get; set; }
+        public decimal? SoTienCuoi { get; set; }
         public string ThongTinNganHang { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime HanThanhToan { get; set; }
@@ -166,5 +179,118 @@ namespace DesktopApp_Project.DTO
         public int? MaNguoiDung { get; set; }
         public DateTime? TuNgay { get; set; }
         public DateTime? DenNgay { get; set; }
+    }
+
+    public class HocVienSearchCriteriaDTO
+    {
+        public string HoTen { get; set; }
+        public string LienHe { get; set; }
+        public int? MaLopHoc { get; set; }
+        public string TrangThai { get; set; }
+    }
+
+    public class CauHoiSearchCriteriaDTO
+    {
+        public string NhanKyNang { get; set; }
+        public decimal? BandTu { get; set; }
+        public decimal? BandDen { get; set; }
+        public string Keyword { get; set; }
+    }
+
+    public class TuVungSearchCriteriaDTO
+    {
+        public int? MaLopHoc { get; set; }
+        public string Keyword { get; set; }
+        public string TuLoai { get; set; }
+        public string CapDo { get; set; }
+        public string ChuDe { get; set; }
+        public string ChuCaiDau { get; set; }
+    }
+
+    public class HocVienLopDTO
+    {
+        public int MaNguoiDung { get; set; }
+        public int MaLopHoc { get; set; }
+        public string HoTen { get; set; }
+        public string SDT { get; set; }
+        public string Email { get; set; }
+        public DateTime NgayVaoLop { get; set; }
+        public DateTime? NgayNghiHoc { get; set; }
+        public string TrangThai { get; set; }
+        public bool DangHoc { get; set; }
+    }
+
+    public class HocPhiTinhDTO
+    {
+        public int MaNguoiDung { get; set; }
+        public int MaLopHoc { get; set; }
+        public string HoTen { get; set; }
+        public DateTime NgayVaoLop { get; set; }
+        public decimal SoTienGoc { get; set; }
+        public decimal PhanTramGiam { get; set; }
+        public decimal SoTienGiam { get; set; }
+        public decimal SoTienCuoi { get; set; }
+        public string TrangThai { get; set; }
+        public string GhiChu { get; set; }
+    }
+
+    public class DashboardSummaryDTO
+    {
+        public int TongHocVien { get; set; }
+        public int HocVienDangHoc { get; set; }
+        public decimal DoanhThuThangNay { get; set; }
+        public int TongLopHoc { get; set; }
+    }
+
+    public class MonthlyRevenueDTO
+    {
+        public int Nam { get; set; }
+        public int Thang { get; set; }
+        public string Nhan { get; set; }
+        public decimal TongTien { get; set; }
+    }
+
+    public class WeeklyScheduleDTO
+    {
+        public int MaLopHoc { get; set; }
+        public string TenLop { get; set; }
+        public string LichHoc { get; set; }
+        public DateTime NgayHoc { get; set; }
+        public string ThuTrongTuan { get; set; }
+    }
+
+    public class BaoCaoDiemDTO
+    {
+        public string TenLop { get; set; }
+        public string HoTen { get; set; }
+        public string TenDotKiemTra { get; set; }
+        public decimal? DiemTong { get; set; }
+        public string NhanXet { get; set; }
+    }
+
+    public class BaoCaoBaiTapDTO
+    {
+        public string HoTen { get; set; }
+        public string TieuDe { get; set; }
+        public string TrangThaiNop { get; set; }
+        public DateTime Deadline { get; set; }
+    }
+
+    public class BaoCaoChuyenCanDTO
+    {
+        public int MaNguoiDung { get; set; }
+        public string HoTen { get; set; }
+        public int SoBuoiCoMat { get; set; }
+        public int SoBuoiVang { get; set; }
+        public decimal TiLeChuyenCan { get; set; }
+    }
+
+    public class BaoCaoCuoiKyDTO
+    {
+        public string HoTen { get; set; }
+        public string TenDotKiemTra { get; set; }
+        public decimal? DiemTong { get; set; }
+        public decimal? DiemTrungBinh { get; set; }
+        public string NhanXet { get; set; }
     }
 }

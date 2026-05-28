@@ -1,4 +1,7 @@
 using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Windows.Forms;
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.DTO;
 
@@ -6,6 +9,8 @@ namespace DesktopApp_Project.GUI
 {
     public partial class FrmDiemDanh : ModuleFormBase
     {
+        private BindingList<DiemDanhDTO> _rows = new BindingList<DiemDanhDTO>();
+
         public FrmDiemDanh()
         {
             InitializeComponent();
@@ -19,8 +24,55 @@ namespace DesktopApp_Project.GUI
 
         protected override void OnRuntimeLoad()
         {
+            ConfigureGrid();
+            ConfigureActions();
             UiHelpers.BindLopHoc(_cboLop, Services);
             LoadData();
+        }
+
+        private void ConfigureActions()
+        {
+            bottom.Controls.Clear();
+            btnLuu.Text = "Lưu tất cả";
+            btnLuu.Width = 130;
+            bottom.Controls.Add(btnLuu);
+        }
+
+        private void ConfigureGrid()
+        {
+            _grid.AutoGenerateColumns = false;
+            _grid.ReadOnly = false;
+            _grid.AllowUserToAddRows = false;
+            _grid.AllowUserToDeleteRows = false;
+            _grid.Columns.Clear();
+
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "MaNguoiDung",
+                HeaderText = "Mã",
+                Visible = false
+            });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "HoTen",
+                HeaderText = "Học viên",
+                ReadOnly = true,
+                FillWeight = 180
+            });
+            _grid.Columns.Add(new DataGridViewCheckBoxColumn
+            {
+                DataPropertyName = "CoMat",
+                HeaderText = "Có mặt",
+                FillWeight = 60
+            });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "TiLeChuyenCan",
+                HeaderText = "Chuyên cần (%)",
+                ReadOnly = true,
+                FillWeight = 80,
+                DefaultCellStyle = { Format = "0.##" }
+            });
         }
 
         private void LoadData()
@@ -28,7 +80,8 @@ namespace DesktopApp_Project.GUI
             var result = Services.DiemDanh.LayBangDiemDanh(UiHelpers.SelectedId(_cboLop), _dtNgay.Value);
             if (result.Success)
             {
-                _grid.DataSource = result.Data;
+                _rows = new BindingList<DiemDanhDTO>(result.Data);
+                _grid.DataSource = _rows;
             }
             else
             {
@@ -38,11 +91,6 @@ namespace DesktopApp_Project.GUI
 
         private void Fill()
         {
-            var item = UiHelpers.SelectedItem<DiemDanhDTO>(_grid);
-            if (item == null) return;
-
-            _cboTrangThai.SelectedItem = item.TrangThai;
-            _txtLyDo.Text = item.LyDoVang;
         }
 
         private void BtnTai_Click(object sender, EventArgs e)
@@ -52,12 +100,8 @@ namespace DesktopApp_Project.GUI
 
         private void BtnLuu_Click(object sender, EventArgs e)
         {
-            var item = UiHelpers.SelectedItem<DiemDanhDTO>(_grid);
-            if (item == null) return;
-
-            item.TrangThai = Convert.ToString(_cboTrangThai.SelectedItem);
-            item.LyDoVang = _txtLyDo.Text.Trim();
-            var result = Services.DiemDanh.Luu(item);
+            _grid.EndEdit();
+            var result = Services.DiemDanh.LuuTatCa(_rows.ToList());
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();
         }

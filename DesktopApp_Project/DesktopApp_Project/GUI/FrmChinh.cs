@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
@@ -43,12 +45,12 @@ namespace DesktopApp_Project.GUI
 
         private class RGBColors
         {
-            public static readonly Color color1 = Color.FromArgb(172, 126, 241);
-            public static readonly Color color2 = Color.FromArgb(249, 118, 176);
-            public static readonly Color color3 = Color.FromArgb(253, 138, 114);
-            public static readonly Color color4 = Color.FromArgb(95, 77, 221);
-            public static readonly Color color5 = Color.FromArgb(249, 88, 155);
-            public static readonly Color color6 = Color.FromArgb(24, 161, 251);
+            public static Color color1 { get { return UiHelpers.AccentColor; } }
+            public static Color color2 { get { return UiHelpers.SuccessColor; } }
+            public static Color color3 { get { return UiHelpers.WarningColor; } }
+            public static Color color4 { get { return UiHelpers.AccentColor; } }
+            public static Color color5 { get { return UiHelpers.SuccessColor; } }
+            public static Color color6 { get { return UiHelpers.WarningColor; } }
         }
 
         public FrmChinh()
@@ -94,6 +96,7 @@ namespace DesktopApp_Project.GUI
             ControlBox = false;
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
+            ApplyShellTheme();
 
             UiHelpers.EnableDoubleBuffering(this);
             UiHelpers.EnableDoubleBuffering(pnlSideMenu);
@@ -108,6 +111,21 @@ namespace DesktopApp_Project.GUI
             };
             leftBorderBtn.Visible = false;
             pnlMenuItems.Controls.Add(leftBorderBtn);
+        }
+
+        private void ApplyShellTheme()
+        {
+            BackColor = UiHelpers.AppBackgroundColor;
+            pnlSideMenu.BackColor = UiHelpers.AppBackgroundColor;
+            pnlMenuItems.BackColor = UiHelpers.AppBackgroundColor;
+            pnlDesktop.BackColor = UiHelpers.AppBackgroundColor;
+            pnlTittleBar.BackColor = UiHelpers.SurfaceAltColor;
+            pnlMovingForm.BackColor = UiHelpers.SurfaceAltColor;
+            pnlLogo.BackColor = UiHelpers.AppBackgroundColor;
+            lblLogo.ForeColor = UiHelpers.TextColor;
+            lblTitleChildForm.ForeColor = UiHelpers.TextColor;
+            icoTittle.BackColor = UiHelpers.SurfaceAltColor;
+            icoTittle.IconColor = UiHelpers.TextColor;
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
@@ -215,7 +233,7 @@ namespace DesktopApp_Project.GUI
 
             DisableButton();
             currentBtn = (IconButton)senderBtn;
-            currentBtn.BackColor = Color.FromArgb(37, 36, 81);
+            currentBtn.BackColor = UiHelpers.SurfaceColor;
             currentBtn.ForeColor = color;
             currentBtn.TextAlign = ContentAlignment.MiddleCenter;
             currentBtn.IconColor = color;
@@ -241,10 +259,10 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
-            currentBtn.BackColor = Color.FromArgb(31, 30, 68);
-            currentBtn.ForeColor = Color.Gainsboro;
+            currentBtn.BackColor = UiHelpers.AppBackgroundColor;
+            currentBtn.ForeColor = UiHelpers.TextColor;
             currentBtn.TextAlign = ContentAlignment.MiddleLeft;
-            currentBtn.IconColor = Color.Gainsboro;
+            currentBtn.IconColor = UiHelpers.TextColor;
             currentBtn.TextImageRelation = TextImageRelation.ImageBeforeText;
             currentBtn.ImageAlign = ContentAlignment.MiddleLeft;
             leftBorderBtn.Visible = false;
@@ -267,6 +285,12 @@ namespace DesktopApp_Project.GUI
 
         private void ShowHome()
         {
+            if (pnlDesktop != null)
+            {
+                ShowDashboard();
+                return;
+            }
+
             ClearDesktop();
 
             var container = new Panel
@@ -307,6 +331,184 @@ namespace DesktopApp_Project.GUI
             container.Controls.Add(header);
             pnlDesktop.Controls.Add(container);
             UiHelpers.ApplyDarkTheme(container);
+        }
+
+        private void ShowDashboard()
+        {
+            ClearDesktop();
+            ApplyShellTheme();
+
+            var container = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(18)
+            };
+
+            var title = new Label
+            {
+                Text = "Dashboard",
+                Dock = DockStyle.Top,
+                Height = 54,
+                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
+                ForeColor = UiHelpers.TextColor,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(10, 0, 0, 0),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            var subtitle = new Label
+            {
+                Text = _currentUser == null ? "Tổng quan lớp IELTS" : "Xin chào " + _currentUser.HoTen,
+                Dock = DockStyle.Top,
+                Height = 34,
+                Font = new Font("Segoe UI", 10F),
+                ForeColor = UiHelpers.MutedTextColor,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(12, 0, 0, 8),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            var summaryResult = _services == null ? null : _services.Dashboard.LayTongQuan();
+            var revenueResult = _services == null ? null : _services.Dashboard.LayDoanhThuThang(6);
+            var scheduleResult = _services == null ? null : _services.Dashboard.LayLichHocTuan();
+            var summary = summaryResult != null && summaryResult.Success ? summaryResult.Data : new DashboardSummaryDTO();
+            var revenue = revenueResult != null && revenueResult.Success ? revenueResult.Data : new List<MonthlyRevenueDTO>();
+            var schedule = scheduleResult != null && scheduleResult.Success ? scheduleResult.Data : new List<WeeklyScheduleDTO>();
+
+            var body = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 2,
+                RowCount = 2,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(0, 12, 0, 0)
+            };
+            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
+            body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55F));
+            body.RowStyles.Add(new RowStyle(SizeType.Absolute, 130F));
+            body.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+
+            var cards = new TableLayoutPanel
+            {
+                Dock = DockStyle.Fill,
+                ColumnCount = 4,
+                RowCount = 1,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Margin = new Padding(0, 0, 0, 12)
+            };
+            for (var i = 0; i < 4; i++)
+            {
+                cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            }
+
+            cards.Controls.Add(CreateMetricCard("Tổng học viên", summary.TongHocVien.ToString("N0"), UiHelpers.AccentColor), 0, 0);
+            cards.Controls.Add(CreateMetricCard("Đang học", summary.HocVienDangHoc.ToString("N0"), UiHelpers.SuccessColor), 1, 0);
+            cards.Controls.Add(CreateMetricCard("Doanh thu tháng", FormatMoney(summary.DoanhThuThangNay), UiHelpers.WarningColor), 2, 0);
+            cards.Controls.Add(CreateMetricCard("Lớp học", summary.TongLopHoc.ToString("N0"), UiHelpers.AccentColor), 3, 0);
+
+            body.Controls.Add(cards, 0, 0);
+            body.SetColumnSpan(cards, 2);
+            body.Controls.Add(CreateRevenueChart(revenue), 0, 1);
+            body.Controls.Add(CreateScheduleGrid(schedule), 1, 1);
+
+            container.Controls.Add(body);
+            container.Controls.Add(subtitle);
+            container.Controls.Add(title);
+            pnlDesktop.Controls.Add(container);
+            UiHelpers.ApplyDarkTheme(container);
+        }
+
+        private Control CreateMetricCard(string label, string value, Color accent)
+        {
+            var panel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = UiHelpers.SurfaceColor,
+                Padding = new Padding(14),
+                Margin = new Padding(6)
+            };
+            panel.Controls.Add(new Label
+            {
+                Text = value,
+                Dock = DockStyle.Fill,
+                Font = new Font("Segoe UI", 14F, FontStyle.Bold),
+                ForeColor = accent,
+                TextAlign = ContentAlignment.MiddleLeft
+            });
+            panel.Controls.Add(new Label
+            {
+                Text = label,
+                Dock = DockStyle.Top,
+                Height = 28,
+                Font = new Font("Segoe UI", 9F),
+                ForeColor = UiHelpers.MutedTextColor,
+                TextAlign = ContentAlignment.MiddleLeft
+            });
+            return panel;
+        }
+
+        private Control CreateRevenueChart(List<MonthlyRevenueDTO> rows)
+        {
+            var panel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = UiHelpers.SurfaceColor,
+                Padding = new Padding(18),
+                Margin = new Padding(6)
+            };
+            panel.Paint += (sender, e) => PaintRevenueChart((Panel)sender, e.Graphics, rows);
+            return panel;
+        }
+
+        private void PaintRevenueChart(Panel panel, Graphics graphics, List<MonthlyRevenueDTO> rows)
+        {
+            graphics.Clear(UiHelpers.SurfaceColor);
+            using (var titleBrush = new SolidBrush(UiHelpers.TextColor))
+            using (var mutedBrush = new SolidBrush(UiHelpers.MutedTextColor))
+            using (var barBrush = new SolidBrush(UiHelpers.AccentColor))
+            using (var linePen = new Pen(UiHelpers.BorderColor))
+            {
+                graphics.DrawString("Doanh thu 6 tháng", new Font("Segoe UI", 12F, FontStyle.Bold), titleBrush, 18, 16);
+                var area = new Rectangle(24, 58, Math.Max(10, panel.Width - 56), Math.Max(10, panel.Height - 98));
+                graphics.DrawLine(linePen, area.Left, area.Bottom, area.Right, area.Bottom);
+                if (rows == null || rows.Count == 0)
+                {
+                    graphics.DrawString("Chưa có dữ liệu", UiHelpers.DefaultFont, mutedBrush, area.Left, area.Top + 20);
+                    return;
+                }
+
+                var max = Math.Max(1m, rows.Max(x => x.TongTien));
+                var barWidth = Math.Max(16, area.Width / rows.Count - 18);
+                for (var i = 0; i < rows.Count; i++)
+                {
+                    var height = (int)(area.Height * (rows[i].TongTien / max));
+                    var x = area.Left + i * (area.Width / rows.Count) + 8;
+                    var y = area.Bottom - height;
+                    graphics.FillRectangle(barBrush, x, y, barWidth, height);
+                    graphics.DrawString(rows[i].Nhan, UiHelpers.DefaultFont, mutedBrush, x - 4, area.Bottom + 6);
+                }
+            }
+        }
+
+        private Control CreateScheduleGrid(List<WeeklyScheduleDTO> rows)
+        {
+            var grid = UiHelpers.Grid();
+            grid.Margin = new Padding(6);
+            grid.ReadOnly = true;
+            grid.DataSource = rows.Select(x => new
+            {
+                Ngày = x.NgayHoc.ToString("dd/MM/yyyy"),
+                Thứ = x.ThuTrongTuan,
+                Lớp = x.TenLop,
+                Lịch = x.LichHoc
+            }).ToList();
+            return grid;
+        }
+
+        private static string FormatMoney(decimal value)
+        {
+            return value.ToString("N0") + " đ";
         }
 
         private void OpenModule(Form childForm)
@@ -415,6 +617,66 @@ namespace DesktopApp_Project.GUI
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
+            ActivateButton(sender, UiHelpers.AccentColor);
+            ShowSettings();
+        }
+
+        private void ShowSettings()
+        {
+            ClearDesktop();
+
+            var panel = new TableLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ColumnCount = 2,
+                BackColor = UiHelpers.SurfaceColor,
+                Padding = new Padding(24),
+                Margin = new Padding(24)
+            };
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 260F));
+
+            var cboTheme = UiHelpers.ComboBox();
+            cboTheme.Items.AddRange(new object[] { "Dark", "Light" });
+            cboTheme.SelectedIndex = AppTheme.DarkMode ? 0 : 1;
+
+            var cboAccent = UiHelpers.ComboBox();
+            cboAccent.Items.AddRange(AppTheme.AccentNames.Cast<object>().ToArray());
+            cboAccent.SelectedIndex = cboAccent.Items.Count == 0 ? -1 : Math.Max(0, Math.Min(AppTheme.AccentIndex, cboAccent.Items.Count - 1));
+
+            var cboLanguage = UiHelpers.ComboBox();
+            cboLanguage.Items.AddRange(new object[] { "Vietnamese", "English" });
+            cboLanguage.SelectedIndex = string.Equals(AppTheme.Language, "English", StringComparison.OrdinalIgnoreCase) ? 1 : 0;
+
+            var btnSave = UiHelpers.Button("Lưu");
+            btnSave.Click += (s, e) =>
+            {
+                var oldLanguage = AppTheme.Language;
+                AppTheme.Apply(Convert.ToString(cboTheme.SelectedItem) == "Dark", Math.Max(0, cboAccent.SelectedIndex), Convert.ToString(cboLanguage.SelectedItem));
+                ApplyShellTheme();
+                UiHelpers.ApplyDarkTheme(this);
+                MessageBox.Show(oldLanguage == AppTheme.Language ? "Đã lưu cài đặt." : "Đã lưu cài đặt. Vui lòng khởi động lại để áp dụng ngôn ngữ.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ShowSettings();
+            };
+
+            panel.Controls.Add(UiHelpers.Label("Theme"), 0, 0);
+            panel.Controls.Add(cboTheme, 1, 0);
+            panel.Controls.Add(UiHelpers.Label("Accent"), 0, 1);
+            panel.Controls.Add(cboAccent, 1, 1);
+            panel.Controls.Add(UiHelpers.Label("Language"), 0, 2);
+            panel.Controls.Add(cboLanguage, 1, 2);
+            panel.Controls.Add(btnSave, 1, 3);
+
+            var container = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(18)
+            };
+            container.Controls.Add(panel);
+            pnlDesktop.Controls.Add(container);
+            UiHelpers.ApplyDarkTheme(container);
 
         }
     }
