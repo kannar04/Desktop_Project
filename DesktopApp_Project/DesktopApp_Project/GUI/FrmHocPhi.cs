@@ -14,12 +14,20 @@ namespace DesktopApp_Project.GUI
         public FrmHocPhi()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmHocPhi(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTao, BtnTao_Click);
+            WireClick(btnCapNhat, BtnCapNhat_Click);
+            WireSelectedIndexChanged(_cboHocVien, CboHocVien_SelectedIndexChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -39,13 +47,13 @@ namespace DesktopApp_Project.GUI
 
             _btnTaoPhieu = UiHelpers.Button("Tạo phiếu");
             _btnTaoPhieu.Width = 120;
-            _btnTaoPhieu.Click += BtnTaoPhieu_Click;
+            WireClick(_btnTaoPhieu, BtnTaoPhieu_Click);
             buttons.Controls.Add(_btnTaoPhieu);
         }
 
         private void LoadData()
         {
-            _grid.DataSource = Services.HocPhi.LayDanhSach(UiHelpers.SelectedId(_cboHocVien));
+            _grid.DataSource = SafeLoad<object>(() => Services.HocPhi.LayDanhSach(UiHelpers.SelectedId(_cboHocVien)), null);
         }
 
         private void BtnTao_Click(object sender, EventArgs e)
@@ -82,6 +90,11 @@ namespace DesktopApp_Project.GUI
             var result = Services.HocPhi.CapNhatTrangThai(item.MaThanhToan, Convert.ToString(_cboTrangThai.SelectedItem));
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();
+        }
+
+        private void CboHocVien_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadData();
         }
     }
 }

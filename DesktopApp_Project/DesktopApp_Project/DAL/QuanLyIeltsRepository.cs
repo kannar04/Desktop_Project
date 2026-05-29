@@ -16,6 +16,16 @@ namespace DesktopApp_Project.DAL
             _factory = factory;
         }
 
+        private static T RequireEntity<T>(T entity, string message) where T : class
+        {
+            if (entity == null)
+            {
+                throw new InvalidOperationException(message);
+            }
+
+            return entity;
+        }
+
         public bool KiemTraKetNoi(out string error)
         {
             try
@@ -153,7 +163,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.NguoiDungs.First(x => x.MaNguoiDung == dto.MaNguoiDung);
+                var entity = RequireEntity(
+                    db.NguoiDungs.FirstOrDefault(x => x.MaNguoiDung == dto.MaNguoiDung),
+                    "Khong tim thay nguoi dung can cap nhat.");
                 entity.VaiTro = dto.VaiTro;
                 entity.HoTen = dto.HoTen;
                 entity.NgaySinh = dto.NgaySinh;
@@ -170,7 +182,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.NguoiDungs.First(x => x.MaNguoiDung == maNguoiDung);
+                var entity = RequireEntity(
+                    db.NguoiDungs.FirstOrDefault(x => x.MaNguoiDung == maNguoiDung),
+                    "Khong tim thay nguoi dung can xoa.");
                 db.NguoiDungs.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -221,7 +235,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.LopHocs.First(x => x.MaLopHoc == dto.MaLopHoc);
+                var entity = RequireEntity(
+                    db.LopHocs.FirstOrDefault(x => x.MaLopHoc == dto.MaLopHoc),
+                    "Khong tim thay lop hoc can cap nhat.");
                 entity.MaGiaoVien = dto.MaGiaoVien;
                 entity.TenLop = dto.TenLop;
                 entity.NhomTrinhDo = dto.NhomTrinhDo;
@@ -234,7 +250,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.LopHocs.First(x => x.MaLopHoc == maLopHoc);
+                var entity = RequireEntity(
+                    db.LopHocs.FirstOrDefault(x => x.MaLopHoc == maLopHoc),
+                    "Khong tim thay lop hoc can xoa.");
                 db.LopHocs.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -394,7 +412,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.TaiLieus.First(x => x.MaTaiLieu == dto.MaTaiLieu);
+                var entity = RequireEntity(
+                    db.TaiLieus.FirstOrDefault(x => x.MaTaiLieu == dto.MaTaiLieu),
+                    "Khong tim thay tai lieu can cap nhat.");
                 entity.MaLopHoc = dto.MaLopHoc;
                 entity.TenChuDe = dto.TenChuDe;
                 entity.NoiDungMoTa = dto.NoiDungMoTa;
@@ -410,7 +430,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.TaiLieus.First(x => x.MaTaiLieu == maTaiLieu);
+                var entity = RequireEntity(
+                    db.TaiLieus.FirstOrDefault(x => x.MaTaiLieu == maTaiLieu),
+                    "Khong tim thay tai lieu can xoa.");
                 db.TaiLieus.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -453,7 +475,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.BaiTaps.First(x => x.MaBaiTap == dto.MaBaiTap);
+                var entity = RequireEntity(
+                    db.BaiTaps.FirstOrDefault(x => x.MaBaiTap == dto.MaBaiTap),
+                    "Khong tim thay bai tap can cap nhat.");
                 entity.MaLopHoc = dto.MaLopHoc;
                 entity.TieuDe = dto.TieuDe;
                 entity.MoTa = dto.MoTa;
@@ -467,7 +491,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.BaiTaps.First(x => x.MaBaiTap == maBaiTap);
+                var entity = RequireEntity(
+                    db.BaiTaps.FirstOrDefault(x => x.MaBaiTap == maBaiTap),
+                    "Khong tim thay bai tap can xoa.");
                 db.BaiTaps.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -524,7 +550,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.ChiTietNopBais.First(x => x.MaNguoiDung == dto.MaNguoiDung && x.MaBaiTap == dto.MaBaiTap);
+                var entity = RequireEntity(
+                    db.ChiTietNopBais.FirstOrDefault(x => x.MaNguoiDung == dto.MaNguoiDung && x.MaBaiTap == dto.MaBaiTap),
+                    "Khong tim thay bai nop can cham.");
                 entity.DiemSo = dto.DiemSo;
                 entity.NhanXet = dto.NhanXet;
                 entity.TrangThaiNop = "Đã chấm";
@@ -740,7 +768,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.CauHois.First(x => x.MaCauHoi == dto.MaCauHoi);
+                var entity = RequireEntity(
+                    db.CauHois.FirstOrDefault(x => x.MaCauHoi == dto.MaCauHoi),
+                    "Khong tim thay cau hoi can cap nhat.");
                 entity.NoiDung = dto.NoiDung;
                 entity.DapAn = dto.DapAn;
                 entity.NhanKyNang = dto.NhanKyNang;
@@ -753,7 +783,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.CauHois.First(x => x.MaCauHoi == maCauHoi);
+                var entity = RequireEntity(
+                    db.CauHois.FirstOrDefault(x => x.MaCauHoi == maCauHoi),
+                    "Khong tim thay cau hoi can xoa.");
                 db.CauHois.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -945,7 +977,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.TuVungs.First(x => x.MaTuVung == dto.MaTuVung);
+                var entity = RequireEntity(
+                    db.TuVungs.FirstOrDefault(x => x.MaTuVung == dto.MaTuVung),
+                    "Khong tim thay tu vung can cap nhat.");
                 entity.MaLopHoc = dto.MaLopHoc;
                 entity.TuTiengAnh = dto.TuTiengAnh;
                 entity.TuLoai = dto.TuLoai;
@@ -963,7 +997,9 @@ namespace DesktopApp_Project.DAL
             {
                 var progress = db.TienTrinhFlashcards.Where(x => x.MaTuVung == maTuVung);
                 db.TienTrinhFlashcards.DeleteAllOnSubmit(progress);
-                var entity = db.TuVungs.First(x => x.MaTuVung == maTuVung);
+                var entity = RequireEntity(
+                    db.TuVungs.FirstOrDefault(x => x.MaTuVung == maTuVung),
+                    "Khong tim thay tu vung can xoa.");
                 db.TuVungs.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -1144,7 +1180,9 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = db.ThanhToanHocPhis.First(x => x.MaThanhToan == maThanhToan);
+                var entity = RequireEntity(
+                    db.ThanhToanHocPhis.FirstOrDefault(x => x.MaThanhToan == maThanhToan),
+                    "Khong tim thay phieu hoc phi can cap nhat.");
                 entity.TrangThai = trangThai;
                 db.SubmitChanges();
             }

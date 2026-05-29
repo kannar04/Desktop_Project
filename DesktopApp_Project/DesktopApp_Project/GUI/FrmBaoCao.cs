@@ -12,12 +12,19 @@ namespace DesktopApp_Project.GUI
         public FrmBaoCao()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmBaoCao(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTao, BtnTao_Click);
+            WireClick(btnXuat, BtnXuat_Click);
         }
 
         protected override void OnRuntimeLoad()
@@ -28,6 +35,11 @@ namespace DesktopApp_Project.GUI
 
         private void BtnTao_Click(object sender, EventArgs e)
         {
+            if (!HasCurrentUser())
+            {
+                return;
+            }
+
             var result = Services.BaoCao.TaoBaoCao(new BaoCaoDTO
             {
                 LoaiBaoCao = Convert.ToString(_cboLoai.SelectedItem),
@@ -54,7 +66,11 @@ namespace DesktopApp_Project.GUI
                 UiHelpers.ShowResult(result);
                 if (result.Success)
                 {
-                    Process.Start(dialog.FileName);
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = dialog.FileName,
+                        UseShellExecute = true
+                    });
                 }
             }
         }

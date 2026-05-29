@@ -14,12 +14,19 @@ namespace DesktopApp_Project.GUI
         public FrmDiemDanh()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmDiemDanh(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTai, BtnTai_Click);
+            WireClick(btnLuu, BtnLuu_Click);
         }
 
         protected override void OnRuntimeLoad()
@@ -77,7 +84,12 @@ namespace DesktopApp_Project.GUI
 
         private void LoadData()
         {
-            var result = Services.DiemDanh.LayBangDiemDanh(UiHelpers.SelectedId(_cboLop), _dtNgay.Value);
+            var result = SafeLoad(() => Services.DiemDanh.LayBangDiemDanh(UiHelpers.SelectedId(_cboLop), _dtNgay.Value), null);
+            if (result == null)
+            {
+                return;
+            }
+
             if (result.Success)
             {
                 _rows = new BindingList<DiemDanhDTO>(result.Data);
@@ -87,10 +99,6 @@ namespace DesktopApp_Project.GUI
             {
                 UiHelpers.ShowResult(result);
             }
-        }
-
-        private void Fill()
-        {
         }
 
         private void BtnTai_Click(object sender, EventArgs e)
@@ -104,11 +112,6 @@ namespace DesktopApp_Project.GUI
             var result = Services.DiemDanh.LuuTatCa(_rows.ToList());
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();
-        }
-
-        private void Grid_SelectionChanged(object sender, EventArgs e)
-        {
-            Fill();
         }
     }
 }

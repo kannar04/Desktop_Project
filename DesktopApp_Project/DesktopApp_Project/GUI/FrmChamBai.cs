@@ -10,12 +10,21 @@ namespace DesktopApp_Project.GUI
         public FrmChamBai()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmChamBai(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTai, BtnTai_Click);
+            WireClick(btnCham, BtnCham_Click);
+            WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireSelectedIndexChanged(_cboBaiTap, CboBaiTap_SelectedIndexChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -25,7 +34,7 @@ namespace DesktopApp_Project.GUI
 
         private void LoadAssignments()
         {
-            var list = Services.BaiTap.LayDanhSach(null);
+            var list = SafeLoad<object>(() => Services.BaiTap.LayDanhSach(null), null);
             _cboBaiTap.DataSource = list;
             _cboBaiTap.DisplayMember = "TieuDe";
             _cboBaiTap.ValueMember = "MaBaiTap";
@@ -37,7 +46,11 @@ namespace DesktopApp_Project.GUI
             var maBaiTap = UiHelpers.SelectedId(_cboBaiTap);
             if (maBaiTap > 0)
             {
-                _grid.DataSource = Services.ChamBai.LayDanhSach(maBaiTap);
+                _grid.DataSource = SafeLoad<object>(() => Services.ChamBai.LayDanhSach(maBaiTap), null);
+            }
+            else
+            {
+                _grid.DataSource = null;
             }
         }
 
@@ -48,14 +61,20 @@ namespace DesktopApp_Project.GUI
 
             _txtNhanXet.Text = item.NhanXet;
             _numDiem.Value = item.DiemSo.HasValue ? item.DiemSo.Value : 0;
-            if (!string.IsNullOrWhiteSpace(item.FileBaiLam) && File.Exists(item.FileBaiLam))
+
+            var resolvedPath = ManagedFileStorage.ResolvePath(item.FileBaiLam);
+            if (!string.IsNullOrWhiteSpace(resolvedPath) && File.Exists(resolvedPath))
             {
-                _txtPreview.Text = "Tệp bài làm: " + item.FileBaiLam + Environment.NewLine +
-                                   "Có thể mở tệp bằng ứng dụng phù hợp trên máy để xem nội dung chi tiết.";
+                _txtPreview.Text = "Tep bai lam: " + resolvedPath + Environment.NewLine +
+                                   "Co the mo tep bang ung dung phu hop tren may de xem noi dung chi tiet.";
+            }
+            else if (!string.IsNullOrWhiteSpace(item.FileBaiLam))
+            {
+                _txtPreview.Text = "Khong tim thay file bai lam: " + item.FileBaiLam;
             }
             else
             {
-                _txtPreview.Text = "Học viên chưa có file bài làm trong hệ thống.";
+                _txtPreview.Text = "Hoc vien chua co file bai lam trong he thong.";
             }
         }
 
@@ -79,6 +98,11 @@ namespace DesktopApp_Project.GUI
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
             PreviewSubmission();
+        }
+
+        private void CboBaiTap_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadSubmissions();
         }
     }
 }

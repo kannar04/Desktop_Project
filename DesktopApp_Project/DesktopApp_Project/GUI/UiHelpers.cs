@@ -456,6 +456,84 @@ namespace DesktopApp_Project.GUI
         }
     }
 
+    public static class ManagedFileStorage
+    {
+        private const string AppFolderName = "QuanLyLopIELTS";
+        private const string UploadsFolderName = "Uploads";
+
+        public static string CopyToManagedFolder(string sourcePath, string category)
+        {
+            if (string.IsNullOrWhiteSpace(sourcePath))
+            {
+                return string.Empty;
+            }
+
+            if (!File.Exists(sourcePath))
+            {
+                return sourcePath;
+            }
+
+            var safeCategory = SanitizePathSegment(category);
+            var targetFolder = Path.Combine(AppRoot, UploadsFolderName, safeCategory);
+            Directory.CreateDirectory(targetFolder);
+
+            var originalName = SanitizeFileName(Path.GetFileName(sourcePath));
+            var storedName = Guid.NewGuid().ToString("N") + "_" + originalName;
+            var targetPath = Path.Combine(targetFolder, storedName);
+            File.Copy(sourcePath, targetPath, false);
+
+            return UploadsFolderName + "/" + safeCategory + "/" + storedName;
+        }
+
+        public static string ResolvePath(string storedPath)
+        {
+            if (string.IsNullOrWhiteSpace(storedPath))
+            {
+                return storedPath;
+            }
+
+            if (Path.IsPathRooted(storedPath))
+            {
+                return storedPath;
+            }
+
+            var normalized = storedPath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            return Path.Combine(AppRoot, normalized);
+        }
+
+        private static string AppRoot
+        {
+            get
+            {
+                return Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    AppFolderName);
+            }
+        }
+
+        private static string SanitizePathSegment(string value)
+        {
+            value = string.IsNullOrWhiteSpace(value) ? "General" : value.Trim();
+            foreach (var invalid in Path.GetInvalidFileNameChars())
+            {
+                value = value.Replace(invalid, '_');
+            }
+
+            return value;
+        }
+
+        private static string SanitizeFileName(string value)
+        {
+            value = string.IsNullOrWhiteSpace(value) ? "upload" : value.Trim();
+            foreach (var invalid in Path.GetInvalidFileNameChars())
+            {
+                value = value.Replace(invalid, '_');
+            }
+
+            return value;
+        }
+    }
+
     public class ModuleFormBase : Form
     {
         protected ServiceFactory Services;
@@ -498,7 +576,7 @@ namespace DesktopApp_Project.GUI
             }
 
             _runtimeLoaded = true;
-            OnRuntimeLoad();
+            SafeRun(OnRuntimeLoad);
         }
 
         protected virtual void OnRuntimeLoad()
@@ -520,9 +598,93 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        protected bool SafeRun(Action action)
+        {
+            try
+            {
+                if (action != null)
+                {
+                    action();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ShowRuntimeError(ex);
+                return false;
+            }
+        }
+
+        protected T SafeLoad<T>(Func<T> action, T fallback)
+        {
+            try
+            {
+                return action == null ? fallback : action();
+            }
+            catch (Exception ex)
+            {
+                ShowRuntimeError(ex);
+                return fallback;
+            }
+        }
+
+        protected bool HasCurrentUser()
+        {
+            if (CurrentUser != null)
+            {
+                return true;
+            }
+
+            Info("Khong co thong tin nguoi dung hien tai. Vui long dang nhap lai.");
+            return false;
+        }
+
+        protected void WireClick(Control control, EventHandler handler)
+        {
+            if (control == null || handler == null)
+            {
+                return;
+            }
+
+            control.Click -= handler;
+            control.Click += (sender, e) => SafeRun(() => handler(sender, e));
+        }
+
+        protected void WireSelectedIndexChanged(ComboBox combo, EventHandler handler)
+        {
+            if (combo == null || handler == null)
+            {
+                return;
+            }
+
+            combo.SelectedIndexChanged -= handler;
+            combo.SelectedIndexChanged += (sender, e) => SafeRun(() => handler(sender, e));
+        }
+
+        protected void WireSelectionChanged(DataGridView grid, EventHandler handler)
+        {
+            if (grid == null || handler == null)
+            {
+                return;
+            }
+
+            grid.SelectionChanged -= handler;
+            grid.SelectionChanged += (sender, e) => SafeRun(() => handler(sender, e));
+        }
+
         protected void Info(string message)
         {
             MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ShowRuntimeError(Exception ex)
+        {
+            var message = ex == null ? "Loi khong xac dinh." : ex.Message;
+            MessageBox.Show("Khong the xu ly yeu cau. Chi tiet: " + message,
+                "Loi",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
         }
     }
 }
