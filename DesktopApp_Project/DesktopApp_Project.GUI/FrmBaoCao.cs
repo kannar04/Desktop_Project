@@ -66,11 +66,21 @@ namespace DesktopApp_Project.GUI
                 UiHelpers.ShowResult(result);
                 if (result.Success)
                 {
-                    Process.Start(new ProcessStartInfo
+                    try
                     {
-                        FileName = dialog.FileName,
-                        UseShellExecute = true
-                    });
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = dialog.FileName,
+                            UseShellExecute = true
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Đã xuất báo cáo nhưng không thể mở file tự động. Chi tiết: " + ex.Message,
+                            "Thông báo",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
                 }
             }
         }

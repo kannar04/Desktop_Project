@@ -37,10 +37,9 @@ namespace DesktopApp_Project.BUS
                                 MaNguoiDung = hv.MaNguoiDung,
                                 MaBuoiHoc = maBuoiHoc,
                                 HoTen = hv.HoTen,
-                                TrangThai = "Có mặt"
+                                TrangThai = AppConstants.AttendancePresent,
+                                CoMat = true
                             };
-                            dto.CoMat = false;
-                            dto.TrangThai = AppConstants.AttendanceAbsent;
                         }
                         else
                         {
@@ -59,11 +58,18 @@ namespace DesktopApp_Project.BUS
             {
                 return Try(() =>
                 {
-                    dto.TrangThai = dto.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
+                    if (ValidationHelper.IsBlank(dto.TrangThai))
+                    {
+                        dto.TrangThai = dto.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
+                    }
+
                     if (!AppConstants.AttendanceStatuses.Contains(dto.TrangThai))
                     {
                         return ServiceResult.Fail("Vui lòng chọn trạng thái điểm danh hợp lệ.");
                     }
+
+                    dto.CoMat = dto.TrangThai == AppConstants.AttendancePresent || dto.TrangThai == AppConstants.AttendanceLate;
+                    dto.LyDoVang = dto.TrangThai == AppConstants.AttendanceAbsent ? dto.LyDoVang : string.Empty;
     
                     Repository.LuuDiemDanh(dto);
                     return ServiceResult.Ok("Lưu điểm danh thành công.");
@@ -82,12 +88,23 @@ namespace DesktopApp_Project.BUS
     
                     foreach (var row in rows)
                     {
-                        row.TrangThai = row.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
-                        row.LyDoVang = row.CoMat ? string.Empty : row.LyDoVang;
                         if (row.MaNguoiDung <= 0 || row.MaBuoiHoc <= 0)
                         {
                             return ServiceResult.Fail("Dữ liệu điểm danh không hợp lệ.");
                         }
+
+                        if (ValidationHelper.IsBlank(row.TrangThai))
+                        {
+                            row.TrangThai = row.CoMat ? AppConstants.AttendancePresent : AppConstants.AttendanceAbsent;
+                        }
+
+                        if (!AppConstants.AttendanceStatuses.Contains(row.TrangThai))
+                        {
+                            return ServiceResult.Fail("Vui lòng chọn trạng thái điểm danh hợp lệ.");
+                        }
+
+                        row.CoMat = row.TrangThai == AppConstants.AttendancePresent || row.TrangThai == AppConstants.AttendanceLate;
+                        row.LyDoVang = row.TrangThai == AppConstants.AttendanceAbsent ? row.LyDoVang : string.Empty;
                     }
     
                     Repository.LuuDiemDanh(rows);
@@ -96,4 +113,3 @@ namespace DesktopApp_Project.BUS
             }
         }
 }
-

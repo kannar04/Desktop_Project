@@ -30,7 +30,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             Func<ITheme> factory;
             if (string.IsNullOrWhiteSpace(name) || !_registry.TryGetValue(name, out factory))
             {
-                throw new ArgumentException("Theme khong ton tai: " + name, "name");
+                throw new ArgumentException("Theme không tồn tại: " + name, "name");
             }
 
             Current = factory();

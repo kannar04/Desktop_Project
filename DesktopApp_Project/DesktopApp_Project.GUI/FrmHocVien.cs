@@ -143,8 +143,13 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (_selectedId == 0) return;
-            if (MessageBox.Show("Bạn có chắc muốn xóa học viên này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (_selectedId == 0)
+            {
+                UiHelpers.WarnSelect("học viên");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("học viên"))
             {
                 return;
             }

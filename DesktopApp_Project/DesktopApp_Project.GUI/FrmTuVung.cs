@@ -151,7 +151,16 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (_selectedId == 0) return;
+            if (_selectedId == 0)
+            {
+                UiHelpers.WarnSelect("từ vựng");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("từ vựng"))
+            {
+                return;
+            }
 
             var result = Services.TuVung.Xoa(_selectedId);
             UiHelpers.ShowResult(result);

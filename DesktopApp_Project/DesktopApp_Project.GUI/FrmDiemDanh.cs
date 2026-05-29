@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
@@ -66,11 +67,19 @@ namespace DesktopApp_Project.GUI
                 ReadOnly = true,
                 FillWeight = 180
             });
-            _grid.Columns.Add(new DataGridViewCheckBoxColumn
+            _grid.Columns.Add(new DataGridViewComboBoxColumn
             {
-                DataPropertyName = "CoMat",
-                HeaderText = "Có mặt",
-                FillWeight = 60
+                DataPropertyName = "TrangThai",
+                HeaderText = "Trạng thái",
+                DataSource = AppConstants.AttendanceStatuses.ToList(),
+                FlatStyle = FlatStyle.Flat,
+                FillWeight = 90
+            });
+            _grid.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "LyDoVang",
+                HeaderText = "Lý do vắng",
+                FillWeight = 140
             });
             _grid.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -109,6 +118,11 @@ namespace DesktopApp_Project.GUI
         private void BtnLuu_Click(object sender, EventArgs e)
         {
             _grid.EndEdit();
+            foreach (var row in _rows)
+            {
+                row.CoMat = row.TrangThai == AppConstants.AttendancePresent || row.TrangThai == AppConstants.AttendanceLate;
+            }
+
             var result = Services.DiemDanh.LuuTatCa(_rows.ToList());
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();

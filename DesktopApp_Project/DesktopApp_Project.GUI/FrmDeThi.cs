@@ -13,6 +13,7 @@ namespace DesktopApp_Project.GUI
         private ComboBox _cboLocKyNang;
         private NumericUpDown _numBandTu;
         private NumericUpDown _numBandDen;
+        private NumericUpDown _numBandCauHoi;
         private TextBox _txtTuKhoa;
 
         public FrmDeThi()
@@ -54,6 +55,7 @@ namespace DesktopApp_Project.GUI
             _numBandDen = new NumericUpDown { Width = 70, DecimalPlaces = 1, Minimum = 0, Maximum = 9, Increment = 0.5M, Value = 9 };
             _txtTuKhoa = UiHelpers.TextBox();
             _txtTuKhoa.Width = 180;
+            _numBandCauHoi = new NumericUpDown { Width = 70, DecimalPlaces = 1, Minimum = 0, Maximum = 9, Increment = 0.5M, Value = 5 };
             var btnLoc = UiHelpers.Button("Lọc");
             btnLoc.Width = 70;
             btnLoc.Click += (sender, e) => SafeRun(() => BtnLoc_Click(sender, e));
@@ -66,6 +68,8 @@ namespace DesktopApp_Project.GUI
             buttons.Controls.Add(UiHelpers.Label("Từ khóa"));
             buttons.Controls.Add(_txtTuKhoa);
             buttons.Controls.Add(btnLoc);
+            buttons.Controls.Add(UiHelpers.Label("Band câu hỏi"));
+            buttons.Controls.Add(_numBandCauHoi);
         }
 
         private void LoadData()
@@ -92,6 +96,7 @@ namespace DesktopApp_Project.GUI
             _txtNoiDung.Text = item.NoiDung;
             _txtDapAn.Text = item.DapAn;
             _cboKyNang.SelectedItem = item.NhanKyNang;
+            _numBandCauHoi.Value = item.BandLevel.HasValue ? item.BandLevel.Value : 5;
         }
 
         private void BtnLoc_Click(object sender, EventArgs e)
@@ -104,6 +109,10 @@ namespace DesktopApp_Project.GUI
             _selectedQuestionId = 0;
             _txtNoiDung.Clear();
             _txtDapAn.Clear();
+            if (_numBandCauHoi != null)
+            {
+                _numBandCauHoi.Value = 5;
+            }
         }
 
         private void BtnMoi_Click(object sender, EventArgs e)
@@ -118,7 +127,8 @@ namespace DesktopApp_Project.GUI
                 MaCauHoi = _selectedQuestionId,
                 NoiDung = _txtNoiDung.Text.Trim(),
                 DapAn = _txtDapAn.Text.Trim(),
-                NhanKyNang = Convert.ToString(_cboKyNang.SelectedItem)
+                NhanKyNang = Convert.ToString(_cboKyNang.SelectedItem),
+                BandLevel = _numBandCauHoi == null ? (decimal?)null : _numBandCauHoi.Value
             });
 
             UiHelpers.ShowResult(result);
@@ -127,7 +137,16 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoaCau_Click(object sender, EventArgs e)
         {
-            if (_selectedQuestionId == 0) return;
+            if (_selectedQuestionId == 0)
+            {
+                UiHelpers.WarnSelect("câu hỏi");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("câu hỏi"))
+            {
+                return;
+            }
 
             var result = Services.DeThi.XoaCauHoi(_selectedQuestionId);
             UiHelpers.ShowResult(result);
@@ -145,7 +164,11 @@ namespace DesktopApp_Project.GUI
         {
             var exam = UiHelpers.SelectedItem<DeThiDTO>(_gridDeThi);
             var question = UiHelpers.SelectedItem<CauHoiDTO>(_gridCauHoi);
-            if (exam == null || question == null) return;
+            if (exam == null || question == null)
+            {
+                UiHelpers.WarnSelect("đề thi và câu hỏi");
+                return;
+            }
 
             var result = Services.DeThi.ThemCauHoiVaoDeThi(exam.MaDeThi, question.MaCauHoi);
             UiHelpers.ShowResult(result);

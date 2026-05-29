@@ -65,16 +65,16 @@ namespace DesktopApp_Project.GUI
             var resolvedPath = ManagedFileStorage.ResolvePath(item.FileBaiLam);
             if (!string.IsNullOrWhiteSpace(resolvedPath) && File.Exists(resolvedPath))
             {
-                _txtPreview.Text = "Tep bai lam: " + resolvedPath + Environment.NewLine +
-                                   "Co the mo tep bang ung dung phu hop tren may de xem noi dung chi tiet.";
+                _txtPreview.Text = "Tệp bài làm: " + resolvedPath + Environment.NewLine +
+                                   "Có thể mở tệp bằng ứng dụng phù hợp trên máy để xem nội dung chi tiết.";
             }
             else if (!string.IsNullOrWhiteSpace(item.FileBaiLam))
             {
-                _txtPreview.Text = "Khong tim thay file bai lam: " + item.FileBaiLam;
+                _txtPreview.Text = "Không tìm thấy file bài làm: " + item.FileBaiLam;
             }
             else
             {
-                _txtPreview.Text = "Hoc vien chua co file bai lam trong he thong.";
+                _txtPreview.Text = "Học viên chưa có file bài làm trong hệ thống.";
             }
         }
 
@@ -86,7 +86,11 @@ namespace DesktopApp_Project.GUI
         private void BtnCham_Click(object sender, EventArgs e)
         {
             var item = UiHelpers.SelectedItem<NopBaiDTO>(_grid);
-            if (item == null) return;
+            if (item == null)
+            {
+                UiHelpers.WarnSelect("bài nộp");
+                return;
+            }
 
             item.DiemSo = _numDiem.Value;
             item.NhanXet = _txtNhanXet.Text.Trim();

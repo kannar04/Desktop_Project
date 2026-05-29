@@ -101,7 +101,16 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (_selectedId == 0) return;
+            if (_selectedId == 0)
+            {
+                UiHelpers.WarnSelect("bài tập");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("bài tập"))
+            {
+                return;
+            }
 
             var result = Services.BaiTap.Xoa(_selectedId);
             UiHelpers.ShowResult(result);

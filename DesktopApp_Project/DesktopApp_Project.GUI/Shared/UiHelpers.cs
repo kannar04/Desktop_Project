@@ -265,6 +265,20 @@ namespace DesktopApp_Project.GUI
                 result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
+        public static void WarnSelect(string itemName)
+        {
+            MessageBox.Show("Vui lòng chọn " + itemName + ".", "Thông báo",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Information);
+        }
+
+        public static bool ConfirmDelete(string itemName)
+        {
+            return MessageBox.Show("Bạn có chắc muốn xóa " + itemName + " này?", "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) == DialogResult.Yes;
+        }
+
         public static void BindLopHoc(ComboBox combo, ServiceFactory services)
         {
             combo.BeginUpdate();
@@ -637,7 +651,7 @@ namespace DesktopApp_Project.GUI
                 return true;
             }
 
-            Info("Khong co thong tin nguoi dung hien tai. Vui long dang nhap lai.");
+            Info("Không có thông tin người dùng hiện tại. Vui lòng đăng nhập lại.");
             return false;
         }
 
@@ -681,9 +695,9 @@ namespace DesktopApp_Project.GUI
 
         private void ShowRuntimeError(Exception ex)
         {
-            var message = ex == null ? "Loi khong xac dinh." : ex.Message;
-            MessageBox.Show("Khong the xu ly yeu cau. Chi tiet: " + message,
-                "Loi",
+            var message = ex == null ? "Lỗi không xác định." : ex.Message;
+            MessageBox.Show("Không thể xử lý yêu cầu. Chi tiết: " + message,
+                "Lỗi",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
         }

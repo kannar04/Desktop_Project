@@ -103,7 +103,16 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (_selectedId == 0) return;
+            if (_selectedId == 0)
+            {
+                UiHelpers.WarnSelect("tài liệu");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("tài liệu"))
+            {
+                return;
+            }
 
             var result = Services.TaiLieu.Xoa(_selectedId);
             UiHelpers.ShowResult(result);

@@ -101,7 +101,16 @@ namespace DesktopApp_Project.GUI
 
         private void BtnXoa_Click(object sender, EventArgs e)
         {
-            if (_selectedClassId == 0) return;
+            if (_selectedClassId == 0)
+            {
+                UiHelpers.WarnSelect("lớp học");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("lớp học"))
+            {
+                return;
+            }
 
             var result = Services.LopHoc.Xoa(_selectedClassId);
             UiHelpers.ShowResult(result);
@@ -126,7 +135,16 @@ namespace DesktopApp_Project.GUI
         private void BtnXoaHv_Click(object sender, EventArgs e)
         {
             var item = UiHelpers.SelectedItem<NguoiDungDTO>(_gridTrongLop);
-            if (item == null || _selectedClassId == 0) return;
+            if (item == null || _selectedClassId == 0)
+            {
+                UiHelpers.WarnSelect("học viên trong lớp");
+                return;
+            }
+
+            if (!UiHelpers.ConfirmDelete("học viên khỏi lớp"))
+            {
+                return;
+            }
 
             var result = Services.LopHoc.XoaHocVien(item.MaNguoiDung, _selectedClassId);
             UiHelpers.ShowResult(result);
