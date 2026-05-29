@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -49,104 +49,109 @@
     <Reference Include="System.Xml" />
     <Reference Include="FontAwesome.Sharp">
       <HintPath>$(UserProfile)\.nuget\packages\fontawesome.sharp\6.6.0\lib\net472\FontAwesome.Sharp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="DesktopApp_Project.BUS.csproj">
-      <Project>{34DB35EE-658C-4CCC-B773-66D275E08F6A}</Project>
+    <ProjectReference Include="..\DesktopApp_Project.BUS\DesktopApp_Project.BUS.csproj">
+      <Project>{774E26A8-88E7-406B-8A4C-F03284EBD186}</Project>
       <Name>DesktopApp_Project.BUS</Name>
     </ProjectReference>
-    <ProjectReference Include="DesktopApp_Project.DTO.csproj">
-      <Project>{1236308D-28A9-42AC-A5C1-13AF74EF8A3A}</Project>
+    <ProjectReference Include="..\DesktopApp_Project.DTO\DesktopApp_Project.DTO.csproj">
+      <Project>{7E99DC35-C4BB-4FA3-8F89-C3276D3CDA5C}</Project>
       <Name>DesktopApp_Project.DTO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DesktopApp_Project.Common\DesktopApp_Project.Common.csproj">
+      <Project>{D5A3C0FE-640D-48EF-B674-93FB4E5CE12D}</Project>
+      <Name>DesktopApp_Project.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GUI\Auth\FrmDangNhap.cs">
+    <Compile Include="Auth\FrmDangNhap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Auth\FrmDangNhap.Designer.cs">
+    <Compile Include="Auth\FrmDangNhap.Designer.cs">
       <DependentUpon>FrmDangNhap.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\BaiTap\FrmBaiTap.cs">
+    <Compile Include="BaiTap\FrmBaiTap.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\BaiTap\FrmBaiTap.Designer.cs">
+    <Compile Include="BaiTap\FrmBaiTap.Designer.cs">
       <DependentUpon>FrmBaiTap.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\BaiTap\FrmChamBai.cs">
+    <Compile Include="BaiTap\FrmChamBai.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\BaiTap\FrmChamBai.Designer.cs">
+    <Compile Include="BaiTap\FrmChamBai.Designer.cs">
       <DependentUpon>FrmChamBai.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\BaoCao\FrmBaoCao.cs">
+    <Compile Include="BaoCao\FrmBaoCao.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\BaoCao\FrmBaoCao.Designer.cs">
+    <Compile Include="BaoCao\FrmBaoCao.Designer.cs">
       <DependentUpon>FrmBaoCao.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\DeThi\FrmDeThi.cs">
+    <Compile Include="DeThi\FrmDeThi.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\DeThi\FrmDeThi.Designer.cs">
+    <Compile Include="DeThi\FrmDeThi.Designer.cs">
       <DependentUpon>FrmDeThi.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\DiemDanh\FrmDiemDanh.cs">
+    <Compile Include="DiemDanh\FrmDiemDanh.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\DiemDanh\FrmDiemDanh.Designer.cs">
+    <Compile Include="DiemDanh\FrmDiemDanh.Designer.cs">
       <DependentUpon>FrmDiemDanh.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\DiemSo\FrmDiemSo.cs">
+    <Compile Include="DiemSo\FrmDiemSo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\DiemSo\FrmDiemSo.Designer.cs">
+    <Compile Include="DiemSo\FrmDiemSo.Designer.cs">
       <DependentUpon>FrmDiemSo.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\HocPhi\FrmHocPhi.cs">
+    <Compile Include="HocPhi\FrmHocPhi.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\HocPhi\FrmHocPhi.Designer.cs">
+    <Compile Include="HocPhi\FrmHocPhi.Designer.cs">
       <DependentUpon>FrmHocPhi.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\HocVien\FrmHocVien.cs">
+    <Compile Include="HocVien\FrmHocVien.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\HocVien\FrmHocVien.Designer.cs">
+    <Compile Include="HocVien\FrmHocVien.Designer.cs">
       <DependentUpon>FrmHocVien.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\LopHoc\FrmLopHoc.cs">
+    <Compile Include="LopHoc\FrmLopHoc.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\LopHoc\FrmLopHoc.Designer.cs">
+    <Compile Include="LopHoc\FrmLopHoc.Designer.cs">
       <DependentUpon>FrmLopHoc.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\Main\FrmChinh.cs">
+    <Compile Include="Main\FrmChinh.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\Main\FrmChinh.Designer.cs">
+    <Compile Include="Main\FrmChinh.Designer.cs">
       <DependentUpon>FrmChinh.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\TaiLieu\FrmTaiLieu.cs">
+    <Compile Include="TaiLieu\FrmTaiLieu.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\TaiLieu\FrmTaiLieu.Designer.cs">
+    <Compile Include="TaiLieu\FrmTaiLieu.Designer.cs">
       <DependentUpon>FrmTaiLieu.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\ThongBao\FrmThongBao.cs">
+    <Compile Include="ThongBao\FrmThongBao.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\ThongBao\FrmThongBao.Designer.cs">
+    <Compile Include="ThongBao\FrmThongBao.Designer.cs">
       <DependentUpon>FrmThongBao.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\TuVung\FrmTuVung.cs">
+    <Compile Include="TuVung\FrmTuVung.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GUI\TuVung\FrmTuVung.Designer.cs">
+    <Compile Include="TuVung\FrmTuVung.Designer.cs">
       <DependentUpon>FrmTuVung.cs</DependentUpon>
     </Compile>
-    <Compile Include="GUI\UiHelpers.cs" />
+    <Compile Include="Shared\UiHelpers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -158,43 +163,43 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <EmbeddedResource Include="GUI\Auth\FrmDangNhap.resx">
+    <EmbeddedResource Include="Auth\FrmDangNhap.resx">
       <DependentUpon>FrmDangNhap.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\BaiTap\FrmChamBai.resx">
+    <EmbeddedResource Include="BaiTap\FrmChamBai.resx">
       <DependentUpon>FrmChamBai.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\BaoCao\FrmBaoCao.resx">
+    <EmbeddedResource Include="BaoCao\FrmBaoCao.resx">
       <DependentUpon>FrmBaoCao.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\DeThi\FrmDeThi.resx">
+    <EmbeddedResource Include="DeThi\FrmDeThi.resx">
       <DependentUpon>FrmDeThi.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\DiemDanh\FrmDiemDanh.resx">
+    <EmbeddedResource Include="DiemDanh\FrmDiemDanh.resx">
       <DependentUpon>FrmDiemDanh.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\DiemSo\FrmDiemSo.resx">
+    <EmbeddedResource Include="DiemSo\FrmDiemSo.resx">
       <DependentUpon>FrmDiemSo.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\HocPhi\FrmHocPhi.resx">
+    <EmbeddedResource Include="HocPhi\FrmHocPhi.resx">
       <DependentUpon>FrmHocPhi.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\HocVien\FrmHocVien.resx">
+    <EmbeddedResource Include="HocVien\FrmHocVien.resx">
       <DependentUpon>FrmHocVien.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\LopHoc\FrmLopHoc.resx">
+    <EmbeddedResource Include="LopHoc\FrmLopHoc.resx">
       <DependentUpon>FrmLopHoc.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\Main\FrmChinh.resx">
+    <EmbeddedResource Include="Main\FrmChinh.resx">
       <DependentUpon>FrmChinh.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\TaiLieu\FrmTaiLieu.resx">
+    <EmbeddedResource Include="TaiLieu\FrmTaiLieu.resx">
       <DependentUpon>FrmTaiLieu.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\ThongBao\FrmThongBao.resx">
+    <EmbeddedResource Include="ThongBao\FrmThongBao.resx">
       <DependentUpon>FrmThongBao.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GUI\TuVung\FrmTuVung.resx">
+    <EmbeddedResource Include="TuVung\FrmTuVung.resx">
       <DependentUpon>FrmTuVung.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>

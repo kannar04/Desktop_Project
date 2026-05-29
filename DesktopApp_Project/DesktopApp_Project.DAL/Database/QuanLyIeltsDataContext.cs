@@ -56,19 +56,30 @@ namespace DesktopApp_Project.DAL
 
         private static string ReadConnectionStringFromAssemblyConfig()
         {
-            var configPath = Assembly.GetExecutingAssembly().Location + ".config";
-            if (!File.Exists(configPath))
+            var configPaths = new[]
             {
-                return string.Empty;
+                Path.Combine(Directory.GetCurrentDirectory(), "DesktopApp_Project.exe.config"),
+                Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "DesktopApp_Project.exe.config"),
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "DesktopApp_Project.exe.config"),
+                Assembly.GetExecutingAssembly().Location + ".config"
+            };
+
+            foreach (var configPath in configPaths.Where(File.Exists))
+            {
+                var document = XDocument.Load(configPath);
+                var connection = document
+                    .Descendants("connectionStrings")
+                    .Elements("add")
+                    .FirstOrDefault(x => (string)x.Attribute("name") == "QuanLyIeltsDb");
+
+                var connectionString = connection == null ? string.Empty : (string)connection.Attribute("connectionString");
+                if (!string.IsNullOrWhiteSpace(connectionString))
+                {
+                    return connectionString;
+                }
             }
 
-            var document = XDocument.Load(configPath);
-            var connection = document
-                .Descendants("connectionStrings")
-                .Elements("add")
-                .FirstOrDefault(x => (string)x.Attribute("name") == "QuanLyIeltsDb");
-
-            return connection == null ? string.Empty : (string)connection.Attribute("connectionString");
+            return string.Empty;
         }
     }
 }

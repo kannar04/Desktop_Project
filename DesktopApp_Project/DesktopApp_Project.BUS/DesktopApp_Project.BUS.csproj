@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>DesktopApp_Project</RootNamespace>
+    <AssemblyName>DesktopApp_Project.BUS</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DesktopApp_Project.DAL\DesktopApp_Project.DAL.csproj" />
+    <ProjectReference Include="..\DesktopApp_Project.DTO\DesktopApp_Project.DTO.csproj" />
+    <ProjectReference Include="..\DesktopApp_Project.Common\DesktopApp_Project.Common.csproj" />
+  </ItemGroup>
+</Project>
