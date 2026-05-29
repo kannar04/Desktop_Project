@@ -9,12 +9,18 @@ namespace DesktopApp_Project.GUI
         public FrmThongBao()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmThongBao(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnGui, BtnGui_Click);
         }
 
         protected override void OnRuntimeLoad()
@@ -25,11 +31,16 @@ namespace DesktopApp_Project.GUI
 
         private void LoadData()
         {
-            _grid.DataSource = Services.ThongBao.LayDanhSach();
+            _grid.DataSource = SafeLoad<object>(() => Services.ThongBao.LayDanhSach(), null);
         }
 
         private void BtnGui_Click(object sender, EventArgs e)
         {
+            if (!HasCurrentUser())
+            {
+                return;
+            }
+
             var result = Services.ThongBao.Gui(new ThongBaoDTO
             {
                 MaNguoiGui = CurrentUser.MaNguoiDung,

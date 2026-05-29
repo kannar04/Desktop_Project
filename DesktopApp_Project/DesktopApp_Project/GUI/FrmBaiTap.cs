@@ -13,12 +13,23 @@ namespace DesktopApp_Project.GUI
         public FrmBaiTap()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmBaiTap(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnMoi, BtnMoi_Click);
+            WireClick(btnGiao, BtnGiao_Click);
+            WireClick(btnXoa, BtnXoa_Click);
+            WireClick(btnFile, BtnFile_Click);
+            WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -31,7 +42,7 @@ namespace DesktopApp_Project.GUI
         private void LoadData()
         {
             var maLop = UiHelpers.SelectedId(_cboLop);
-            _grid.DataSource = Services.BaiTap.LayDanhSach(maLop == 0 ? (int?)null : maLop);
+            _grid.DataSource = SafeLoad<object>(() => Services.BaiTap.LayDanhSach(maLop == 0 ? (int?)null : maLop), null);
         }
 
         private void FillFromGrid()
@@ -107,7 +118,7 @@ namespace DesktopApp_Project.GUI
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
-                    _txtFile.Text = dialog.FileName;
+                    _txtFile.Text = ManagedFileStorage.CopyToManagedFolder(dialog.FileName, "BaiTap");
                 }
             }
         }

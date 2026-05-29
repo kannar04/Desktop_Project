@@ -18,12 +18,23 @@ namespace DesktopApp_Project.GUI
         public FrmDeThi()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmDeThi(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnMoi, BtnMoi_Click);
+            WireClick(btnLuuCau, BtnLuuCau_Click);
+            WireClick(btnXoaCau, BtnXoaCau_Click);
+            WireClick(btnTaoDe, BtnTaoDe_Click);
+            WireClick(btnThemVaoDe, BtnThemVaoDe_Click);
+            WireSelectionChanged(_gridCauHoi, GridCauHoi_SelectionChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -45,7 +56,7 @@ namespace DesktopApp_Project.GUI
             _txtTuKhoa.Width = 180;
             var btnLoc = UiHelpers.Button("Lọc");
             btnLoc.Width = 70;
-            btnLoc.Click += BtnLoc_Click;
+            btnLoc.Click += (sender, e) => SafeRun(() => BtnLoc_Click(sender, e));
 
             buttons.Controls.Add(UiHelpers.Label("Kỹ năng"));
             buttons.Controls.Add(_cboLocKyNang);
@@ -59,15 +70,17 @@ namespace DesktopApp_Project.GUI
 
         private void LoadData()
         {
-            var result = Services.DeThi.LayCauHoi(new CauHoiSearchCriteriaDTO
+            var result = SafeLoad(() => Services.DeThi.LayCauHoi(new CauHoiSearchCriteriaDTO
             {
                 NhanKyNang = _cboLocKyNang == null ? AppConstants.FilterAll : Convert.ToString(_cboLocKyNang.SelectedItem),
                 BandTu = _numBandTu == null ? (decimal?)null : _numBandTu.Value,
                 BandDen = _numBandDen == null ? (decimal?)null : _numBandDen.Value,
                 Keyword = _txtTuKhoa == null ? null : _txtTuKhoa.Text
-            });
-            _gridCauHoi.DataSource = result.Success ? result.Data : Services.DeThi.LayCauHoi((string)null);
-            _gridDeThi.DataSource = Services.DeThi.LayDeThi();
+            }), null);
+            _gridCauHoi.DataSource = result != null && result.Success
+                ? result.Data
+                : SafeLoad<object>(() => Services.DeThi.LayCauHoi((string)null), null);
+            _gridDeThi.DataSource = SafeLoad<object>(() => Services.DeThi.LayDeThi(), null);
         }
 
         private void FillQuestion()

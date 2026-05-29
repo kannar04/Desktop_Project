@@ -9,12 +9,22 @@ namespace DesktopApp_Project.GUI
         public FrmDiemSo()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmDiemSo(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTaoDot, BtnTaoDot_Click);
+            WireClick(btnTai, BtnTai_Click);
+            WireClick(btnLuu, BtnLuu_Click);
+            WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
+            WireSelectedIndexChanged(_cboDot, CboDot_SelectedIndexChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -28,8 +38,8 @@ namespace DesktopApp_Project.GUI
             var maLop = UiHelpers.SelectedId(_cboLop);
             if (maLop <= 0) return;
 
-            _gridHocVien.DataSource = Services.LopHoc.LayHocVienTrongLop(maLop);
-            _cboDot.DataSource = Services.DiemSo.LayDotKiemTra(maLop);
+            _gridHocVien.DataSource = SafeLoad<object>(() => Services.LopHoc.LayHocVienTrongLop(maLop), null);
+            _cboDot.DataSource = SafeLoad<object>(() => Services.DiemSo.LayDotKiemTra(maLop), null);
             _cboDot.DisplayMember = "TenDotKiemTra";
             _cboDot.ValueMember = "MaDotKiemTra";
             LoadScores();
@@ -53,7 +63,11 @@ namespace DesktopApp_Project.GUI
             var maDot = UiHelpers.SelectedId(_cboDot);
             if (maDot > 0)
             {
-                _gridDiem.DataSource = Services.DiemSo.LayDiemSo(maDot);
+                _gridDiem.DataSource = SafeLoad<object>(() => Services.DiemSo.LayDiemSo(maDot), null);
+            }
+            else
+            {
+                _gridDiem.DataSource = null;
             }
         }
 
@@ -85,6 +99,11 @@ namespace DesktopApp_Project.GUI
         private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadRoundsAndStudents();
+        }
+
+        private void CboDot_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadScores();
         }
     }
 }

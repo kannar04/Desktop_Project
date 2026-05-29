@@ -20,12 +20,22 @@ namespace DesktopApp_Project.GUI
         public FrmTuVung()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmTuVung(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnMoi, BtnMoi_Click);
+            WireClick(btnLuu, BtnLuu_Click);
+            WireClick(btnXoa, BtnXoa_Click);
+            WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -54,7 +64,7 @@ namespace DesktopApp_Project.GUI
 
             var btnLoc = UiHelpers.Button("Lọc");
             btnLoc.Width = 70;
-            btnLoc.Click += BtnLoc_Click;
+            btnLoc.Click += (sender, e) => SafeRun(() => BtnLoc_Click(sender, e));
             buttons.Controls.Add(UiHelpers.Label("Từ khóa"));
             buttons.Controls.Add(_txtTuKhoa);
             buttons.Controls.Add(UiHelpers.Label("Loại"));
@@ -70,7 +80,7 @@ namespace DesktopApp_Project.GUI
 
         private void LoadData()
         {
-            _grid.DataSource = Services.TuVung.TimKiem(new TuVungSearchCriteriaDTO
+            _grid.DataSource = SafeLoad<object>(() => Services.TuVung.TimKiem(new TuVungSearchCriteriaDTO
             {
                 MaLopHoc = UiHelpers.SelectedId(_cboLop),
                 Keyword = _txtTuKhoa == null ? null : _txtTuKhoa.Text,
@@ -78,7 +88,7 @@ namespace DesktopApp_Project.GUI
                 CapDo = _cboCapDoFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboCapDoFilter.SelectedItem),
                 ChuDe = _cboChuDeFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboChuDeFilter.SelectedItem),
                 ChuCaiDau = _cboChuCaiFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboChuCaiFilter.SelectedItem)
-            });
+            }), null);
         }
 
         private void Fill()

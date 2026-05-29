@@ -1,6 +1,6 @@
--- DEV-ONLY DESTRUCTIVE RESET SCRIPT.
--- This script drops and recreates tables for the local QuanLyLopIELTS development database.
--- Do not run against production or any database that contains data you need to keep.
+-- NON-DESTRUCTIVE SETUP SCRIPT.
+-- Creates the QuanLyLopIELTS database and initial schema only when the schema is missing.
+-- For a full destructive rebuild, run ResetDatabase.sql instead.
 
 IF DB_ID(N'QuanLyLopIELTS') IS NULL
 BEGIN
@@ -11,27 +11,10 @@ GO
 USE QuanLyLopIELTS;
 GO
 
-IF OBJECT_ID(N'dbo.ChiTiet_ThongBao', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_ThongBao;
-IF OBJECT_ID(N'dbo.ThongBao', N'U') IS NOT NULL DROP TABLE dbo.ThongBao;
-IF OBJECT_ID(N'dbo.ThanhToanHocPhi', N'U') IS NOT NULL DROP TABLE dbo.ThanhToanHocPhi;
-IF OBJECT_ID(N'dbo.NhatKyBaoCao', N'U') IS NOT NULL DROP TABLE dbo.NhatKyBaoCao;
-IF OBJECT_ID(N'dbo.TienTrinh_Flashcard', N'U') IS NOT NULL DROP TABLE dbo.TienTrinh_Flashcard;
-IF OBJECT_ID(N'dbo.TuVung', N'U') IS NOT NULL DROP TABLE dbo.TuVung;
-IF OBJECT_ID(N'dbo.ChiTiet_DiemSo', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_DiemSo;
-IF OBJECT_ID(N'dbo.DotKiemTra', N'U') IS NOT NULL DROP TABLE dbo.DotKiemTra;
-IF OBJECT_ID(N'dbo.ChiTiet_DeThi', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_DeThi;
-IF OBJECT_ID(N'dbo.CauHoi', N'U') IS NOT NULL DROP TABLE dbo.CauHoi;
-IF OBJECT_ID(N'dbo.DeThi', N'U') IS NOT NULL DROP TABLE dbo.DeThi;
-IF OBJECT_ID(N'dbo.ChiTiet_DiemDanh', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_DiemDanh;
-IF OBJECT_ID(N'dbo.BuoiHoc', N'U') IS NOT NULL DROP TABLE dbo.BuoiHoc;
-IF OBJECT_ID(N'dbo.ChiTiet_NopBai', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_NopBai;
-IF OBJECT_ID(N'dbo.BaiTap', N'U') IS NOT NULL DROP TABLE dbo.BaiTap;
-IF OBJECT_ID(N'dbo.TaiLieu', N'U') IS NOT NULL DROP TABLE dbo.TaiLieu;
-IF OBJECT_ID(N'dbo.ChiTiet_LopHoc', N'U') IS NOT NULL DROP TABLE dbo.ChiTiet_LopHoc;
-IF OBJECT_ID(N'dbo.LopHoc', N'U') IS NOT NULL DROP TABLE dbo.LopHoc;
-IF OBJECT_ID(N'dbo.NguoiDung', N'U') IS NOT NULL DROP TABLE dbo.NguoiDung;
-GO
+-- Each table and seed block below is guarded so the script can be rerun safely.
 
+IF OBJECT_ID(N'dbo.NguoiDung', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.NguoiDung
 (
     MaNguoiDung INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_NguoiDung PRIMARY KEY,
@@ -47,7 +30,10 @@ CREATE TABLE dbo.NguoiDung
     CONSTRAINT UQ_NguoiDung_Email UNIQUE (Email),
     CONSTRAINT CK_NguoiDung_VaiTro CHECK (VaiTro IN (N'Admin', N'GiaoVien', N'HocSinh', N'NhanVien'))
 );
+END
 
+IF OBJECT_ID(N'dbo.LopHoc', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.LopHoc
 (
     MaLopHoc INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_LopHoc PRIMARY KEY,
@@ -58,7 +44,10 @@ CREATE TABLE dbo.LopHoc
     CONSTRAINT UQ_LopHoc_TenLop UNIQUE (TenLop),
     CONSTRAINT FK_LopHoc_GiaoVien FOREIGN KEY (MaGiaoVien) REFERENCES dbo.NguoiDung(MaNguoiDung)
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_LopHoc', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_LopHoc
 (
     MaNguoiDung INT NOT NULL,
@@ -71,7 +60,10 @@ CREATE TABLE dbo.ChiTiet_LopHoc
     CONSTRAINT FK_CTLH_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc) ON DELETE CASCADE,
     CONSTRAINT CK_CTLH_TrangThai CHECK (TrangThai IN (N'Đang học', N'Tạm nghỉ', N'Đã nghỉ'))
 );
+END
 
+IF OBJECT_ID(N'dbo.TaiLieu', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.TaiLieu
 (
     MaTaiLieu INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_TaiLieu PRIMARY KEY,
@@ -85,7 +77,10 @@ CREATE TABLE dbo.TaiLieu
     CONSTRAINT FK_TaiLieu_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc) ON DELETE CASCADE,
     CONSTRAINT CK_TaiLieu_KyNang CHECK (NhanKyNang IN (N'Listening', N'Reading', N'Writing', N'Speaking'))
 );
+END
 
+IF OBJECT_ID(N'dbo.BaiTap', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.BaiTap
 (
     MaBaiTap INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_BaiTap PRIMARY KEY,
@@ -97,7 +92,10 @@ CREATE TABLE dbo.BaiTap
     NgayTao DATETIME NOT NULL CONSTRAINT DF_BaiTap_NgayTao DEFAULT GETDATE(),
     CONSTRAINT FK_BaiTap_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc) ON DELETE CASCADE
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_NopBai', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_NopBai
 (
     MaNguoiDung INT NOT NULL,
@@ -112,7 +110,10 @@ CREATE TABLE dbo.ChiTiet_NopBai
     CONSTRAINT FK_NopBai_BaiTap FOREIGN KEY (MaBaiTap) REFERENCES dbo.BaiTap(MaBaiTap) ON DELETE CASCADE,
     CONSTRAINT CK_NopBai_Diem CHECK (DiemSo IS NULL OR (DiemSo >= 0 AND DiemSo <= 9))
 );
+END
 
+IF OBJECT_ID(N'dbo.BuoiHoc', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.BuoiHoc
 (
     MaBuoiHoc INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_BuoiHoc PRIMARY KEY,
@@ -121,7 +122,10 @@ CREATE TABLE dbo.BuoiHoc
     CONSTRAINT FK_BuoiHoc_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc) ON DELETE CASCADE,
     CONSTRAINT UQ_BuoiHoc UNIQUE (MaLopHoc, NgayHoc)
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_DiemDanh', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_DiemDanh
 (
     MaNguoiDung INT NOT NULL,
@@ -133,7 +137,10 @@ CREATE TABLE dbo.ChiTiet_DiemDanh
     CONSTRAINT FK_DiemDanh_BuoiHoc FOREIGN KEY (MaBuoiHoc) REFERENCES dbo.BuoiHoc(MaBuoiHoc) ON DELETE CASCADE,
     CONSTRAINT CK_DiemDanh_TrangThai CHECK (TrangThai IN (N'Có mặt', N'Vắng', N'Đi trễ'))
 );
+END
 
+IF OBJECT_ID(N'dbo.DeThi', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.DeThi
 (
     MaDeThi INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_DeThi PRIMARY KEY,
@@ -141,7 +148,10 @@ CREATE TABLE dbo.DeThi
     FileDuLieu NVARCHAR(500) NULL,
     NgayTao DATETIME NOT NULL CONSTRAINT DF_DeThi_NgayTao DEFAULT GETDATE()
 );
+END
 
+IF OBJECT_ID(N'dbo.CauHoi', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.CauHoi
 (
     MaCauHoi INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_CauHoi PRIMARY KEY,
@@ -152,7 +162,10 @@ CREATE TABLE dbo.CauHoi
     CONSTRAINT CK_CauHoi_KyNang CHECK (NhanKyNang IN (N'Listening', N'Reading', N'Writing', N'Speaking')),
     CONSTRAINT CK_CauHoi_BandLevel CHECK (BandLevel IS NULL OR (BandLevel >= 0 AND BandLevel <= 9))
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_DeThi', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_DeThi
 (
     MaDeThi INT NOT NULL,
@@ -161,7 +174,10 @@ CREATE TABLE dbo.ChiTiet_DeThi
     CONSTRAINT FK_CTDT_DeThi FOREIGN KEY (MaDeThi) REFERENCES dbo.DeThi(MaDeThi) ON DELETE CASCADE,
     CONSTRAINT FK_CTDT_CauHoi FOREIGN KEY (MaCauHoi) REFERENCES dbo.CauHoi(MaCauHoi) ON DELETE CASCADE
 );
+END
 
+IF OBJECT_ID(N'dbo.DotKiemTra', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.DotKiemTra
 (
     MaDotKiemTra INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_DotKiemTra PRIMARY KEY,
@@ -172,7 +188,10 @@ CREATE TABLE dbo.DotKiemTra
     CONSTRAINT FK_DotKiemTra_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc) ON DELETE CASCADE,
     CONSTRAINT FK_DotKiemTra_DeThi FOREIGN KEY (MaDeThi) REFERENCES dbo.DeThi(MaDeThi)
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_DiemSo', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_DiemSo
 (
     MaNguoiDung INT NOT NULL,
@@ -195,7 +214,10 @@ CREATE TABLE dbo.ChiTiet_DiemSo
         (DiemTong IS NULL OR (DiemTong >= 0 AND DiemTong <= 9))
     )
 );
+END
 
+IF OBJECT_ID(N'dbo.TuVung', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.TuVung
 (
     MaTuVung INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_TuVung PRIMARY KEY,
@@ -210,7 +232,10 @@ CREATE TABLE dbo.TuVung
     CONSTRAINT UQ_TuVung_Lop UNIQUE (MaLopHoc, TuTiengAnh),
     CONSTRAINT CK_TuVung_CapDo CHECK (CapDo IN (N'B1', N'B2', N'C1', N'C2'))
 );
+END
 
+IF OBJECT_ID(N'dbo.TienTrinh_Flashcard', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.TienTrinh_Flashcard
 (
     MaNguoiDung INT NOT NULL,
@@ -220,7 +245,10 @@ CREATE TABLE dbo.TienTrinh_Flashcard
     CONSTRAINT FK_Flashcard_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES dbo.NguoiDung(MaNguoiDung) ON DELETE CASCADE,
     CONSTRAINT FK_Flashcard_TuVung FOREIGN KEY (MaTuVung) REFERENCES dbo.TuVung(MaTuVung) ON DELETE CASCADE
 );
+END
 
+IF OBJECT_ID(N'dbo.ThongBao', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ThongBao
 (
     MaThongBao INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_ThongBao PRIMARY KEY,
@@ -231,7 +259,10 @@ CREATE TABLE dbo.ThongBao
     ThoiGianGui DATETIME NOT NULL CONSTRAINT DF_ThongBao_ThoiGian DEFAULT GETDATE(),
     CONSTRAINT FK_ThongBao_NguoiGui FOREIGN KEY (MaNguoiGui) REFERENCES dbo.NguoiDung(MaNguoiDung)
 );
+END
 
+IF OBJECT_ID(N'dbo.ChiTiet_ThongBao', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ChiTiet_ThongBao
 (
     MaThongBao INT NOT NULL,
@@ -241,7 +272,10 @@ CREATE TABLE dbo.ChiTiet_ThongBao
     CONSTRAINT FK_CTThongBao_ThongBao FOREIGN KEY (MaThongBao) REFERENCES dbo.ThongBao(MaThongBao) ON DELETE CASCADE,
     CONSTRAINT FK_CTThongBao_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES dbo.NguoiDung(MaNguoiDung) ON DELETE CASCADE
 );
+END
 
+IF OBJECT_ID(N'dbo.ThanhToanHocPhi', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.ThanhToanHocPhi
 (
     MaThanhToan INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_ThanhToanHocPhi PRIMARY KEY,
@@ -259,7 +293,10 @@ CREATE TABLE dbo.ThanhToanHocPhi
     CONSTRAINT FK_HocPhi_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES dbo.NguoiDung(MaNguoiDung) ON DELETE CASCADE,
     CONSTRAINT FK_HocPhi_LopHoc FOREIGN KEY (MaLopHoc) REFERENCES dbo.LopHoc(MaLopHoc)
 );
+END
 
+IF OBJECT_ID(N'dbo.NhatKyBaoCao', N'U') IS NULL
+BEGIN
 CREATE TABLE dbo.NhatKyBaoCao
 (
     MaNhatKy INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_NhatKyBaoCao PRIMARY KEY,
@@ -269,8 +306,11 @@ CREATE TABLE dbo.NhatKyBaoCao
     ThoiGianTao DATETIME NOT NULL CONSTRAINT DF_NhatKyBaoCao_ThoiGian DEFAULT GETDATE(),
     CONSTRAINT FK_NhatKyBaoCao_NguoiDung FOREIGN KEY (MaNguoiDung) REFERENCES dbo.NguoiDung(MaNguoiDung)
 );
+END
 GO
 
+IF OBJECT_ID(N'dbo.NguoiDung', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.NguoiDung)
+BEGIN
 INSERT INTO dbo.NguoiDung (VaiTro, HoTen, NgaySinh, SDT, Email, TrinhDoDauVao, TaiKhoan, MatKhau)
 VALUES
 (N'Admin', N'Quản trị hệ thống', NULL, N'0900000000', N'admin@ielts.local', NULL, N'admin', N'admin'),
@@ -306,11 +346,19 @@ VALUES
 (N'HocSinh', N'Huỳnh Ngọc Thảo', '2004-09-13', N'0912000014', N'thao.huynh@example.com', N'Band 6.0', N'thao.huynh', N'123456'),
 (N'HocSinh', N'Cao Tuệ Vy', '2003-05-30', N'0912000015', N'vy.cao@example.com', N'Band 6.5', N'vy.cao', N'123456');
 
+END
+
+IF OBJECT_ID(N'dbo.LopHoc', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.LopHoc)
+BEGIN
 INSERT INTO dbo.LopHoc (MaGiaoVien, TenLop, NhomTrinhDo, LichHoc)
 VALUES
 (2, N'IELTS Cơ Bản', N'Band 4.0-5.5', N'Thứ 2 - Thứ 4, 18:00'),
 (2, N'IELTS Nâng Cao', N'Band 5.5-7.0', N'Thứ 3 - Thứ 5, 19:30');
 
+END
+
+IF OBJECT_ID(N'dbo.ChiTiet_LopHoc', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.ChiTiet_LopHoc)
+BEGIN
 INSERT INTO dbo.ChiTiet_LopHoc (MaNguoiDung, MaLopHoc, NgayVaoLop, NgayNghiHoc, TrangThai)
 VALUES
 (3, 1, '2023-02-01', NULL, N'Đang học'),
@@ -343,8 +391,11 @@ VALUES
 (30, 2, '2023-02-15', NULL, N'Đang học'),
 (31, 2, '2024-04-01', NULL, N'Đang học'),
 (32, 2, '2023-11-01', DATEADD(day, -10, GETDATE()), N'Tạm nghỉ');
+END
 GO
 
+IF OBJECT_ID(N'dbo.TuVung', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.TuVung)
+BEGIN
 INSERT INTO dbo.TuVung (MaLopHoc, TuTiengAnh, TuLoai, PhienAm, Nghia, CapDo, ChuDe)
 VALUES
 (1, N'algorithm', N'noun', N'/ˈælɡərɪðəm/', N'thuật toán', N'B2', N'Technology'),
@@ -545,13 +596,20 @@ VALUES
 (1, N'accuracy', N'noun', N'/ˈækjərəsi/', N'độ chính xác', N'B2', N'Academic/IELTS General'),
 (1, N'analytically', N'adverb', N'/ˌænəˈlɪtɪkli/', N'một cách phân tích', N'C1', N'Academic/IELTS General'),
 (1, N'relevant', N'adjective', N'/ˈreləvənt/', N'liên quan', N'B2', N'Academic/IELTS General');
+END
 GO
 
+IF OBJECT_ID(N'dbo.DeThi', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.DeThi)
+BEGIN
 INSERT INTO dbo.DeThi (TenDeThi, FileDuLieu, NgayTao)
 VALUES
 (N'IELTS Practice Test 1', NULL, GETDATE()),
 (N'IELTS Practice Test 2', NULL, GETDATE());
 
+END
+
+IF OBJECT_ID(N'dbo.CauHoi', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.CauHoi)
+BEGIN
 INSERT INTO dbo.CauHoi (NoiDung, DapAn, NhanKyNang, BandLevel)
 VALUES
 (N'Listen to a conversation about booking accommodation and identify the final price.', N'120 dollars', N'Listening', 5.5),
@@ -561,17 +619,29 @@ VALUES
 (N'Explain why cybersecurity has become important for modern businesses.', N'Because digital systems store sensitive data', N'Reading', 6.5),
 (N'Compare two views about online education and give your opinion.', N'Balanced opinion essay', N'Writing', 7.0);
 
+END
+
+IF OBJECT_ID(N'dbo.BaiTap', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.BaiTap)
+BEGIN
 INSERT INTO dbo.BaiTap (MaLopHoc, TieuDe, MoTa, Deadline, FileDinhKem, NgayTao)
 VALUES
 (1, N'Writing Task 1 - Biểu đồ đường', N'Viết báo cáo 150 từ về xu hướng doanh thu.', DATEADD(day, 7, GETDATE()), NULL, GETDATE()),
 (2, N'Speaking Part 2 - Teamwork', N'Chuẩn bị câu trả lời 2 phút về làm việc nhóm.', DATEADD(day, 5, GETDATE()), NULL, GETDATE());
 
+END
+
+IF OBJECT_ID(N'dbo.ChiTiet_NopBai', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.ChiTiet_NopBai)
+BEGIN
 INSERT INTO dbo.ChiTiet_NopBai (MaNguoiDung, MaBaiTap, FileBaiLam, ThoiGianNop, TrangThaiNop, DiemSo, NhanXet)
 VALUES
 (3, 1, N'an_task1.docx', DATEADD(day, -1, GETDATE()), N'Đã chấm', 6.0, N'Bố cục rõ, cần cải thiện từ vựng.'),
 (4, 1, NULL, NULL, N'Chưa nộp', NULL, NULL),
 (18, 2, N'anh_speaking.mp3', DATEADD(hour, -8, GETDATE()), N'Đã nộp', NULL, NULL);
 
+END
+
+IF OBJECT_ID(N'dbo.BuoiHoc', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.BuoiHoc)
+BEGIN
 INSERT INTO dbo.BuoiHoc (MaLopHoc, NgayHoc)
 VALUES
 (1, CONVERT(date, DATEADD(day, -7, GETDATE()))),
@@ -579,6 +649,10 @@ VALUES
 (2, CONVERT(date, DATEADD(day, -6, GETDATE()))),
 (2, CONVERT(date, DATEADD(day, -1, GETDATE())));
 
+END
+
+IF OBJECT_ID(N'dbo.ChiTiet_DiemDanh', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.ChiTiet_DiemDanh)
+BEGIN
 INSERT INTO dbo.ChiTiet_DiemDanh (MaNguoiDung, MaBuoiHoc, TrangThai, LyDoVang)
 VALUES
 (3, 1, N'Có mặt', NULL),
@@ -591,11 +665,19 @@ VALUES
 (18, 4, N'Có mặt', NULL),
 (19, 4, N'Có mặt', NULL);
 
+END
+
+IF OBJECT_ID(N'dbo.DotKiemTra', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.DotKiemTra)
+BEGIN
 INSERT INTO dbo.DotKiemTra (MaLopHoc, MaDeThi, TenDotKiemTra, NgayKiemTra)
 VALUES
 (1, 1, N'Midterm 1', CONVERT(date, DATEADD(day, -20, GETDATE()))),
 (2, 2, N'Midterm 1', CONVERT(date, DATEADD(day, -18, GETDATE())));
 
+END
+
+IF OBJECT_ID(N'dbo.ChiTiet_DiemSo', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.ChiTiet_DiemSo)
+BEGIN
 INSERT INTO dbo.ChiTiet_DiemSo (MaNguoiDung, MaDotKiemTra, DiemL, DiemR, DiemW, DiemS, DiemTong, NhanXet)
 VALUES
 (3, 1, 5.5, 6.0, 5.5, 6.0, 6.0, N'Cần tăng độ chính xác ngữ pháp.'),
@@ -603,6 +685,10 @@ VALUES
 (18, 2, 6.5, 7.0, 6.0, 6.5, 6.5, N'Phản xạ nói tốt.'),
 (19, 2, 6.0, 6.5, 6.0, 6.0, 6.0, N'Cần mở rộng ý trong Writing.');
 
+END
+
+IF OBJECT_ID(N'dbo.ThanhToanHocPhi', N'U') IS NOT NULL AND NOT EXISTS (SELECT 1 FROM dbo.ThanhToanHocPhi)
+BEGIN
 INSERT INTO dbo.ThanhToanHocPhi
     (MaNguoiDung, MaLopHoc, SoTien, SoTienGoc, PhanTramGiam, SoTienGiam, SoTienCuoi, ThongTinNganHang, NgayTao, HanThanhToan, TrangThai)
 VALUES
@@ -610,4 +696,5 @@ VALUES
 (4, 1, 3000000, 3000000, 0, 0, 3000000, N'VCB 012345678 - Trung tâm IELTS', DATEADD(day, -4, GETDATE()), DATEADD(day, 6, GETDATE()), N'Chờ thanh toán'),
 (18, 2, 2800000, 3500000, 20, 700000, 2800000, N'VCB 012345678 - Trung tâm IELTS', DATEADD(month, -1, GETDATE()), DATEADD(day, -18, GETDATE()), N'Đã thanh toán'),
 (19, 2, 3500000, 3500000, 0, 0, 3500000, N'VCB 012345678 - Trung tâm IELTS', DATEADD(day, -3, GETDATE()), DATEADD(day, 7, GETDATE()), N'Đã thanh toán');
+END
 GO

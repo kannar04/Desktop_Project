@@ -16,12 +16,22 @@ namespace DesktopApp_Project.GUI
         public FrmHocVien()
         {
             InitializeComponent();
+            WireEvents();
         }
 
         public FrmHocVien(ServiceFactory services, NguoiDungDTO currentUser)
             : this()
         {
             SetRuntimeContext(services, currentUser);
+        }
+
+        private void WireEvents()
+        {
+            WireClick(btnTim, BtnTim_Click);
+            WireClick(btnThem, BtnThem_Click);
+            WireClick(btnLuu, BtnLuu_Click);
+            WireClick(btnXoa, BtnXoa_Click);
+            WireSelectionChanged(_grid, Grid_SelectionChanged);
         }
 
         protected override void OnRuntimeLoad()
@@ -69,13 +79,13 @@ namespace DesktopApp_Project.GUI
                 }
             }
 
-            _grid.DataSource = Services.HocVien.TimKiem(new HocVienSearchCriteriaDTO
+            _grid.DataSource = SafeLoad<object>(() => Services.HocVien.TimKiem(new HocVienSearchCriteriaDTO
             {
                 HoTen = _txtTim.Text,
                 LienHe = _txtLienHe == null ? null : _txtLienHe.Text,
                 MaLopHoc = maLopHoc,
                 TrangThai = _cboTrangThaiFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboTrangThaiFilter.SelectedItem)
-            });
+            }), null);
         }
 
         private void FillFromGrid()
