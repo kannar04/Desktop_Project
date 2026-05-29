@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <RootNamespace>DesktopApp_Project</RootNamespace>
+    <AssemblyName>DesktopApp_Project.DAL</AssemblyName>
+    <BaseOutputPath>bin\DAL\</BaseOutputPath>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="DesktopApp_Project.DTO.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="DAL\Database\**\*.cs" />
+    <Compile Include="DAL\Entities\**\*.cs" />
+    <Compile Include="DAL\Mappers\**\*.cs" />
+    <Compile Include="DAL\Repositories\**\*.cs" />
+    <None Include="DAL\Sql\*.sql" />
+  </ItemGroup>
+</Project>

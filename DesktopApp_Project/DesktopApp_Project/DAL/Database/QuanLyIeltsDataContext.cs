@@ -1,5 +1,9 @@
 using System.Configuration;
 using System.Data.Linq;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace DesktopApp_Project.DAL
 {
@@ -42,7 +46,29 @@ namespace DesktopApp_Project.DAL
         {
             var connection = ConfigurationManager.ConnectionStrings["QuanLyIeltsDb"];
             var connectionString = connection == null ? string.Empty : connection.ConnectionString;
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = ReadConnectionStringFromAssemblyConfig();
+            }
+
             return new QuanLyIeltsDataContext(connectionString);
+        }
+
+        private static string ReadConnectionStringFromAssemblyConfig()
+        {
+            var configPath = Assembly.GetExecutingAssembly().Location + ".config";
+            if (!File.Exists(configPath))
+            {
+                return string.Empty;
+            }
+
+            var document = XDocument.Load(configPath);
+            var connection = document
+                .Descendants("connectionStrings")
+                .Elements("add")
+                .FirstOrDefault(x => (string)x.Attribute("name") == "QuanLyIeltsDb");
+
+            return connection == null ? string.Empty : (string)connection.Attribute("connectionString");
         }
     }
 }

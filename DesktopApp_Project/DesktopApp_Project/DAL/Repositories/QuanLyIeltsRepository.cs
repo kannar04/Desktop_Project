@@ -124,13 +124,13 @@ namespace DesktopApp_Project.DAL
                         query = query.Where(x => db.ChiTietLopHocs.Any(ct =>
                             ct.MaNguoiDung == x.MaNguoiDung
                             && ct.MaLopHoc == maLopHoc
-                            && ct.TrangThai == trangThai));
+                            && AppConstants.GetTextAliases(trangThai).Contains(ct.TrangThai)));
                     }
                     else
                     {
                         query = query.Where(x => db.ChiTietLopHocs.Any(ct =>
                             ct.MaNguoiDung == x.MaNguoiDung
-                            && ct.TrangThai == trangThai));
+                            && AppConstants.GetTextAliases(trangThai).Contains(ct.TrangThai)));
                     }
                 }
 
@@ -310,7 +310,7 @@ namespace DesktopApp_Project.DAL
 
                 if (onlyActive)
                 {
-                    query = query.Where(x => x.ct.TrangThai == AppConstants.EnrollmentActive && x.ct.NgayNghiHoc == null);
+                    query = query.Where(x => AppConstants.EnrollmentActiveAliases.Contains(x.ct.TrangThai) && x.ct.NgayNghiHoc == null);
                 }
 
                 return query.AsEnumerable().Select(x => new HocVienLopDTO
@@ -323,7 +323,7 @@ namespace DesktopApp_Project.DAL
                     NgayVaoLop = x.ct.NgayVaoLop,
                     NgayNghiHoc = x.ct.NgayNghiHoc,
                     TrangThai = x.ct.TrangThai,
-                    DangHoc = x.ct.TrangThai == AppConstants.EnrollmentActive && !x.ct.NgayNghiHoc.HasValue
+                    DangHoc = AppConstants.EnrollmentActiveAliases.Contains(x.ct.TrangThai) && !x.ct.NgayNghiHoc.HasValue
                 }).OrderBy(x => x.HoTen).ToList();
             }
         }
@@ -604,7 +604,7 @@ namespace DesktopApp_Project.DAL
                         MaNguoiDung = dd.MaNguoiDung,
                         MaBuoiHoc = dd.MaBuoiHoc,
                         HoTen = nd.HoTen,
-                        CoMat = dd.TrangThai == AppConstants.AttendancePresent || dd.TrangThai == AppConstants.AttendanceLate,
+                        CoMat = AppConstants.AttendancePresentAliases.Contains(dd.TrangThai) || AppConstants.AttendanceLateAliases.Contains(dd.TrangThai),
                         TrangThai = dd.TrangThai,
                         LyDoVang = dd.LyDoVang
                     };
@@ -668,7 +668,7 @@ namespace DesktopApp_Project.DAL
                 var soBuoiCoMatTheoHangSo = db.ChiTietDiemDanhs.Count(x =>
                     x.MaNguoiDung == maNguoiDung
                     && buoiIds.Contains(x.MaBuoiHoc)
-                    && (x.TrangThai == AppConstants.AttendancePresent || x.TrangThai == AppConstants.AttendanceLate));
+                    && (AppConstants.AttendancePresentAliases.Contains(x.TrangThai) || AppConstants.AttendanceLateAliases.Contains(x.TrangThai)));
                 if (soBuoiCoMatTheoHangSo >= 0)
                 {
                     return Math.Round(soBuoiCoMatTheoHangSo * 100m / buoiIds.Count, 2);
@@ -1195,7 +1195,7 @@ namespace DesktopApp_Project.DAL
                 var start = new DateTime(today.Year, today.Month, 1);
                 var end = start.AddMonths(1);
                 var paidThisMonth = db.ThanhToanHocPhis
-                    .Where(x => x.TrangThai == AppConstants.PaymentPaid && x.NgayTao >= start && x.NgayTao < end)
+                    .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai) && x.NgayTao >= start && x.NgayTao < end)
                     .AsEnumerable()
                     .Sum(x => x.SoTienCuoi.HasValue ? x.SoTienCuoi.Value : x.SoTien);
 
@@ -1203,7 +1203,7 @@ namespace DesktopApp_Project.DAL
                 {
                     TongHocVien = db.NguoiDungs.Count(x => x.VaiTro == AppConstants.RoleStudent),
                     HocVienDangHoc = db.ChiTietLopHocs
-                        .Where(x => x.TrangThai == AppConstants.EnrollmentActive && x.NgayNghiHoc == null)
+                        .Where(x => AppConstants.EnrollmentActiveAliases.Contains(x.TrangThai) && x.NgayNghiHoc == null)
                         .Select(x => x.MaNguoiDung)
                         .Distinct()
                         .Count(),
@@ -1220,7 +1220,7 @@ namespace DesktopApp_Project.DAL
                 months = Math.Max(1, months);
                 var firstMonth = new DateTime(today.Year, today.Month, 1).AddMonths(-(months - 1));
                 var paid = db.ThanhToanHocPhis
-                    .Where(x => x.TrangThai == AppConstants.PaymentPaid && x.NgayTao >= firstMonth)
+                    .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai) && x.NgayTao >= firstMonth)
                     .AsEnumerable()
                     .GroupBy(x => new { x.NgayTao.Year, x.NgayTao.Month })
                     .ToDictionary(
@@ -1351,7 +1351,7 @@ namespace DesktopApp_Project.DAL
                 foreach (var hv in hocVien)
                 {
                     var soCoMat = diemDanh.Count(x => x.MaNguoiDung == hv.MaNguoiDung
-                        && (x.TrangThai == AppConstants.AttendancePresent || x.TrangThai == AppConstants.AttendanceLate));
+                        && (AppConstants.AttendancePresentAliases.Contains(x.TrangThai) || AppConstants.AttendanceLateAliases.Contains(x.TrangThai)));
                     var soVang = Math.Max(0, buoiIds.Count - soCoMat);
                     result.Add(new BaoCaoChuyenCanDTO
                     {
