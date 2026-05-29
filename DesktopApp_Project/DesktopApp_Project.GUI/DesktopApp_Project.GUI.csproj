@@ -47,10 +47,6 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="FontAwesome.Sharp">
-      <HintPath>$(UserProfile)\.nuget\packages\fontawesome.sharp\6.6.0\lib\net472\FontAwesome.Sharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DesktopApp_Project.BUS\DesktopApp_Project.BUS.csproj">
