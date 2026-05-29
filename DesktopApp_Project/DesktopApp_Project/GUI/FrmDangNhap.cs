@@ -161,11 +161,13 @@ namespace DesktopApp_Project.GUI
             if (txtPassword.UseSystemPasswordChar)
             {
                 txtPassword.UseSystemPasswordChar = false;
+                txtPassword.PasswordChar = '\0';
                 icoShowPass.IconChar = IconChar.EyeSlash;
             }
             else
             {
                 txtPassword.UseSystemPasswordChar = true;
+                txtPassword.PasswordChar = '*';
                 icoShowPass.IconChar = IconChar.Eye;
             }
         }
