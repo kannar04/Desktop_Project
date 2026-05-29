@@ -147,6 +147,10 @@
     <Compile Include="FrmTuVung.Designer.cs">
       <DependentUpon>FrmTuVung.cs</DependentUpon>
     </Compile>
+    <Compile Include="Shared\Themes\AppThemeAdapter.cs" />
+    <Compile Include="Shared\Themes\ITheme.cs" />
+    <Compile Include="Shared\Themes\Test1Theme.cs" />
+    <Compile Include="Shared\Themes\ThemeManager.cs" />
     <Compile Include="Shared\UiHelpers.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

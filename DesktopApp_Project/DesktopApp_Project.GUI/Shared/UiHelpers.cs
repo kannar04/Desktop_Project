@@ -568,6 +568,7 @@ namespace DesktopApp_Project.GUI
             if (!IsInDesignMode)
             {
                 UiHelpers.ApplyDarkTheme(this);
+                Shared.Themes.ThemeManager.ApplyTheme(this);
             }
 
             if (_runtimeLoaded || !CanUseServices)

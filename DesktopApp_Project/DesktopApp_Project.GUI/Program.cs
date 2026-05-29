@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using DesktopApp_Project.GUI;
+using DesktopApp_Project.GUI.Shared.Themes;
 
 namespace DesktopApp_Project
 {
@@ -14,6 +15,7 @@ namespace DesktopApp_Project
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            ThemeManager.SetTheme("AppTheme");
             Application.Run(new FrmDangNhap());
         }
     }

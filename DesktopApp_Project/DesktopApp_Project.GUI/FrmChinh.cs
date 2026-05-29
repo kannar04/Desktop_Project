@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
+using DesktopApp_Project.GUI.Shared.Themes;
 using FontAwesome.Sharp;
 
 namespace DesktopApp_Project.GUI
@@ -39,18 +40,19 @@ namespace DesktopApp_Project.GUI
         private ServiceFactory _services;
         private NguoiDungDTO _currentUser;
         private bool _runtimeLoaded;
+        private bool _allowClose;
         private IconButton currentBtn;
         private Panel leftBorderBtn;
         private Form currentChildForm;
 
         private class RGBColors
         {
-            public static Color color1 { get { return UiHelpers.AccentColor; } }
-            public static Color color2 { get { return UiHelpers.SuccessColor; } }
-            public static Color color3 { get { return UiHelpers.WarningColor; } }
-            public static Color color4 { get { return UiHelpers.AccentColor; } }
-            public static Color color5 { get { return UiHelpers.SuccessColor; } }
-            public static Color color6 { get { return UiHelpers.WarningColor; } }
+            public static Color color1 { get { return ThemeManager.Current.Accent; } }
+            public static Color color2 { get { return ThemeManager.Current.Success; } }
+            public static Color color3 { get { return ThemeManager.Current.Warning; } }
+            public static Color color4 { get { return ThemeManager.Current.Accent; } }
+            public static Color color5 { get { return ThemeManager.Current.Success; } }
+            public static Color color6 { get { return ThemeManager.Current.Warning; } }
         }
 
         public FrmChinh()
@@ -96,6 +98,8 @@ namespace DesktopApp_Project.GUI
             ControlBox = false;
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
+            ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
+            ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
             ApplyShellTheme();
 
             UiHelpers.EnableDoubleBuffering(this);
@@ -115,17 +119,122 @@ namespace DesktopApp_Project.GUI
 
         private void ApplyShellTheme()
         {
-            BackColor = UiHelpers.AppBackgroundColor;
-            pnlSideMenu.BackColor = UiHelpers.AppBackgroundColor;
-            pnlMenuItems.BackColor = UiHelpers.AppBackgroundColor;
-            pnlDesktop.BackColor = UiHelpers.AppBackgroundColor;
-            pnlTittleBar.BackColor = UiHelpers.SurfaceAltColor;
-            pnlMovingForm.BackColor = UiHelpers.SurfaceAltColor;
-            pnlLogo.BackColor = UiHelpers.AppBackgroundColor;
-            lblLogo.ForeColor = UiHelpers.TextColor;
-            lblTitleChildForm.ForeColor = UiHelpers.TextColor;
-            icoTittle.BackColor = UiHelpers.SurfaceAltColor;
-            icoTittle.IconColor = UiHelpers.TextColor;
+            var theme = ThemeManager.Current;
+
+            BackColor = theme.BackgroundDark;
+            pnlSideMenu.BackColor = theme.PanelDark;
+            pnlMenuItems.BackColor = theme.PanelDark;
+            pnlDesktop.BackColor = theme.BackgroundDark;
+            pnlTittleBar.BackColor = theme.PanelDark;
+            pnlMovingForm.BackColor = theme.PanelDark;
+            pnlLogo.BackColor = theme.PanelDark;
+            lblLogo.ForeColor = theme.Accent;
+            lblTitleChildForm.ForeColor = currentBtn == null ? theme.PrimaryText : theme.Accent;
+            icoTittle.BackColor = theme.PanelDark;
+            icoTittle.IconColor = currentBtn == null ? theme.PrimaryText : theme.Accent;
+            StyleShellWindowButton(btnMinimize);
+            StyleShellWindowButton(btnMaximize);
+            StyleShellWindowButton(btnClose);
+            ApplySidebarTheme();
+        }
+
+        private void ApplySidebarTheme()
+        {
+            var buttons = new[]
+            {
+                btnChinh,
+                btnBaiTap,
+                btnBaoCao,
+                btnChamBai,
+                btnDeThi,
+                btnDiemDanh,
+                btnDiemSo,
+                btnHocPhi,
+                btnHocVien,
+                btnLopHoc,
+                btnTaiLieu,
+                btnTuVung,
+                btnThongBao,
+                btnSetting
+            };
+
+            foreach (var button in buttons)
+            {
+                StyleMenuButton(button, button == currentBtn);
+            }
+        }
+
+        private void StyleMenuButton(IconButton button, bool active)
+        {
+            var theme = ThemeManager.Current;
+
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.UseVisualStyleBackColor = false;
+            button.Font = theme.BodyFont;
+            button.Cursor = Cursors.Hand;
+            button.BackColor = active ? theme.Accent : Color.Transparent;
+            button.ForeColor = active ? ThemeManager.GetReadableTextColor(theme.Accent) : theme.PrimaryText;
+            button.IconColor = active ? ThemeManager.GetReadableTextColor(theme.Accent) : theme.Accent;
+            button.FlatAppearance.MouseOverBackColor = active ? theme.Accent : theme.ControlBackground;
+            button.FlatAppearance.MouseDownBackColor = active ? theme.AccentPressed : theme.ControlBackground;
+
+            button.MouseEnter -= SidebarButton_MouseEnter;
+            button.MouseLeave -= SidebarButton_MouseLeave;
+            button.MouseEnter += SidebarButton_MouseEnter;
+            button.MouseLeave += SidebarButton_MouseLeave;
+        }
+
+        private void SidebarButton_MouseEnter(object sender, EventArgs e)
+        {
+            var button = sender as IconButton;
+            if (button == null || button == currentBtn)
+            {
+                return;
+            }
+
+            button.BackColor = ThemeManager.Current.ControlBackground;
+            button.ForeColor = ThemeManager.Current.PrimaryText;
+            button.IconColor = ThemeManager.Current.Accent;
+        }
+
+        private void SidebarButton_MouseLeave(object sender, EventArgs e)
+        {
+            var button = sender as IconButton;
+            if (button == null || button == currentBtn)
+            {
+                return;
+            }
+
+            button.BackColor = Color.Transparent;
+            button.ForeColor = ThemeManager.Current.PrimaryText;
+            button.IconColor = ThemeManager.Current.Accent;
+        }
+
+        private void StyleShellWindowButton(Button button)
+        {
+            button.BackColor = Color.Transparent;
+            button.ForeColor = ThemeManager.Current.PrimaryText;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.UseVisualStyleBackColor = false;
+        }
+
+        private void ThemeManager_ThemeChanged(object sender, EventArgs e)
+        {
+            ThemeManager.ApplyTheme(this);
+            ApplyShellTheme();
+            if (currentChildForm != null)
+            {
+                ThemeManager.ApplyTheme(currentChildForm);
+            }
+            pnlDesktop.Invalidate(true);
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
+            base.OnFormClosed(e);
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
@@ -202,6 +311,12 @@ namespace DesktopApp_Project.GUI
 
         private void btnClose_Click(object sender, EventArgs e)
         {
+            if (!ConfirmExit())
+            {
+                return;
+            }
+
+            _allowClose = true;
             Application.Exit();
         }
 
@@ -233,23 +348,23 @@ namespace DesktopApp_Project.GUI
 
             DisableButton();
             currentBtn = (IconButton)senderBtn;
-            currentBtn.BackColor = UiHelpers.SurfaceColor;
-            currentBtn.ForeColor = color;
+            currentBtn.BackColor = ThemeManager.Current.Accent;
+            currentBtn.ForeColor = ThemeManager.GetReadableTextColor(ThemeManager.Current.Accent);
             currentBtn.TextAlign = ContentAlignment.MiddleCenter;
-            currentBtn.IconColor = color;
+            currentBtn.IconColor = ThemeManager.GetReadableTextColor(ThemeManager.Current.Accent);
             currentBtn.TextImageRelation = TextImageRelation.TextBeforeImage;
             currentBtn.ImageAlign = ContentAlignment.MiddleRight;
 
-            leftBorderBtn.BackColor = color;
+            leftBorderBtn.BackColor = ThemeManager.Current.Accent;
             leftBorderBtn.Height = currentBtn.Height;
             leftBorderBtn.Location = new Point(0, currentBtn.Top);
             leftBorderBtn.Visible = true;
             leftBorderBtn.BringToFront();
 
             lblTitleChildForm.Text = currentBtn.Text;
-            lblTitleChildForm.ForeColor = color;
+            lblTitleChildForm.ForeColor = ThemeManager.Current.Accent;
             icoTittle.IconChar = currentBtn.IconChar;
-            icoTittle.IconColor = color;
+            icoTittle.IconColor = ThemeManager.Current.Accent;
         }
 
         private void DisableButton()
@@ -259,10 +374,10 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
-            currentBtn.BackColor = UiHelpers.AppBackgroundColor;
-            currentBtn.ForeColor = UiHelpers.TextColor;
+            currentBtn.BackColor = Color.Transparent;
+            currentBtn.ForeColor = ThemeManager.Current.PrimaryText;
             currentBtn.TextAlign = ContentAlignment.MiddleLeft;
-            currentBtn.IconColor = UiHelpers.TextColor;
+            currentBtn.IconColor = ThemeManager.Current.Accent;
             currentBtn.TextImageRelation = TextImageRelation.ImageBeforeText;
             currentBtn.ImageAlign = ContentAlignment.MiddleLeft;
             leftBorderBtn.Visible = false;
@@ -296,7 +411,7 @@ namespace DesktopApp_Project.GUI
             var container = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = UiHelpers.AppBackgroundColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(16)
             };
 
@@ -306,8 +421,8 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Top,
                 Height = 56,
                 Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                ForeColor = UiHelpers.TextColor,
-                BackColor = UiHelpers.SurfaceAltColor,
+                ForeColor = ThemeManager.Current.PrimaryText,
+                BackColor = ThemeManager.Current.PanelDark,
                 Padding = new Padding(16, 0, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft
             };
@@ -323,14 +438,14 @@ namespace DesktopApp_Project.GUI
                 AutoSize = false,
                 Height = 40,
                 Font = new Font("Segoe UI", 11F, FontStyle.Regular),
-                ForeColor = UiHelpers.MutedTextColor,
+                ForeColor = ThemeManager.Current.SecondaryText,
                 Padding = new Padding(18, 12, 0, 0)
             };
 
             container.Controls.Add(subtitle);
             container.Controls.Add(header);
             pnlDesktop.Controls.Add(container);
-            UiHelpers.ApplyDarkTheme(container);
+            ThemeManager.ApplyTheme(container);
         }
 
         private void ShowDashboard()
@@ -341,7 +456,7 @@ namespace DesktopApp_Project.GUI
             var container = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = UiHelpers.AppBackgroundColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(18)
             };
 
@@ -351,20 +466,20 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Top,
                 Height = 54,
                 Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                ForeColor = UiHelpers.TextColor,
-                BackColor = UiHelpers.AppBackgroundColor,
+                ForeColor = ThemeManager.Current.PrimaryText,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(10, 0, 0, 0),
                 TextAlign = ContentAlignment.MiddleLeft
             };
 
             var subtitle = new Label
             {
-                Text = _currentUser == null ? "Tổng quan lớp IELTS" : "Xin chào " + _currentUser.HoTen,
+                Text = "Xin chào, Admin !!!",
                 Dock = DockStyle.Top,
                 Height = 34,
                 Font = new Font("Segoe UI", 10F),
-                ForeColor = UiHelpers.MutedTextColor,
-                BackColor = UiHelpers.AppBackgroundColor,
+                ForeColor = ThemeManager.Current.SecondaryText,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(12, 0, 0, 8),
                 TextAlign = ContentAlignment.MiddleLeft
             };
@@ -381,7 +496,7 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Fill,
                 ColumnCount = 2,
                 RowCount = 2,
-                BackColor = UiHelpers.AppBackgroundColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(0, 12, 0, 0)
             };
             body.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
@@ -394,7 +509,7 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Fill,
                 ColumnCount = 4,
                 RowCount = 1,
-                BackColor = UiHelpers.AppBackgroundColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Margin = new Padding(0, 0, 0, 12)
             };
             for (var i = 0; i < 4; i++)
@@ -402,10 +517,10 @@ namespace DesktopApp_Project.GUI
                 cards.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
             }
 
-            cards.Controls.Add(CreateMetricCard("Tổng học viên", summary.TongHocVien.ToString("N0"), UiHelpers.AccentColor), 0, 0);
-            cards.Controls.Add(CreateMetricCard("Đang học", summary.HocVienDangHoc.ToString("N0"), UiHelpers.SuccessColor), 1, 0);
-            cards.Controls.Add(CreateMetricCard("Doanh thu tháng", FormatMoney(summary.DoanhThuThangNay), UiHelpers.WarningColor), 2, 0);
-            cards.Controls.Add(CreateMetricCard("Lớp học", summary.TongLopHoc.ToString("N0"), UiHelpers.AccentColor), 3, 0);
+            cards.Controls.Add(CreateMetricCard("Tổng học viên", summary.TongHocVien.ToString("N0"), ThemeManager.Current.Accent), 0, 0);
+            cards.Controls.Add(CreateMetricCard("Đang học", summary.HocVienDangHoc.ToString("N0"), ThemeManager.Current.Success), 1, 0);
+            cards.Controls.Add(CreateMetricCard("Doanh thu tháng", FormatMoney(summary.DoanhThuThangNay), ThemeManager.Current.Warning), 2, 0);
+            cards.Controls.Add(CreateMetricCard("Lớp học", summary.TongLopHoc.ToString("N0"), ThemeManager.Current.Accent), 3, 0);
 
             body.Controls.Add(cards, 0, 0);
             body.SetColumnSpan(cards, 2);
@@ -416,7 +531,8 @@ namespace DesktopApp_Project.GUI
             container.Controls.Add(subtitle);
             container.Controls.Add(title);
             pnlDesktop.Controls.Add(container);
-            UiHelpers.ApplyDarkTheme(container);
+            ThemeManager.ApplyTheme(container);
+            ApplyShellTheme();
         }
 
         private Control CreateMetricCard(string label, string value, Color accent)
@@ -424,10 +540,11 @@ namespace DesktopApp_Project.GUI
             var panel = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = UiHelpers.SurfaceColor,
+                BackColor = ThemeManager.Current.PanelDark,
                 Padding = new Padding(14),
                 Margin = new Padding(6)
             };
+            panel.Paint += MetricCard_Paint;
             panel.Controls.Add(new Label
             {
                 Text = value,
@@ -442,10 +559,24 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Top,
                 Height = 28,
                 Font = new Font("Segoe UI", 9F),
-                ForeColor = UiHelpers.MutedTextColor,
+                ForeColor = ThemeManager.Current.SecondaryText,
                 TextAlign = ContentAlignment.MiddleLeft
             });
             return panel;
+        }
+
+        private void MetricCard_Paint(object sender, PaintEventArgs e)
+        {
+            var panel = sender as Panel;
+            if (panel == null)
+            {
+                return;
+            }
+
+            using (var pen = new Pen(ThemeManager.Current.BorderColor))
+            {
+                e.Graphics.DrawRectangle(pen, 0, 0, panel.Width - 1, panel.Height - 1);
+            }
         }
 
         private Control CreateRevenueChart(List<MonthlyRevenueDTO> rows)
@@ -453,7 +584,7 @@ namespace DesktopApp_Project.GUI
             var panel = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = UiHelpers.SurfaceColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(18),
                 Margin = new Padding(6)
             };
@@ -463,11 +594,11 @@ namespace DesktopApp_Project.GUI
 
         private void PaintRevenueChart(Panel panel, Graphics graphics, List<MonthlyRevenueDTO> rows)
         {
-            graphics.Clear(UiHelpers.SurfaceColor);
-            using (var titleBrush = new SolidBrush(UiHelpers.TextColor))
-            using (var mutedBrush = new SolidBrush(UiHelpers.MutedTextColor))
-            using (var barBrush = new SolidBrush(UiHelpers.AccentColor))
-            using (var linePen = new Pen(UiHelpers.BorderColor))
+            graphics.Clear(ThemeManager.Current.BackgroundDark);
+            using (var titleBrush = new SolidBrush(ThemeManager.Current.PrimaryText))
+            using (var mutedBrush = new SolidBrush(ThemeManager.Current.SecondaryText))
+            using (var barBrush = new SolidBrush(ThemeManager.Current.Accent))
+            using (var linePen = new Pen(ThemeManager.Current.BorderColor))
             {
                 graphics.DrawString("Doanh thu 6 tháng", new Font("Segoe UI", 12F, FontStyle.Bold), titleBrush, 18, 16);
                 var area = new Rectangle(24, 58, Math.Max(10, panel.Width - 56), Math.Max(10, panel.Height - 98));
@@ -617,7 +748,7 @@ namespace DesktopApp_Project.GUI
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, UiHelpers.AccentColor);
+            ActivateButton(sender, ThemeManager.Current.Accent);
             ShowSettings();
         }
 
@@ -630,7 +761,7 @@ namespace DesktopApp_Project.GUI
                 Dock = DockStyle.Top,
                 AutoSize = true,
                 ColumnCount = 2,
-                BackColor = UiHelpers.SurfaceColor,
+                BackColor = ThemeManager.Current.PanelDark,
                 Padding = new Padding(24),
                 Margin = new Padding(24)
             };
@@ -654,8 +785,9 @@ namespace DesktopApp_Project.GUI
             {
                 var oldLanguage = AppTheme.Language;
                 AppTheme.Apply(Convert.ToString(cboTheme.SelectedItem) == "Dark", Math.Max(0, cboAccent.SelectedIndex), Convert.ToString(cboLanguage.SelectedItem));
+                ThemeManager.SetTheme("AppTheme");
+                ThemeManager.ApplyTheme(this);
                 ApplyShellTheme();
-                UiHelpers.ApplyDarkTheme(this);
                 MessageBox.Show(oldLanguage == AppTheme.Language ? "Đã lưu cài đặt." : "Đã lưu cài đặt. Vui lòng khởi động lại để áp dụng ngôn ngữ.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ShowSettings();
             };
@@ -671,13 +803,34 @@ namespace DesktopApp_Project.GUI
             var container = new Panel
             {
                 Dock = DockStyle.Fill,
-                BackColor = UiHelpers.AppBackgroundColor,
+                BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(18)
             };
             container.Controls.Add(panel);
             pnlDesktop.Controls.Add(container);
-            UiHelpers.ApplyDarkTheme(container);
+            ThemeManager.ApplyTheme(container);
+            ApplyShellTheme();
 
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!_allowClose && e.CloseReason == CloseReason.UserClosing && !ConfirmExit())
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            base.OnFormClosing(e);
+        }
+
+        private bool ConfirmExit()
+        {
+            return MessageBox.Show(
+                "Bạn có muốn tắt ứng dụng?",
+                "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) == DialogResult.Yes;
         }
     }
 }
