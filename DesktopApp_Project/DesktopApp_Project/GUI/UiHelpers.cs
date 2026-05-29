@@ -456,7 +456,7 @@ namespace DesktopApp_Project.GUI
         }
     }
 
-    public abstract class ModuleFormBase : Form
+    public class ModuleFormBase : Form
     {
         protected ServiceFactory Services;
         protected NguoiDungDTO CurrentUser;

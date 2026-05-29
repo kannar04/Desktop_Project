@@ -19,17 +19,17 @@ namespace DesktopApp_Project.GUI
         {
             this.pnlLogin = new System.Windows.Forms.Panel();
             this.btnLogin = new FontAwesome.Sharp.IconButton();
+            this.pnlUsername = new System.Windows.Forms.Panel();
+            this.lblUsername = new System.Windows.Forms.Label();
+            this.txtUsername = new System.Windows.Forms.TextBox();
+            this.pnlUnder1 = new System.Windows.Forms.Panel();
+            this.icoUsername = new FontAwesome.Sharp.IconPictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.icoShowPass = new FontAwesome.Sharp.IconPictureBox();
             this.lblPassword = new System.Windows.Forms.Label();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.pnlUnder2 = new System.Windows.Forms.Panel();
             this.icoPassword = new FontAwesome.Sharp.IconPictureBox();
-            this.pnlUsername = new System.Windows.Forms.Panel();
-            this.lblUsername = new System.Windows.Forms.Label();
-            this.txtUsername = new System.Windows.Forms.TextBox();
-            this.pnlUnder1 = new System.Windows.Forms.Panel();
-            this.icoUsername = new FontAwesome.Sharp.IconPictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -37,22 +37,22 @@ namespace DesktopApp_Project.GUI
             this.btnMinimize = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.pnlLogin.SuspendLayout();
+            this.pnlUsername.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoShowPass)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.icoPassword)).BeginInit();
-            this.pnlUsername.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).BeginInit();
             this.pnlMovingForm.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlLogin
             // 
             this.pnlLogin.Controls.Add(this.btnLogin);
-            this.pnlLogin.Controls.Add(this.panel1);
             this.pnlLogin.Controls.Add(this.pnlUsername);
+            this.pnlLogin.Controls.Add(this.panel1);
             this.pnlLogin.Controls.Add(this.label3);
             this.pnlLogin.Location = new System.Drawing.Point(300, 50);
-            this.pnlLogin.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlLogin.Margin = new System.Windows.Forms.Padding(2);
             this.pnlLogin.Name = "pnlLogin";
             this.pnlLogin.Size = new System.Drawing.Size(275, 350);
             this.pnlLogin.TabIndex = 0;
@@ -65,13 +65,75 @@ namespace DesktopApp_Project.GUI
             this.btnLogin.IconChar = FontAwesome.Sharp.IconChar.SignIn;
             this.btnLogin.IconColor = System.Drawing.Color.Gainsboro;
             this.btnLogin.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.btnLogin.Location = new System.Drawing.Point(101, 250);
-            this.btnLogin.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLogin.Location = new System.Drawing.Point(101, 277);
+            this.btnLogin.Margin = new System.Windows.Forms.Padding(2);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(65, 28);
             this.btnLogin.TabIndex = 3;
             this.btnLogin.UseVisualStyleBackColor = false;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
+            // 
+            // pnlUsername
+            // 
+            this.pnlUsername.Controls.Add(this.lblUsername);
+            this.pnlUsername.Controls.Add(this.txtUsername);
+            this.pnlUsername.Controls.Add(this.pnlUnder1);
+            this.pnlUsername.Controls.Add(this.icoUsername);
+            this.pnlUsername.Location = new System.Drawing.Point(17, 119);
+            this.pnlUsername.Margin = new System.Windows.Forms.Padding(2);
+            this.pnlUsername.Name = "pnlUsername";
+            this.pnlUsername.Size = new System.Drawing.Size(233, 55);
+            this.pnlUsername.TabIndex = 0;
+            // 
+            // lblUsername
+            // 
+            this.lblUsername.BackColor = System.Drawing.Color.Transparent;
+            this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.lblUsername.Location = new System.Drawing.Point(45, 17);
+            this.lblUsername.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.lblUsername.Name = "lblUsername";
+            this.lblUsername.Size = new System.Drawing.Size(54, 17);
+            this.lblUsername.TabIndex = 0;
+            this.lblUsername.Text = "Username";
+            this.lblUsername.Click += new System.EventHandler(this.lblUsername_Click);
+            // 
+            // txtUsername
+            // 
+            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtUsername.ForeColor = System.Drawing.Color.Gainsboro;
+            this.txtUsername.Location = new System.Drawing.Point(45, 17);
+            this.txtUsername.Margin = new System.Windows.Forms.Padding(2);
+            this.txtUsername.Multiline = true;
+            this.txtUsername.Name = "txtUsername";
+            this.txtUsername.Size = new System.Drawing.Size(180, 17);
+            this.txtUsername.TabIndex = 0;
+            this.txtUsername.Enter += new System.EventHandler(this.txtUsername_Enter);
+            this.txtUsername.Leave += new System.EventHandler(this.txtUsername_Leave);
+            // 
+            // pnlUnder1
+            // 
+            this.pnlUnder1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.pnlUnder1.Location = new System.Drawing.Point(45, 38);
+            this.pnlUnder1.Margin = new System.Windows.Forms.Padding(2);
+            this.pnlUnder1.Name = "pnlUnder1";
+            this.pnlUnder1.Size = new System.Drawing.Size(180, 2);
+            this.pnlUnder1.TabIndex = 0;
+            // 
+            // icoUsername
+            // 
+            this.icoUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.icoUsername.ForeColor = System.Drawing.Color.Gainsboro;
+            this.icoUsername.IconChar = FontAwesome.Sharp.IconChar.User;
+            this.icoUsername.IconColor = System.Drawing.Color.Gainsboro;
+            this.icoUsername.IconFont = FontAwesome.Sharp.IconFont.Auto;
+            this.icoUsername.IconSize = 30;
+            this.icoUsername.Location = new System.Drawing.Point(9, 7);
+            this.icoUsername.Margin = new System.Windows.Forms.Padding(2);
+            this.icoUsername.Name = "icoUsername";
+            this.icoUsername.Size = new System.Drawing.Size(32, 30);
+            this.icoUsername.TabIndex = 0;
+            this.icoUsername.TabStop = false;
             // 
             // panel1
             // 
@@ -80,11 +142,11 @@ namespace DesktopApp_Project.GUI
             this.panel1.Controls.Add(this.txtPassword);
             this.panel1.Controls.Add(this.pnlUnder2);
             this.panel1.Controls.Add(this.icoPassword);
-            this.panel1.Location = new System.Drawing.Point(17, 191);
-            this.panel1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.panel1.Location = new System.Drawing.Point(17, 193);
+            this.panel1.Margin = new System.Windows.Forms.Padding(2);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(233, 43);
-            this.panel1.TabIndex = 0;
+            this.panel1.Size = new System.Drawing.Size(231, 53);
+            this.panel1.TabIndex = 1;
             // 
             // icoShowPass
             // 
@@ -95,7 +157,7 @@ namespace DesktopApp_Project.GUI
             this.icoShowPass.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoShowPass.IconSize = 15;
             this.icoShowPass.Location = new System.Drawing.Point(208, 17);
-            this.icoShowPass.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.icoShowPass.Margin = new System.Windows.Forms.Padding(2);
             this.icoShowPass.Name = "icoShowPass";
             this.icoShowPass.Size = new System.Drawing.Size(17, 15);
             this.icoShowPass.TabIndex = 4;
@@ -120,11 +182,11 @@ namespace DesktopApp_Project.GUI
             this.txtPassword.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.txtPassword.ForeColor = System.Drawing.Color.Gainsboro;
             this.txtPassword.Location = new System.Drawing.Point(45, 17);
-            this.txtPassword.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.txtPassword.Margin = new System.Windows.Forms.Padding(2);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(180, 13);
-            this.txtPassword.TabIndex = 2;
+            this.txtPassword.TabIndex = 1;
             this.txtPassword.UseSystemPasswordChar = true;
             this.txtPassword.Enter += new System.EventHandler(this.txtPassword_Enter);
             this.txtPassword.Leave += new System.EventHandler(this.txtPassword_Leave);
@@ -133,7 +195,7 @@ namespace DesktopApp_Project.GUI
             // 
             this.pnlUnder2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
             this.pnlUnder2.Location = new System.Drawing.Point(45, 35);
-            this.pnlUnder2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlUnder2.Margin = new System.Windows.Forms.Padding(2);
             this.pnlUnder2.Name = "pnlUnder2";
             this.pnlUnder2.Size = new System.Drawing.Size(180, 2);
             this.pnlUnder2.TabIndex = 0;
@@ -147,72 +209,11 @@ namespace DesktopApp_Project.GUI
             this.icoPassword.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoPassword.IconSize = 30;
             this.icoPassword.Location = new System.Drawing.Point(9, 7);
-            this.icoPassword.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.icoPassword.Margin = new System.Windows.Forms.Padding(2);
             this.icoPassword.Name = "icoPassword";
             this.icoPassword.Size = new System.Drawing.Size(32, 30);
             this.icoPassword.TabIndex = 0;
             this.icoPassword.TabStop = false;
-            // 
-            // pnlUsername
-            // 
-            this.pnlUsername.Controls.Add(this.lblUsername);
-            this.pnlUsername.Controls.Add(this.txtUsername);
-            this.pnlUsername.Controls.Add(this.pnlUnder1);
-            this.pnlUsername.Controls.Add(this.icoUsername);
-            this.pnlUsername.Location = new System.Drawing.Point(17, 136);
-            this.pnlUsername.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.pnlUsername.Name = "pnlUsername";
-            this.pnlUsername.Size = new System.Drawing.Size(233, 43);
-            this.pnlUsername.TabIndex = 0;
-            // 
-            // lblUsername
-            // 
-            this.lblUsername.BackColor = System.Drawing.Color.Transparent;
-            this.lblUsername.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.lblUsername.Location = new System.Drawing.Point(45, 17);
-            this.lblUsername.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.lblUsername.Name = "lblUsername";
-            this.lblUsername.Size = new System.Drawing.Size(54, 17);
-            this.lblUsername.TabIndex = 0;
-            this.lblUsername.Text = "Username";
-            this.lblUsername.Click += new System.EventHandler(this.lblUsername_Click);
-            // 
-            // txtUsername
-            // 
-            this.txtUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
-            this.txtUsername.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtUsername.ForeColor = System.Drawing.Color.Gainsboro;
-            this.txtUsername.Location = new System.Drawing.Point(45, 17);
-            this.txtUsername.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.txtUsername.Name = "txtUsername";
-            this.txtUsername.Size = new System.Drawing.Size(180, 13);
-            this.txtUsername.TabIndex = 1;
-            this.txtUsername.Enter += new System.EventHandler(this.txtUsername_Enter);
-            this.txtUsername.Leave += new System.EventHandler(this.txtUsername_Leave);
-            // 
-            // pnlUnder1
-            // 
-            this.pnlUnder1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-            this.pnlUnder1.Location = new System.Drawing.Point(45, 35);
-            this.pnlUnder1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.pnlUnder1.Name = "pnlUnder1";
-            this.pnlUnder1.Size = new System.Drawing.Size(180, 2);
-            this.pnlUnder1.TabIndex = 0;
-            // 
-            // icoUsername
-            // 
-            this.icoUsername.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
-            this.icoUsername.ForeColor = System.Drawing.Color.Gainsboro;
-            this.icoUsername.IconChar = FontAwesome.Sharp.IconChar.User;
-            this.icoUsername.IconColor = System.Drawing.Color.Gainsboro;
-            this.icoUsername.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.icoUsername.IconSize = 30;
-            this.icoUsername.Location = new System.Drawing.Point(9, 7);
-            this.icoUsername.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
-            this.icoUsername.Name = "icoUsername";
-            this.icoUsername.Size = new System.Drawing.Size(32, 30);
-            this.icoUsername.TabIndex = 0;
-            this.icoUsername.TabStop = false;
             // 
             // label3
             // 
@@ -306,18 +307,18 @@ namespace DesktopApp_Project.GUI
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pnlLogin);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "FrmDangNhap";
             this.Text = "FrmDangNhap";
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FrmDangNhap_Paint);
             this.pnlLogin.ResumeLayout(false);
+            this.pnlUsername.ResumeLayout(false);
+            this.pnlUsername.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.icoShowPass)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.icoPassword)).EndInit();
-            this.pnlUsername.ResumeLayout(false);
-            this.pnlUsername.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.icoUsername)).EndInit();
             this.pnlMovingForm.ResumeLayout(false);
             this.ResumeLayout(false);
 

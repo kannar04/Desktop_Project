@@ -342,7 +342,8 @@ namespace DesktopApp_Project.GUI
             {
                 Dock = DockStyle.Fill,
                 BackColor = UiHelpers.AppBackgroundColor,
-                Padding = new Padding(18)
+                Padding = new Padding(18),
+                AutoScroll = true
             };
 
             var title = new Label
