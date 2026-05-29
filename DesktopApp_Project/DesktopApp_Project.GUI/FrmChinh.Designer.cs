@@ -59,7 +59,7 @@ namespace DesktopApp_Project.GUI
             this.pnlSideMenu.Controls.Add(this.pnlLogo);
             this.pnlSideMenu.Dock = System.Windows.Forms.DockStyle.Left;
             this.pnlSideMenu.Location = new System.Drawing.Point(2, 2);
-            this.pnlSideMenu.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlSideMenu.Margin = new System.Windows.Forms.Padding(2);
             this.pnlSideMenu.Name = "pnlSideMenu";
             this.pnlSideMenu.Size = new System.Drawing.Size(240, 896);
             this.pnlSideMenu.TabIndex = 0;
@@ -83,7 +83,7 @@ namespace DesktopApp_Project.GUI
             this.pnlMenuItems.Controls.Add(this.btnChinh);
             this.pnlMenuItems.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMenuItems.Location = new System.Drawing.Point(0, 100);
-            this.pnlMenuItems.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlMenuItems.Margin = new System.Windows.Forms.Padding(2);
             this.pnlMenuItems.Name = "pnlMenuItems";
             this.pnlMenuItems.Size = new System.Drawing.Size(240, 736);
             this.pnlMenuItems.TabIndex = 14;
@@ -99,7 +99,7 @@ namespace DesktopApp_Project.GUI
             this.btnThongBao.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnThongBao.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnThongBao.Location = new System.Drawing.Point(0, 720);
-            this.btnThongBao.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnThongBao.Margin = new System.Windows.Forms.Padding(2);
             this.btnThongBao.Name = "btnThongBao";
             this.btnThongBao.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnThongBao.Size = new System.Drawing.Size(223, 60);
@@ -121,7 +121,7 @@ namespace DesktopApp_Project.GUI
             this.btnTuVung.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnTuVung.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnTuVung.Location = new System.Drawing.Point(0, 660);
-            this.btnTuVung.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnTuVung.Margin = new System.Windows.Forms.Padding(2);
             this.btnTuVung.Name = "btnTuVung";
             this.btnTuVung.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnTuVung.Size = new System.Drawing.Size(223, 60);
@@ -143,7 +143,7 @@ namespace DesktopApp_Project.GUI
             this.btnTaiLieu.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnTaiLieu.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnTaiLieu.Location = new System.Drawing.Point(0, 600);
-            this.btnTaiLieu.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnTaiLieu.Margin = new System.Windows.Forms.Padding(2);
             this.btnTaiLieu.Name = "btnTaiLieu";
             this.btnTaiLieu.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnTaiLieu.Size = new System.Drawing.Size(223, 60);
@@ -165,7 +165,7 @@ namespace DesktopApp_Project.GUI
             this.btnLopHoc.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnLopHoc.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnLopHoc.Location = new System.Drawing.Point(0, 540);
-            this.btnLopHoc.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnLopHoc.Margin = new System.Windows.Forms.Padding(2);
             this.btnLopHoc.Name = "btnLopHoc";
             this.btnLopHoc.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnLopHoc.Size = new System.Drawing.Size(223, 60);
@@ -187,7 +187,7 @@ namespace DesktopApp_Project.GUI
             this.btnHocVien.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnHocVien.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnHocVien.Location = new System.Drawing.Point(0, 480);
-            this.btnHocVien.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnHocVien.Margin = new System.Windows.Forms.Padding(2);
             this.btnHocVien.Name = "btnHocVien";
             this.btnHocVien.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnHocVien.Size = new System.Drawing.Size(223, 60);
@@ -209,7 +209,7 @@ namespace DesktopApp_Project.GUI
             this.btnHocPhi.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnHocPhi.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnHocPhi.Location = new System.Drawing.Point(0, 420);
-            this.btnHocPhi.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnHocPhi.Margin = new System.Windows.Forms.Padding(2);
             this.btnHocPhi.Name = "btnHocPhi";
             this.btnHocPhi.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnHocPhi.Size = new System.Drawing.Size(223, 60);
@@ -231,7 +231,7 @@ namespace DesktopApp_Project.GUI
             this.btnDiemSo.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnDiemSo.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnDiemSo.Location = new System.Drawing.Point(0, 360);
-            this.btnDiemSo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDiemSo.Margin = new System.Windows.Forms.Padding(2);
             this.btnDiemSo.Name = "btnDiemSo";
             this.btnDiemSo.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnDiemSo.Size = new System.Drawing.Size(223, 60);
@@ -253,7 +253,7 @@ namespace DesktopApp_Project.GUI
             this.btnDiemDanh.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnDiemDanh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnDiemDanh.Location = new System.Drawing.Point(0, 300);
-            this.btnDiemDanh.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDiemDanh.Margin = new System.Windows.Forms.Padding(2);
             this.btnDiemDanh.Name = "btnDiemDanh";
             this.btnDiemDanh.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnDiemDanh.Size = new System.Drawing.Size(223, 60);
@@ -275,7 +275,7 @@ namespace DesktopApp_Project.GUI
             this.btnDeThi.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnDeThi.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnDeThi.Location = new System.Drawing.Point(0, 240);
-            this.btnDeThi.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnDeThi.Margin = new System.Windows.Forms.Padding(2);
             this.btnDeThi.Name = "btnDeThi";
             this.btnDeThi.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnDeThi.Size = new System.Drawing.Size(223, 60);
@@ -297,7 +297,7 @@ namespace DesktopApp_Project.GUI
             this.btnChamBai.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnChamBai.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnChamBai.Location = new System.Drawing.Point(0, 180);
-            this.btnChamBai.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnChamBai.Margin = new System.Windows.Forms.Padding(2);
             this.btnChamBai.Name = "btnChamBai";
             this.btnChamBai.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnChamBai.Size = new System.Drawing.Size(223, 60);
@@ -319,7 +319,7 @@ namespace DesktopApp_Project.GUI
             this.btnBaoCao.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnBaoCao.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnBaoCao.Location = new System.Drawing.Point(0, 120);
-            this.btnBaoCao.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnBaoCao.Margin = new System.Windows.Forms.Padding(2);
             this.btnBaoCao.Name = "btnBaoCao";
             this.btnBaoCao.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnBaoCao.Size = new System.Drawing.Size(223, 60);
@@ -341,7 +341,7 @@ namespace DesktopApp_Project.GUI
             this.btnBaiTap.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnBaiTap.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnBaiTap.Location = new System.Drawing.Point(0, 60);
-            this.btnBaiTap.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnBaiTap.Margin = new System.Windows.Forms.Padding(2);
             this.btnBaiTap.Name = "btnBaiTap";
             this.btnBaiTap.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnBaiTap.Size = new System.Drawing.Size(223, 60);
@@ -363,7 +363,7 @@ namespace DesktopApp_Project.GUI
             this.btnChinh.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnChinh.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnChinh.Location = new System.Drawing.Point(0, 0);
-            this.btnChinh.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnChinh.Margin = new System.Windows.Forms.Padding(2);
             this.btnChinh.Name = "btnChinh";
             this.btnChinh.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnChinh.Size = new System.Drawing.Size(223, 60);
@@ -385,7 +385,7 @@ namespace DesktopApp_Project.GUI
             this.btnSetting.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.btnSetting.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnSetting.Location = new System.Drawing.Point(0, 836);
-            this.btnSetting.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnSetting.Margin = new System.Windows.Forms.Padding(2);
             this.btnSetting.Name = "btnSetting";
             this.btnSetting.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
             this.btnSetting.Size = new System.Drawing.Size(240, 60);
@@ -401,7 +401,7 @@ namespace DesktopApp_Project.GUI
             this.pnlLogo.Controls.Add(this.lblLogo);
             this.pnlLogo.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlLogo.Location = new System.Drawing.Point(0, 0);
-            this.pnlLogo.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlLogo.Margin = new System.Windows.Forms.Padding(2);
             this.pnlLogo.Name = "pnlLogo";
             this.pnlLogo.Size = new System.Drawing.Size(240, 100);
             this.pnlLogo.TabIndex = 0;
@@ -428,14 +428,14 @@ namespace DesktopApp_Project.GUI
             this.pnlTittleBar.Controls.Add(this.pnlMovingForm);
             this.pnlTittleBar.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlTittleBar.Location = new System.Drawing.Point(242, 2);
-            this.pnlTittleBar.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlTittleBar.Margin = new System.Windows.Forms.Padding(2);
             this.pnlTittleBar.Name = "pnlTittleBar";
             this.pnlTittleBar.Size = new System.Drawing.Size(1122, 100);
             this.pnlTittleBar.TabIndex = 1;
             // 
             // icoTittle
             // 
-            this.icoTittle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.icoTittle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.icoTittle.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(26)))), ((int)(((byte)(25)))), ((int)(((byte)(62)))));
             this.icoTittle.ForeColor = System.Drawing.Color.Gainsboro;
@@ -443,7 +443,7 @@ namespace DesktopApp_Project.GUI
             this.icoTittle.IconColor = System.Drawing.Color.Gainsboro;
             this.icoTittle.IconFont = FontAwesome.Sharp.IconFont.Auto;
             this.icoTittle.Location = new System.Drawing.Point(40, 46);
-            this.icoTittle.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.icoTittle.Margin = new System.Windows.Forms.Padding(2);
             this.icoTittle.Name = "icoTittle";
             this.icoTittle.Size = new System.Drawing.Size(32, 32);
             this.icoTittle.TabIndex = 2;
@@ -451,7 +451,7 @@ namespace DesktopApp_Project.GUI
             // 
             // lblTitleChildForm
             // 
-            this.lblTitleChildForm.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.lblTitleChildForm.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.lblTitleChildForm.Font = new System.Drawing.Font("Segoe UI", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitleChildForm.ForeColor = System.Drawing.Color.Gainsboro;
@@ -470,7 +470,7 @@ namespace DesktopApp_Project.GUI
             this.pnlMovingForm.Controls.Add(this.btnClose);
             this.pnlMovingForm.Dock = System.Windows.Forms.DockStyle.Top;
             this.pnlMovingForm.Location = new System.Drawing.Point(0, 0);
-            this.pnlMovingForm.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlMovingForm.Margin = new System.Windows.Forms.Padding(2);
             this.pnlMovingForm.Name = "pnlMovingForm";
             this.pnlMovingForm.Size = new System.Drawing.Size(1122, 25);
             this.pnlMovingForm.TabIndex = 0;
@@ -484,7 +484,7 @@ namespace DesktopApp_Project.GUI
             this.btnMinimize.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnMinimize.ForeColor = System.Drawing.Color.Gainsboro;
             this.btnMinimize.Location = new System.Drawing.Point(1041, 0);
-            this.btnMinimize.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnMinimize.Margin = new System.Windows.Forms.Padding(2);
             this.btnMinimize.Name = "btnMinimize";
             this.btnMinimize.Size = new System.Drawing.Size(27, 25);
             this.btnMinimize.TabIndex = 2;
@@ -500,7 +500,7 @@ namespace DesktopApp_Project.GUI
             this.btnMaximize.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnMaximize.ForeColor = System.Drawing.Color.Gainsboro;
             this.btnMaximize.Location = new System.Drawing.Point(1068, 0);
-            this.btnMaximize.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnMaximize.Margin = new System.Windows.Forms.Padding(2);
             this.btnMaximize.Name = "btnMaximize";
             this.btnMaximize.Size = new System.Drawing.Size(27, 25);
             this.btnMaximize.TabIndex = 1;
@@ -516,7 +516,7 @@ namespace DesktopApp_Project.GUI
             this.btnClose.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnClose.ForeColor = System.Drawing.Color.Gainsboro;
             this.btnClose.Location = new System.Drawing.Point(1095, 0);
-            this.btnClose.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.btnClose.Margin = new System.Windows.Forms.Padding(2);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(27, 25);
             this.btnClose.TabIndex = 0;
@@ -529,7 +529,7 @@ namespace DesktopApp_Project.GUI
             this.pnlDesktop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
             this.pnlDesktop.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlDesktop.Location = new System.Drawing.Point(242, 102);
-            this.pnlDesktop.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pnlDesktop.Margin = new System.Windows.Forms.Padding(2);
             this.pnlDesktop.Name = "pnlDesktop";
             this.pnlDesktop.Size = new System.Drawing.Size(1122, 796);
             this.pnlDesktop.TabIndex = 2;
@@ -545,10 +545,11 @@ namespace DesktopApp_Project.GUI
             this.Controls.Add(this.pnlTittleBar);
             this.Controls.Add(this.pnlSideMenu);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "FrmChinh";
             this.Padding = new System.Windows.Forms.Padding(2);
             this.Text = "FrmChinh";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.pnlSideMenu.ResumeLayout(false);
             this.pnlMenuItems.ResumeLayout(false);
             this.pnlLogo.ResumeLayout(false);
