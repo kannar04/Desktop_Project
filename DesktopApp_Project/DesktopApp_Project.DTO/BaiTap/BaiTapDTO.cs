@@ -10,7 +10,9 @@ namespace DesktopApp_Project.DTO
             public string MoTa { get; set; }
             public DateTime Deadline { get; set; }
             public string FileDinhKem { get; set; }
+            public string LoaiFile { get; set; }
+            public string TenFileGoc { get; set; }
+            public string DuongDanLocal { get; set; }
             public DateTime NgayTao { get; set; }
         }
 }
-

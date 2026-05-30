@@ -32,9 +32,10 @@ namespace DesktopApp_Project.BUS
                         return ServiceResult.Fail("Nhãn kỹ năng phải là Listening, Reading, Writing hoặc Speaking.");
                     }
     
-                    if (!ValidationHelper.IsSupportedFile(dto.DuongDanFile, new[] { ".pdf", ".doc", ".docx" }))
+                    if (!ValidationHelper.IsSupportedFile(dto.DuongDanFile, AppConstants.SupportedMediaExtensions)
+                        || !ValidationHelper.IsSupportedFile(dto.DuongDanLocal, AppConstants.SupportedMediaExtensions))
                     {
-                        return ServiceResult.Fail("Định dạng tài liệu không được hỗ trợ. Chỉ nhận PDF, Word.");
+                        return ServiceResult.Fail("Dinh dang file khong duoc ho tro.");
                     }
     
                     if (!ValidationHelper.IsValidVideoLink(dto.VideoLink))
@@ -63,4 +64,3 @@ namespace DesktopApp_Project.BUS
             }
         }
 }
-

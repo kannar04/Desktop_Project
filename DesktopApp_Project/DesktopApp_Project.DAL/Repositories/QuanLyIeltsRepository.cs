@@ -400,6 +400,11 @@ namespace DesktopApp_Project.DAL
                     DuongDanFile = dto.DuongDanFile,
                     VideoLink = dto.VideoLink,
                     NhanKyNang = dto.NhanKyNang,
+                    LoaiFile = dto.LoaiFile,
+                    TenFileGoc = dto.TenFileGoc,
+                    DuongDanLocal = dto.DuongDanLocal,
+                    DuongDanCloud = dto.DuongDanCloud,
+                    ThumbnailPath = dto.ThumbnailPath,
                     NgayCapNhat = DateTime.Now
                 };
                 db.TaiLieus.InsertOnSubmit(entity);
@@ -421,6 +426,11 @@ namespace DesktopApp_Project.DAL
                 entity.DuongDanFile = dto.DuongDanFile;
                 entity.VideoLink = dto.VideoLink;
                 entity.NhanKyNang = dto.NhanKyNang;
+                entity.LoaiFile = dto.LoaiFile;
+                entity.TenFileGoc = dto.TenFileGoc;
+                entity.DuongDanLocal = dto.DuongDanLocal;
+                entity.DuongDanCloud = dto.DuongDanCloud;
+                entity.ThumbnailPath = dto.ThumbnailPath;
                 entity.NgayCapNhat = DateTime.Now;
                 db.SubmitChanges();
             }
@@ -655,11 +665,32 @@ namespace DesktopApp_Project.DAL
             }
         }
 
-        public decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc)
+        public decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc, int? thang = null, int? nam = null)
         {
             using (var db = _factory.Create())
             {
-                var buoiIds = db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc).Select(x => x.MaBuoiHoc).ToList();
+                var chiTietLop = db.ChiTietLopHocs
+                    .Where(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc)
+                    .OrderByDescending(x => x.NgayVaoLop)
+                    .FirstOrDefault();
+                if (chiTietLop == null)
+                {
+                    return 0m;
+                }
+
+                var ngayVaoLop = chiTietLop.NgayVaoLop.Date;
+                var buoiQuery = db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc && x.NgayHoc >= ngayVaoLop);
+                if (thang.HasValue)
+                {
+                    buoiQuery = buoiQuery.Where(x => x.NgayHoc.Month == thang.Value);
+                }
+
+                if (nam.HasValue)
+                {
+                    buoiQuery = buoiQuery.Where(x => x.NgayHoc.Year == nam.Value);
+                }
+
+                var buoiIds = buoiQuery.Select(x => x.MaBuoiHoc).ToList();
                 if (buoiIds.Count == 0)
                 {
                     return 0m;
@@ -695,10 +726,230 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = new DeThiEntity { TenDeThi = dto.TenDeThi, FileDuLieu = dto.FileDuLieu, NgayTao = DateTime.Now };
+                var entity = new DeThiEntity
+                {
+                    TenDeThi = dto.TenDeThi,
+                    KyNang = dto.KyNang,
+                    BandLevel = dto.BandLevel,
+                    BandTu = dto.BandTu,
+                    BandDen = dto.BandDen,
+                    MoTa = dto.MoTa,
+                    FileDuLieu = dto.FileDuLieu,
+                    AudioPath = dto.AudioPath,
+                    ImagePath = dto.ImagePath,
+                    TrangThai = string.IsNullOrWhiteSpace(dto.TrangThai) ? "DangTao" : dto.TrangThai,
+                    NgayTao = DateTime.Now
+                };
                 db.DeThis.InsertOnSubmit(entity);
                 db.SubmitChanges();
                 return entity.MaDeThi;
+            }
+        }
+
+        public void UpdateDeThi(DeThiDTO dto)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = RequireEntity(
+                    db.DeThis.FirstOrDefault(x => x.MaDeThi == dto.MaDeThi),
+                    "Khong tim thay de thi can cap nhat.");
+                entity.TenDeThi = dto.TenDeThi;
+                entity.KyNang = dto.KyNang;
+                entity.BandLevel = dto.BandLevel;
+                entity.BandTu = dto.BandTu;
+                entity.BandDen = dto.BandDen;
+                entity.MoTa = dto.MoTa;
+                entity.FileDuLieu = dto.FileDuLieu;
+                entity.AudioPath = dto.AudioPath;
+                entity.ImagePath = dto.ImagePath;
+                entity.TrangThai = string.IsNullOrWhiteSpace(dto.TrangThai) ? entity.TrangThai : dto.TrangThai;
+                db.SubmitChanges();
+            }
+        }
+
+        public void DeleteDeThi(int maDeThi)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = RequireEntity(
+                    db.DeThis.FirstOrDefault(x => x.MaDeThi == maDeThi),
+                    "Khong tim thay de thi can xoa.");
+                var details = db.ChiTietDeThis.Where(x => x.MaDeThi == maDeThi);
+                db.ChiTietDeThis.DeleteAllOnSubmit(details);
+                foreach (var dot in db.DotKiemTras.Where(x => x.MaDeThi == maDeThi))
+                {
+                    dot.MaDeThi = null;
+                }
+
+                db.DeThis.DeleteOnSubmit(entity);
+                db.SubmitChanges();
+            }
+        }
+
+        public List<ReadingPassageDTO> GetReadingPassages(decimal? bandTu, decimal? bandDen)
+        {
+            using (var db = _factory.Create())
+            {
+                var query = db.ReadingPassages.AsQueryable();
+                if (bandTu.HasValue)
+                {
+                    query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value >= bandTu.Value);
+                }
+
+                if (bandDen.HasValue)
+                {
+                    query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value <= bandDen.Value);
+                }
+
+                var questionCounts = db.CauHois
+                    .Where(x => x.PassageId.HasValue)
+                    .GroupBy(x => x.PassageId.Value)
+                    .ToDictionary(x => x.Key, x => x.Count());
+
+                return query.OrderByDescending(x => x.NgayTao)
+                    .AsEnumerable()
+                    .Select(x =>
+                    {
+                        var dto = DtoMapper.ToDto(x);
+                        int count;
+                        dto.SoCauHoi = questionCounts.TryGetValue(dto.PassageId, out count) ? count : 0;
+                        return dto;
+                    })
+                    .ToList();
+            }
+        }
+
+        public ReadingPassageDTO GetReadingPassageById(int maPassage)
+        {
+            using (var db = _factory.Create())
+            {
+                return DtoMapper.ToDto(db.ReadingPassages.FirstOrDefault(x => x.PassageId == maPassage));
+            }
+        }
+
+        public List<ListeningSectionDTO> GetListeningSections(decimal? bandTu, decimal? bandDen)
+        {
+            using (var db = _factory.Create())
+            {
+                var query = db.ListeningSections.AsQueryable();
+                if (bandTu.HasValue)
+                {
+                    query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value >= bandTu.Value);
+                }
+
+                if (bandDen.HasValue)
+                {
+                    query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value <= bandDen.Value);
+                }
+
+                var questionCounts = db.CauHois
+                    .Where(x => x.SectionId.HasValue)
+                    .GroupBy(x => x.SectionId.Value)
+                    .ToDictionary(x => x.Key, x => x.Count());
+
+                return query.OrderBy(x => x.SectionNumber)
+                    .ThenByDescending(x => x.NgayTao)
+                    .AsEnumerable()
+                    .Select(x =>
+                    {
+                        var dto = DtoMapper.ToDto(x);
+                        int count;
+                        dto.SoCauHoi = questionCounts.TryGetValue(dto.SectionId, out count) ? count : 0;
+                        return dto;
+                    })
+                    .ToList();
+            }
+        }
+
+        public ListeningSectionDTO GetListeningSectionById(int maSection)
+        {
+            using (var db = _factory.Create())
+            {
+                return DtoMapper.ToDto(db.ListeningSections.FirstOrDefault(x => x.SectionId == maSection));
+            }
+        }
+
+        public int InsertReadingPassage(ReadingPassageDTO dto)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = new ReadingPassageEntity
+                {
+                    PassageCode = dto.PassageCode,
+                    Title = dto.Title,
+                    Content = dto.Content,
+                    ImagePath = dto.ImagePath,
+                    BandLevel = dto.BandLevel,
+                    Topic = dto.Topic,
+                    NgayTao = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                };
+                db.ReadingPassages.InsertOnSubmit(entity);
+                db.SubmitChanges();
+                return entity.PassageId;
+            }
+        }
+
+        public void InsertReadingPassageBulk(IEnumerable<ReadingPassageDTO> danhSach)
+        {
+            using (var db = _factory.Create())
+            {
+                db.ReadingPassages.InsertAllOnSubmit((danhSach ?? new List<ReadingPassageDTO>()).Select(dto => new ReadingPassageEntity
+                {
+                    PassageCode = dto.PassageCode,
+                    Title = dto.Title,
+                    Content = dto.Content,
+                    ImagePath = dto.ImagePath,
+                    BandLevel = dto.BandLevel,
+                    Topic = dto.Topic,
+                    NgayTao = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                }));
+                db.SubmitChanges();
+            }
+        }
+
+        public int InsertListeningSection(ListeningSectionDTO dto)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = new ListeningSectionEntity
+                {
+                    SectionCode = dto.SectionCode,
+                    Title = dto.Title,
+                    SectionNumber = dto.SectionNumber > 0 ? dto.SectionNumber : dto.PartNo,
+                    PartNo = dto.PartNo > 0 ? dto.PartNo : dto.SectionNumber,
+                    AudioPath = dto.AudioPath,
+                    Transcript = dto.Transcript,
+                    BandLevel = dto.BandLevel,
+                    Topic = dto.Topic,
+                    NgayTao = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                };
+                db.ListeningSections.InsertOnSubmit(entity);
+                db.SubmitChanges();
+                return entity.SectionId;
+            }
+        }
+
+        public void InsertListeningSectionBulk(IEnumerable<ListeningSectionDTO> danhSach)
+        {
+            using (var db = _factory.Create())
+            {
+                db.ListeningSections.InsertAllOnSubmit((danhSach ?? new List<ListeningSectionDTO>()).Select(dto => new ListeningSectionEntity
+                {
+                    SectionCode = dto.SectionCode,
+                    Title = dto.Title,
+                    SectionNumber = dto.SectionNumber > 0 ? dto.SectionNumber : dto.PartNo,
+                    PartNo = dto.PartNo > 0 ? dto.PartNo : dto.SectionNumber,
+                    AudioPath = dto.AudioPath,
+                    Transcript = dto.Transcript,
+                    BandLevel = dto.BandLevel,
+                    Topic = dto.Topic,
+                    NgayTao = DateTime.Now,
+                    CreatedAt = DateTime.Now
+                }));
+                db.SubmitChanges();
             }
         }
 
@@ -709,10 +960,10 @@ namespace DesktopApp_Project.DAL
                 var query = db.CauHois.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
-                    query = query.Where(x => x.NoiDung.Contains(keyword) || x.NhanKyNang.Contains(keyword));
+                    query = query.Where(x => x.NoiDung.Contains(keyword) || x.NhanKyNang.Contains(keyword) || x.QuestionType.Contains(keyword));
                 }
 
-                return query.OrderBy(x => x.NhanKyNang).AsEnumerable().Select(DtoMapper.ToDto).ToList();
+                return query.OrderBy(x => x.NhanKyNang).AsEnumerable().Select(x => FillQuestionGroupTitle(DtoMapper.ToDto(x), db)).ToList();
             }
         }
 
@@ -742,13 +993,13 @@ namespace DesktopApp_Project.DAL
                 if (!string.IsNullOrWhiteSpace(criteria.Keyword))
                 {
                     var keyword = criteria.Keyword.Trim();
-                    query = query.Where(x => x.NoiDung.Contains(keyword) || x.DapAn.Contains(keyword));
+                    query = query.Where(x => x.NoiDung.Contains(keyword) || x.DapAn.Contains(keyword) || x.QuestionType.Contains(keyword) || x.AnswerKey.Contains(keyword));
                 }
 
                 return query.OrderBy(x => x.NhanKyNang)
                     .ThenBy(x => x.BandLevel)
                     .AsEnumerable()
-                    .Select(DtoMapper.ToDto)
+                    .Select(x => FillQuestionGroupTitle(DtoMapper.ToDto(x), db))
                     .ToList();
             }
         }
@@ -757,10 +1008,45 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
-                var entity = new CauHoiEntity { NoiDung = dto.NoiDung, DapAn = dto.DapAn, NhanKyNang = dto.NhanKyNang, BandLevel = dto.BandLevel };
+                var entity = ToCauHoiEntity(dto);
                 db.CauHois.InsertOnSubmit(entity);
                 db.SubmitChanges();
                 return entity.MaCauHoi;
+            }
+        }
+
+        public List<CauHoiDTO> GetCauHoiByPassageId(int maPassage)
+        {
+            using (var db = _factory.Create())
+            {
+                return db.CauHois
+                    .Where(x => x.PassageId == maPassage)
+                    .OrderBy(x => x.MaCauHoi)
+                    .AsEnumerable()
+                    .Select(x => FillQuestionGroupTitle(DtoMapper.ToDto(x), db))
+                    .ToList();
+            }
+        }
+
+        public List<CauHoiDTO> GetCauHoiBySectionId(int maSection)
+        {
+            using (var db = _factory.Create())
+            {
+                return db.CauHois
+                    .Where(x => x.SectionId == maSection)
+                    .OrderBy(x => x.MaCauHoi)
+                    .AsEnumerable()
+                    .Select(x => FillQuestionGroupTitle(DtoMapper.ToDto(x), db))
+                    .ToList();
+            }
+        }
+
+        public void InsertCauHoiBulk(IEnumerable<CauHoiDTO> danhSach)
+        {
+            using (var db = _factory.Create())
+            {
+                db.CauHois.InsertAllOnSubmit((danhSach ?? new List<CauHoiDTO>()).Select(ToCauHoiEntity));
+                db.SubmitChanges();
             }
         }
 
@@ -774,6 +1060,15 @@ namespace DesktopApp_Project.DAL
                 entity.NoiDung = dto.NoiDung;
                 entity.DapAn = dto.DapAn;
                 entity.NhanKyNang = dto.NhanKyNang;
+                entity.QuestionType = dto.QuestionType;
+                entity.OptionA = dto.OptionA;
+                entity.OptionB = dto.OptionB;
+                entity.OptionC = dto.OptionC;
+                entity.OptionD = dto.OptionD;
+                entity.AnswerKey = dto.AnswerKey;
+                entity.Explanation = dto.Explanation;
+                entity.PassageId = dto.PassageId;
+                entity.SectionId = dto.SectionId;
                 entity.BandLevel = dto.BandLevel;
                 db.SubmitChanges();
             }
@@ -786,6 +1081,8 @@ namespace DesktopApp_Project.DAL
                 var entity = RequireEntity(
                     db.CauHois.FirstOrDefault(x => x.MaCauHoi == maCauHoi),
                     "Khong tim thay cau hoi can xoa.");
+                var details = db.ChiTietDeThis.Where(x => x.MaCauHoi == maCauHoi);
+                db.ChiTietDeThis.DeleteAllOnSubmit(details);
                 db.CauHois.DeleteOnSubmit(entity);
                 db.SubmitChanges();
             }
@@ -793,14 +1090,244 @@ namespace DesktopApp_Project.DAL
 
         public void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi)
         {
+            ThemCauHoiVaoDeThi(maDeThi, maCauHoi, null, null, null);
+        }
+
+        public int GetNextThuTu(int maDeThi)
+        {
+            using (var db = _factory.Create())
+            {
+                var current = db.ChiTietDeThis
+                    .Where(x => x.MaDeThi == maDeThi && x.ThuTu.HasValue)
+                    .Select(x => x.ThuTu.Value)
+                    .DefaultIfEmpty(0)
+                    .Max();
+                return current + 1;
+            }
+        }
+
+        public bool ExistsQuestionInExam(int maDeThi, int maCauHoi)
+        {
+            using (var db = _factory.Create())
+            {
+                return db.ChiTietDeThis.Any(x => x.MaDeThi == maDeThi && x.MaCauHoi == maCauHoi);
+            }
+        }
+
+        public void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi, string groupType, int? groupId, int? thuTu)
+        {
             using (var db = _factory.Create())
             {
                 if (!db.ChiTietDeThis.Any(x => x.MaDeThi == maDeThi && x.MaCauHoi == maCauHoi))
                 {
-                    db.ChiTietDeThis.InsertOnSubmit(new ChiTietDeThiEntity { MaDeThi = maDeThi, MaCauHoi = maCauHoi });
+                    var finalOrder = thuTu.HasValue && thuTu.Value > 0
+                        ? thuTu.Value
+                        : db.ChiTietDeThis.Where(x => x.MaDeThi == maDeThi && x.ThuTu.HasValue).Select(x => x.ThuTu.Value).DefaultIfEmpty(0).Max() + 1;
+                    db.ChiTietDeThis.InsertOnSubmit(new ChiTietDeThiEntity
+                    {
+                        MaDeThi = maDeThi,
+                        MaCauHoi = maCauHoi,
+                        GroupType = groupType,
+                        GroupId = groupId,
+                        ThuTu = finalOrder
+                    });
                     db.SubmitChanges();
                 }
             }
+        }
+
+        public List<IeltsExamItemDTO> GetNoiDungDeThi(int maDeThi)
+        {
+            using (var db = _factory.Create())
+            {
+                var query =
+                    from ct in db.ChiTietDeThis
+                    join q in db.CauHois on ct.MaCauHoi equals q.MaCauHoi
+                    where ct.MaDeThi == maDeThi
+                    select new { ct, q };
+
+                return query.AsEnumerable()
+                    .Select(x => new IeltsExamItemDTO
+                    {
+                        MaDeThi = x.ct.MaDeThi,
+                        MaCauHoi = x.ct.MaCauHoi,
+                        GroupType = x.ct.GroupType,
+                        GroupId = x.ct.GroupId,
+                        ThuTu = x.ct.ThuTu,
+                        GroupTitle = ResolveGroupTitle(db, x.ct.GroupType, x.ct.GroupId),
+                        NoiDung = x.q.NoiDung,
+                        QuestionType = x.q.QuestionType,
+                        AnswerKey = x.q.AnswerKey,
+                        BandLevel = x.q.BandLevel
+                    })
+                    .OrderBy(x => x.GroupType)
+                    .ThenBy(x => x.GroupId)
+                    .ThenBy(x => x.ThuTu)
+                    .ToList();
+            }
+        }
+
+        public void XoaCauHoiKhoiDeThi(int maDeThi, int maCauHoi)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = db.ChiTietDeThis.FirstOrDefault(x => x.MaDeThi == maDeThi && x.MaCauHoi == maCauHoi);
+                if (entity != null)
+                {
+                    db.ChiTietDeThis.DeleteOnSubmit(entity);
+                    db.SubmitChanges();
+                }
+            }
+        }
+
+        public int ImportIeltsRows(IEnumerable<IeltsImportRowDTO> rows)
+        {
+            using (var db = _factory.Create())
+            {
+                var count = 0;
+                foreach (var row in rows ?? new List<IeltsImportRowDTO>())
+                {
+                    var skill = (row.Skill ?? string.Empty).Trim();
+                    int? passageId = null;
+                    int? sectionId = null;
+
+                    if (string.Equals(skill, "Reading", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var title = string.IsNullOrWhiteSpace(row.PassageTitle) ? "Reading Passage" : row.PassageTitle.Trim();
+                        var code = string.IsNullOrWhiteSpace(row.PassageCode) ? row.ParentCode : row.PassageCode;
+                        var passage = db.ReadingPassages.FirstOrDefault(x => (!string.IsNullOrEmpty(code) && x.PassageCode == code) || x.Title == title);
+                        if (passage == null)
+                        {
+                            passage = new ReadingPassageEntity
+                            {
+                                PassageCode = code,
+                                Title = title,
+                                Content = row.PassageContent ?? string.Empty,
+                                ImagePath = row.ImagePath,
+                                BandLevel = row.BandLevel,
+                                Topic = row.Topic,
+                                NgayTao = DateTime.Now,
+                                CreatedAt = DateTime.Now
+                            };
+                            db.ReadingPassages.InsertOnSubmit(passage);
+                            db.SubmitChanges();
+                        }
+
+                        passageId = passage.PassageId;
+                    }
+                    else if (string.Equals(skill, "Listening", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var title = string.IsNullOrWhiteSpace(row.SectionTitle) ? "Listening Section" : row.SectionTitle.Trim();
+                        var number = row.SectionNumber.HasValue && row.SectionNumber.Value >= 1 && row.SectionNumber.Value <= 4 ? row.SectionNumber.Value : 1;
+                        var code = string.IsNullOrWhiteSpace(row.SectionCode) ? row.ParentCode : row.SectionCode;
+                        var section = db.ListeningSections.FirstOrDefault(x => (!string.IsNullOrEmpty(code) && x.SectionCode == code) || (x.Title == title && x.SectionNumber == number));
+                        if (section == null)
+                        {
+                            section = new ListeningSectionEntity
+                            {
+                                SectionCode = code,
+                                Title = title,
+                                SectionNumber = number,
+                                PartNo = number,
+                                AudioPath = row.AudioPath,
+                                Transcript = row.Transcript,
+                                BandLevel = row.BandLevel,
+                                Topic = row.Topic,
+                                NgayTao = DateTime.Now,
+                                CreatedAt = DateTime.Now
+                            };
+                            db.ListeningSections.InsertOnSubmit(section);
+                            db.SubmitChanges();
+                        }
+
+                        sectionId = section.SectionId;
+                    }
+
+                    db.CauHois.InsertOnSubmit(new CauHoiEntity
+                    {
+                        NoiDung = row.QuestionText,
+                        DapAn = row.AnswerKey,
+                        NhanKyNang = skill,
+                        QuestionType = row.QuestionType,
+                        OptionA = row.OptionA,
+                        OptionB = row.OptionB,
+                        OptionC = row.OptionC,
+                        OptionD = row.OptionD,
+                        AnswerKey = row.AnswerKey,
+                        Explanation = row.Explanation,
+                        PassageId = passageId,
+                        SectionId = sectionId,
+                        BandLevel = row.BandLevel
+                    });
+                    count++;
+                }
+
+                db.SubmitChanges();
+                return count;
+            }
+        }
+
+        private static CauHoiEntity ToCauHoiEntity(CauHoiDTO dto)
+        {
+            return new CauHoiEntity
+            {
+                NoiDung = dto.NoiDung,
+                DapAn = string.IsNullOrWhiteSpace(dto.DapAn) ? dto.AnswerKey : dto.DapAn,
+                NhanKyNang = dto.NhanKyNang,
+                QuestionType = dto.QuestionType,
+                OptionA = dto.OptionA,
+                OptionB = dto.OptionB,
+                OptionC = dto.OptionC,
+                OptionD = dto.OptionD,
+                AnswerKey = dto.AnswerKey,
+                Explanation = dto.Explanation,
+                PassageId = dto.PassageId,
+                SectionId = dto.SectionId,
+                BandLevel = dto.BandLevel
+            };
+        }
+
+        private static CauHoiDTO FillQuestionGroupTitle(CauHoiDTO dto, QuanLyIeltsDataContext db)
+        {
+            if (dto == null)
+            {
+                return null;
+            }
+
+            if (dto.PassageId.HasValue)
+            {
+                var passage = db.ReadingPassages.FirstOrDefault(x => x.PassageId == dto.PassageId.Value);
+                dto.GroupTitle = passage == null ? string.Empty : passage.Title;
+            }
+            else if (dto.SectionId.HasValue)
+            {
+                var section = db.ListeningSections.FirstOrDefault(x => x.SectionId == dto.SectionId.Value);
+                dto.GroupTitle = section == null ? string.Empty : section.Title;
+            }
+
+            return dto;
+        }
+
+        private static string ResolveGroupTitle(QuanLyIeltsDataContext db, string groupType, int? groupId)
+        {
+            if (!groupId.HasValue)
+            {
+                return string.Empty;
+            }
+
+            if (string.Equals(groupType, "Reading", StringComparison.OrdinalIgnoreCase))
+            {
+                var passage = db.ReadingPassages.FirstOrDefault(x => x.PassageId == groupId.Value);
+                return passage == null ? string.Empty : passage.Title;
+            }
+
+            if (string.Equals(groupType, "Listening", StringComparison.OrdinalIgnoreCase))
+            {
+                var section = db.ListeningSections.FirstOrDefault(x => x.SectionId == groupId.Value);
+                return section == null ? string.Empty : section.Title;
+            }
+
+            return string.Empty;
         }
 
         public List<DotKiemTraDTO> GetDotKiemTra(int maLopHoc)
@@ -1103,6 +1630,9 @@ namespace DesktopApp_Project.DAL
                         ThongTinNganHang = hp.ThongTinNganHang,
                         NgayTao = hp.NgayTao,
                         HanThanhToan = hp.HanThanhToan,
+                        MaHoaDon = hp.MaHoaDon,
+                        PhuongThucThanhToan = hp.PhuongThucThanhToan,
+                        NgayThanhToan = hp.NgayThanhToan,
                         TrangThai = hp.TrangThai
                     };
 
@@ -1142,6 +1672,9 @@ namespace DesktopApp_Project.DAL
                     ThongTinNganHang = dto.ThongTinNganHang,
                     NgayTao = DateTime.Now,
                     HanThanhToan = dto.HanThanhToan,
+                    MaHoaDon = dto.MaHoaDon,
+                    PhuongThucThanhToan = dto.PhuongThucThanhToan,
+                    NgayThanhToan = dto.NgayThanhToan,
                     TrangThai = dto.TrangThai
                 };
                 db.ThanhToanHocPhis.InsertOnSubmit(entity);
@@ -1168,6 +1701,9 @@ namespace DesktopApp_Project.DAL
                         ThongTinNganHang = dto.ThongTinNganHang,
                         NgayTao = dto.NgayTao,
                         HanThanhToan = dto.HanThanhToan,
+                        MaHoaDon = dto.MaHoaDon,
+                        PhuongThucThanhToan = dto.PhuongThucThanhToan,
+                        NgayThanhToan = dto.NgayThanhToan,
                         TrangThai = dto.TrangThai
                     });
                 }
@@ -1186,6 +1722,166 @@ namespace DesktopApp_Project.DAL
                 entity.TrangThai = trangThai;
                 db.SubmitChanges();
             }
+        }
+
+        public PaymentResultDTO TaoNhatKyThanhToan(PaymentRequestDTO request, string maGiaoDichNgoai, string paymentUrl, string qrContent)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = new NhatKyThanhToanEntity
+                {
+                    MaThanhToan = request.MaThanhToan,
+                    PhuongThuc = request.PhuongThuc,
+                    SoTien = request.SoTien,
+                    NoiDungThanhToan = request.NoiDungThanhToan,
+                    MaGiaoDichNgoai = maGiaoDichNgoai,
+                    PaymentUrl = paymentUrl,
+                    QrContent = qrContent,
+                    TrangThai = AppConstants.PaymentPending,
+                    NgayTao = DateTime.Now
+                };
+                db.NhatKyThanhToans.InsertOnSubmit(entity);
+                db.SubmitChanges();
+                return DtoMapper.ToDto(entity);
+            }
+        }
+
+        public PaymentResultDTO LayGiaoDichThanhToan(int maGiaoDich)
+        {
+            using (var db = _factory.Create())
+            {
+                return DtoMapper.ToDto(db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich));
+            }
+        }
+
+        public List<PaymentResultDTO> LayGiaoDichTheoThanhToan(int maThanhToan)
+        {
+            using (var db = _factory.Create())
+            {
+                return db.NhatKyThanhToans
+                    .Where(x => x.MaThanhToan == maThanhToan)
+                    .OrderByDescending(x => x.NgayTao)
+                    .AsEnumerable()
+                    .Select(DtoMapper.ToDto)
+                    .ToList();
+            }
+        }
+
+        public void CapNhatTrangThaiGiaoDich(int maGiaoDich, string trangThai)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = RequireEntity(
+                    db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich),
+                    "Khong tim thay giao dich thanh toan.");
+                entity.TrangThai = trangThai;
+                entity.NgayCapNhat = DateTime.Now;
+                db.SubmitChanges();
+            }
+        }
+
+        public void CapNhatTrangThaiHocPhi(int maThanhToan, string trangThai, string phuongThuc, DateTime? ngayThanhToan)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = RequireEntity(
+                    db.ThanhToanHocPhis.FirstOrDefault(x => x.MaThanhToan == maThanhToan),
+                    "Khong tim thay phieu hoc phi can cap nhat.");
+                entity.TrangThai = trangThai;
+                entity.PhuongThucThanhToan = phuongThuc;
+                entity.NgayThanhToan = ngayThanhToan;
+                db.SubmitChanges();
+            }
+        }
+
+        public HoaDonHocPhiDTO LayHoaDonHocPhi(int maThanhToan)
+        {
+            using (var db = _factory.Create())
+            {
+                return BuildHoaDonQuery(db).FirstOrDefault(x => x.MaThanhToan == maThanhToan);
+            }
+        }
+
+        public List<HoaDonHocPhiDTO> LayHoaDonHocPhiTheoKhoangNgay(DateTime tuNgay, DateTime denNgay)
+        {
+            using (var db = _factory.Create())
+            {
+                var start = tuNgay.Date;
+                var end = denNgay.Date.AddDays(1);
+                return BuildHoaDonQuery(db)
+                    .Where(x => x.NgayTao >= start && x.NgayTao < end)
+                    .OrderBy(x => x.NgayTao)
+                    .ThenBy(x => x.TenLop)
+                    .ToList();
+            }
+        }
+
+        public List<BaoCaoDoanhThuDTO> LayBaoCaoDoanhThu(DateTime tuNgay, DateTime denNgay)
+        {
+            using (var db = _factory.Create())
+            {
+                var start = tuNgay.Date;
+                var end = denNgay.Date.AddDays(1);
+                return BuildHoaDonQuery(db)
+                    .Where(x => x.NgayTao >= start && x.NgayTao < end)
+                    .AsEnumerable()
+                    .GroupBy(x => new { Ngay = x.NgayTao.Date, x.MaLopHoc, x.TenLop })
+                    .Select(g => new BaoCaoDoanhThuDTO
+                    {
+                        Ngay = g.Key.Ngay,
+                        MaLopHoc = g.Key.MaLopHoc,
+                        TenLop = g.Key.TenLop,
+                        SoPhieu = g.Count(),
+                        SoPhieuDaThanhToan = g.Count(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai)),
+                        TongTienDaThanhToan = g
+                            .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai))
+                            .Sum(x => x.SoTienCuoi.HasValue ? x.SoTienCuoi.Value : x.SoTien)
+                    })
+                    .OrderBy(x => x.Ngay)
+                    .ThenBy(x => x.TenLop)
+                    .ToList();
+            }
+        }
+
+        public void CapNhatThongTinHoaDon(int maThanhToan, string maHoaDon)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = RequireEntity(
+                    db.ThanhToanHocPhis.FirstOrDefault(x => x.MaThanhToan == maThanhToan),
+                    "Khong tim thay phieu hoc phi can cap nhat hoa don.");
+                entity.MaHoaDon = maHoaDon;
+                db.SubmitChanges();
+            }
+        }
+
+        private static IQueryable<HoaDonHocPhiDTO> BuildHoaDonQuery(QuanLyIeltsDataContext db)
+        {
+            return
+                from hp in db.ThanhToanHocPhis
+                join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
+                join lop in db.LopHocs on hp.MaLopHoc equals (int?)lop.MaLopHoc into lopJoin
+                from lop in lopJoin.DefaultIfEmpty()
+                select new HoaDonHocPhiDTO
+                {
+                    MaThanhToan = hp.MaThanhToan,
+                    MaHoaDon = hp.MaHoaDon,
+                    MaNguoiDung = hp.MaNguoiDung,
+                    MaLopHoc = hp.MaLopHoc,
+                    HoTen = nd.HoTen,
+                    TenLop = lop == null ? string.Empty : lop.TenLop,
+                    SoTien = hp.SoTien,
+                    SoTienGoc = hp.SoTienGoc,
+                    PhanTramGiam = hp.PhanTramGiam,
+                    SoTienGiam = hp.SoTienGiam,
+                    SoTienCuoi = hp.SoTienCuoi,
+                    ThongTinNganHang = hp.ThongTinNganHang,
+                    NgayTao = hp.NgayTao,
+                    HanThanhToan = hp.HanThanhToan,
+                    NgayThanhToan = hp.NgayThanhToan,
+                    PhuongThucThanhToan = hp.PhuongThucThanhToan,
+                    TrangThai = hp.TrangThai
+                };
         }
 
         public DashboardSummaryDTO GetDashboardSummary(DateTime today)

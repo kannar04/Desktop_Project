@@ -14,8 +14,10 @@ namespace DesktopApp_Project.DAL
             [Column] public string MoTa { get; set; }
             [Column] public DateTime Deadline { get; set; }
             [Column] public string FileDinhKem { get; set; }
+            [Column] public string LoaiFile { get; set; }
+            [Column] public string TenFileGoc { get; set; }
+            [Column] public string DuongDanLocal { get; set; }
             [Column] public DateTime NgayTao { get; set; }
         }
 }
-
 

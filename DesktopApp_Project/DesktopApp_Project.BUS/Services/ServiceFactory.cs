@@ -35,6 +35,9 @@ namespace DesktopApp_Project.BUS
                 ThongBao = new ThongBaoService(_repository);
                 HocPhi = new HocPhiService(_repository);
                 Dashboard = new DashboardService(_repository);
+                ExternalStorage = new FakeExternalStorageService();
+                Media = new MediaService(_repository, ExternalStorage);
+                Payment = new PaymentService(_repository);
             }
     
             public AuthService Auth { get; private set; }
@@ -51,6 +54,8 @@ namespace DesktopApp_Project.BUS
             public ThongBaoService ThongBao { get; private set; }
             public HocPhiService HocPhi { get; private set; }
             public DashboardService Dashboard { get; private set; }
+            public PaymentService Payment { get; private set; }
+            public MediaService Media { get; private set; }
+            public IExternalStorageService ExternalStorage { get; private set; }
         }
 }
-

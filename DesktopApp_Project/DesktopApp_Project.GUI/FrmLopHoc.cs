@@ -8,6 +8,7 @@ namespace DesktopApp_Project.GUI
     public partial class FrmLopHoc : ModuleFormBase
     {
         private int _selectedClassId;
+        private bool _allowGridFill;
 
         public FrmLopHoc()
         {
@@ -29,6 +30,7 @@ namespace DesktopApp_Project.GUI
             WireClick(btnThemHv, BtnThemHv_Click);
             WireClick(btnXoaHv, BtnXoaHv_Click);
             WireSelectionChanged(_gridLop, GridLop_SelectionChanged);
+            WireCellClick(_gridLop, GridLop_CellClick);
         }
 
         protected override void OnRuntimeLoad()
@@ -39,6 +41,9 @@ namespace DesktopApp_Project.GUI
         private void LoadClasses()
         {
             _gridLop.DataSource = SafeLoad<object>(() => Services.LopHoc.LayDanhSach(), null);
+            ClearForm();
+            LoadStudents();
+            ResetClassGridSelection();
         }
 
         private void FillClass()
@@ -153,7 +158,30 @@ namespace DesktopApp_Project.GUI
 
         private void GridLop_SelectionChanged(object sender, EventArgs e)
         {
+            if (!_allowGridFill)
+            {
+                return;
+            }
+
             FillClass();
+        }
+
+        private void GridLop_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            _allowGridFill = true;
+            FillClass();
+        }
+
+        private void ResetClassGridSelection()
+        {
+            _allowGridFill = false;
+            _gridLop.ClearSelection();
+            _gridLop.CurrentCell = null;
         }
     }
 }

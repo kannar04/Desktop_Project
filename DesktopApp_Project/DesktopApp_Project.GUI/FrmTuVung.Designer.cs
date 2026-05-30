@@ -331,6 +331,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmTuVung";
+            this.Text = "Cập nhật kho từ vựng";
             ((System.ComponentModel.ISupportInitialize)(this._grid)).EndInit();
             this.root.ResumeLayout(false);
             this.root.PerformLayout();

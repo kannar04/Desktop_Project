@@ -12,6 +12,7 @@ namespace DesktopApp_Project.GUI
         private TextBox _txtLienHe;
         private ComboBox _cboLopFilter;
         private ComboBox _cboTrangThaiFilter;
+        private bool _allowGridFill;
 
         public FrmHocVien()
         {
@@ -32,6 +33,7 @@ namespace DesktopApp_Project.GUI
             WireClick(btnLuu, BtnLuu_Click);
             WireClick(btnXoa, BtnXoa_Click);
             WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireCellClick(_grid, Grid_CellClick);
         }
 
         protected override void OnRuntimeLoad()
@@ -86,6 +88,7 @@ namespace DesktopApp_Project.GUI
                 MaLopHoc = maLopHoc,
                 TrangThai = _cboTrangThaiFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboTrangThaiFilter.SelectedItem)
             }), null);
+            ResetGridSelection();
         }
 
         private void FillFromGrid()
@@ -165,7 +168,30 @@ namespace DesktopApp_Project.GUI
 
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
+            if (!_allowGridFill)
+            {
+                return;
+            }
+
             FillFromGrid();
+        }
+
+        private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            _allowGridFill = true;
+            FillFromGrid();
+        }
+
+        private void ResetGridSelection()
+        {
+            _allowGridFill = false;
+            _grid.ClearSelection();
+            _grid.CurrentCell = null;
         }
     }
 }

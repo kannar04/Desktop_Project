@@ -502,6 +502,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmDiemSo";
+            this.Text = "Điểm số";
             ((System.ComponentModel.ISupportInitialize)(this._gridHocVien)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._gridDiem)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._diemL)).EndInit();

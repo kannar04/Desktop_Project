@@ -49,16 +49,35 @@ namespace DesktopApp_Project.DAL
         List<DiemDanhDTO> GetDiemDanh(int maBuoiHoc);
         void LuuDiemDanh(DiemDanhDTO dto);
         void LuuDiemDanh(IEnumerable<DiemDanhDTO> danhSach);
-        decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc);
+        decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc, int? thang = null, int? nam = null);
 
         List<DeThiDTO> GetDeThi();
         int InsertDeThi(DeThiDTO dto);
+        void UpdateDeThi(DeThiDTO dto);
+        void DeleteDeThi(int maDeThi);
+        List<ReadingPassageDTO> GetReadingPassages(decimal? bandTu, decimal? bandDen);
+        List<ListeningSectionDTO> GetListeningSections(decimal? bandTu, decimal? bandDen);
+        ReadingPassageDTO GetReadingPassageById(int maPassage);
+        ListeningSectionDTO GetListeningSectionById(int maSection);
+        int InsertReadingPassage(ReadingPassageDTO dto);
+        void InsertReadingPassageBulk(IEnumerable<ReadingPassageDTO> danhSach);
+        int InsertListeningSection(ListeningSectionDTO dto);
+        void InsertListeningSectionBulk(IEnumerable<ListeningSectionDTO> danhSach);
         List<CauHoiDTO> GetCauHoi(string keyword);
         List<CauHoiDTO> SearchCauHoi(CauHoiSearchCriteriaDTO criteria);
+        List<CauHoiDTO> GetCauHoiByPassageId(int maPassage);
+        List<CauHoiDTO> GetCauHoiBySectionId(int maSection);
         int InsertCauHoi(CauHoiDTO dto);
+        void InsertCauHoiBulk(IEnumerable<CauHoiDTO> danhSach);
         void UpdateCauHoi(CauHoiDTO dto);
         void DeleteCauHoi(int maCauHoi);
+        int GetNextThuTu(int maDeThi);
+        bool ExistsQuestionInExam(int maDeThi, int maCauHoi);
         void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi);
+        void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi, string groupType, int? groupId, int? thuTu);
+        void XoaCauHoiKhoiDeThi(int maDeThi, int maCauHoi);
+        List<IeltsExamItemDTO> GetNoiDungDeThi(int maDeThi);
+        int ImportIeltsRows(IEnumerable<IeltsImportRowDTO> rows);
 
         List<DotKiemTraDTO> GetDotKiemTra(int maLopHoc);
         int InsertDotKiemTra(DotKiemTraDTO dto);
@@ -83,6 +102,15 @@ namespace DesktopApp_Project.DAL
         int InsertHocPhi(ThanhToanHocPhiDTO dto);
         void InsertHocPhiBulk(IEnumerable<ThanhToanHocPhiDTO> danhSach);
         void UpdateTrangThaiHocPhi(int maThanhToan, string trangThai);
+        PaymentResultDTO TaoNhatKyThanhToan(PaymentRequestDTO request, string maGiaoDichNgoai, string paymentUrl, string qrContent);
+        PaymentResultDTO LayGiaoDichThanhToan(int maGiaoDich);
+        List<PaymentResultDTO> LayGiaoDichTheoThanhToan(int maThanhToan);
+        void CapNhatTrangThaiGiaoDich(int maGiaoDich, string trangThai);
+        void CapNhatTrangThaiHocPhi(int maThanhToan, string trangThai, string phuongThuc, DateTime? ngayThanhToan);
+        HoaDonHocPhiDTO LayHoaDonHocPhi(int maThanhToan);
+        List<HoaDonHocPhiDTO> LayHoaDonHocPhiTheoKhoangNgay(DateTime tuNgay, DateTime denNgay);
+        List<BaoCaoDoanhThuDTO> LayBaoCaoDoanhThu(DateTime tuNgay, DateTime denNgay);
+        void CapNhatThongTinHoaDon(int maThanhToan, string maHoaDon);
 
         DashboardSummaryDTO GetDashboardSummary(DateTime today);
         List<MonthlyRevenueDTO> GetRevenueByMonth(int months, DateTime today);

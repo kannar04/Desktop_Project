@@ -32,6 +32,15 @@ namespace DesktopApp_Project.Common
                 "Writing",
                 "Speaking"
             };
+
+            public static readonly string[] IeltsQuestionTypes =
+            {
+                "Multiple Choice",
+                "Matching",
+                "True/False/Not Given",
+                "Fill in the Blank",
+                "Short Answer"
+            };
     
             public const string FilterAll = "Tất cả";
             public const string AttendancePresent = "Có mặt";
@@ -72,12 +81,45 @@ namespace DesktopApp_Project.Common
             public const string PaymentPending = "Chờ thanh toán";
             public const string PaymentPaid = "Đã thanh toán";
             public const string PaymentOverdue = "Quá hạn";
+            public const string PaymentCancelled = "Đã hủy";
+            public const string PaymentMethodMoMo = "MoMo";
+            public const string PaymentMethodVNPay = "VNPay";
     
             public static readonly string[] PaymentStatuses =
             {
                 PaymentPending,
                 PaymentPaid,
                 PaymentOverdue
+            };
+
+            public static readonly string[] PaymentMethods =
+            {
+                PaymentMethodMoMo,
+                PaymentMethodVNPay
+            };
+
+            public static readonly string[] SupportedMediaExtensions =
+            {
+                ".pdf",
+                ".doc",
+                ".docx",
+                ".ppt",
+                ".pptx",
+                ".xls",
+                ".xlsx",
+                ".txt",
+                ".jpg",
+                ".jpeg",
+                ".png",
+                ".gif",
+                ".bmp",
+                ".mp3",
+                ".wav",
+                ".m4a",
+                ".mp4",
+                ".mov",
+                ".avi",
+                ".mkv"
             };
 
             public static readonly string[] PaymentPaidAliases = BuildAliases(PaymentPaid);
@@ -100,6 +142,8 @@ namespace DesktopApp_Project.Common
     
             public static readonly string[] CefrLevels =
             {
+                "A1",
+                "A2",
                 "B1",
                 "B2",
                 "C1",
@@ -189,4 +233,3 @@ namespace DesktopApp_Project.Common
             }
         }
 }
-

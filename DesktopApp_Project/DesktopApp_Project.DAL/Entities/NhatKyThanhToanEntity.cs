@@ -1,0 +1,23 @@
+using System;
+using System.Data.Linq.Mapping;
+
+namespace DesktopApp_Project.DAL
+{
+    [Table(Name = "dbo.NhatKyThanhToan")]
+    public class NhatKyThanhToanEntity
+    {
+        [Column(IsPrimaryKey = true, IsDbGenerated = true, AutoSync = AutoSync.OnInsert)]
+        public int MaGiaoDich { get; set; }
+
+        [Column] public int MaThanhToan { get; set; }
+        [Column] public string PhuongThuc { get; set; }
+        [Column] public decimal SoTien { get; set; }
+        [Column] public string NoiDungThanhToan { get; set; }
+        [Column] public string MaGiaoDichNgoai { get; set; }
+        [Column] public string PaymentUrl { get; set; }
+        [Column] public string QrContent { get; set; }
+        [Column] public string TrangThai { get; set; }
+        [Column] public DateTime NgayTao { get; set; }
+        [Column] public DateTime? NgayCapNhat { get; set; }
+    }
+}

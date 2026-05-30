@@ -49,9 +49,8 @@ namespace DesktopApp_Project.GUI
             ForeColor = ThemeManager.Current.PrimaryText;
             StartPosition = FormStartPosition.CenterScreen;
             DoubleBuffered = true;
-            MinimumSize = new Size(900, 640);
-            ClientSize = new Size(900, 640);
-            Text = "Dang nhap - Quan ly lop IELTS";
+            MinimumSize = new Size(760, 500);
+            Text = "Đăng nhập - Quản lý lớp IELTS";
         }
 
         private void FrmDangNhap_Load(object sender, EventArgs e)
@@ -100,30 +99,30 @@ namespace DesktopApp_Project.GUI
             StyleWindowButton(btnMinimize);
             StyleWindowButton(btnClose);
 
-            label1.Visible = false;
-            label2.Visible = false;
+            label1.Visible = true;
+            label1.Font = new Font("Segoe UI", 24F, FontStyle.Bold);
+            label1.ForeColor = theme.PrimaryText;
+            label1.BackColor = Color.Transparent;
+            label1.TextAlign = ContentAlignment.MiddleLeft;
 
-            pnlLogin.Size = new Size(400, 500);
-            pnlLogin.Location = new Point((ClientSize.Width - pnlLogin.Width) / 2, (ClientSize.Height - pnlLogin.Height) / 2);
+            label2.Visible = true;
+            label2.Font = new Font("Segoe UI", 13F, FontStyle.Regular);
+            label2.ForeColor = theme.SecondaryText;
+            label2.BackColor = Color.Transparent;
+            label2.TextAlign = ContentAlignment.TopLeft;
+
             pnlLogin.BackColor = theme.PanelDark;
             SetRoundedRegion(pnlLogin, 18);
 
-            label3.Text = "Dang nhap";
             label3.Font = new Font("Segoe UI", 18F, FontStyle.Bold);
             label3.ForeColor = theme.Accent;
             label3.BackColor = Color.Transparent;
-            label3.Location = new Point(0, 42);
-            label3.Size = new Size(pnlLogin.Width, 42);
             label3.TextAlign = ContentAlignment.MiddleCenter;
 
             pnlUsername.BackColor = theme.ControlBackground;
-            pnlUsername.Location = new Point(42, 142);
-            pnlUsername.Size = new Size(316, 58);
             SetRoundedRegion(pnlUsername, 8);
 
             panel1.BackColor = theme.ControlBackground;
-            panel1.Location = new Point(42, 220);
-            panel1.Size = new Size(316, 58);
             SetRoundedRegion(panel1, 8);
 
             StyleTextInput(txtUsername, lblUsername, pnlUnder1, icoUsername);
@@ -134,14 +133,8 @@ namespace DesktopApp_Project.GUI
             icoShowPass.BackColor = Color.Transparent;
             icoShowPass.IconColor = theme.Accent;
             icoShowPass.ForeColor = theme.Accent;
-            icoShowPass.IconSize = 18;
-            icoShowPass.Size = new Size(24, 24);
-            icoShowPass.Location = new Point(panel1.Width - 42, 18);
             icoShowPass.Cursor = Cursors.Hand;
 
-            btnLogin.Text = "Dang nhap";
-            btnLogin.Size = new Size(316, 44);
-            btnLogin.Location = new Point(42, 330);
             btnLogin.BackColor = theme.Accent;
             btnLogin.ForeColor = theme.BackgroundDark;
             btnLogin.IconColor = theme.BackgroundDark;
@@ -174,24 +167,17 @@ namespace DesktopApp_Project.GUI
             placeholder.BackColor = Color.Transparent;
             placeholder.ForeColor = string.IsNullOrEmpty(textBox.Text) ? theme.SecondaryText : theme.Accent;
             placeholder.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
-            placeholder.Location = new Point(50, string.IsNullOrEmpty(textBox.Text) ? 20 : 4);
-            placeholder.Size = new Size(170, 18);
 
             textBox.BorderStyle = BorderStyle.None;
             textBox.BackColor = theme.ControlBackground;
             textBox.ForeColor = theme.PrimaryText;
             textBox.Font = theme.BodyFont;
-            textBox.Location = new Point(50, 24);
-            textBox.Size = new Size(218, 22);
 
-            underline.Visible = false;
+            underline.BackColor = theme.PrimaryText;
 
             icon.BackColor = Color.Transparent;
             icon.ForeColor = theme.Accent;
             icon.IconColor = theme.Accent;
-            icon.IconSize = 24;
-            icon.Size = new Size(28, 28);
-            icon.Location = new Point(14, 16);
         }
 
         private void StyleWindowButton(Button button)

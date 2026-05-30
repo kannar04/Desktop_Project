@@ -9,6 +9,7 @@ namespace DesktopApp_Project.GUI
     {
         private int _selectedId;
         private bool _isFilling;
+        private bool _allowGridFill;
 
         public FrmBaiTap()
         {
@@ -29,6 +30,7 @@ namespace DesktopApp_Project.GUI
             WireClick(btnXoa, BtnXoa_Click);
             WireClick(btnFile, BtnFile_Click);
             WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireCellClick(_grid, Grid_CellClick);
             WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
         }
 
@@ -43,6 +45,7 @@ namespace DesktopApp_Project.GUI
         {
             var maLop = UiHelpers.SelectedId(_cboLop);
             _grid.DataSource = SafeLoad<object>(() => Services.BaiTap.LayDanhSach(maLop == 0 ? (int?)null : maLop), null);
+            ResetGridSelection();
         }
 
         private void FillFromGrid()
@@ -134,6 +137,22 @@ namespace DesktopApp_Project.GUI
 
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
+            if (!_allowGridFill)
+            {
+                return;
+            }
+
+            FillFromGrid();
+        }
+
+        private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            _allowGridFill = true;
             FillFromGrid();
         }
 
@@ -144,7 +163,15 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
+            ClearForm();
             LoadData();
+        }
+
+        private void ResetGridSelection()
+        {
+            _allowGridFill = false;
+            _grid.ClearSelection();
+            _grid.CurrentCell = null;
         }
     }
 }

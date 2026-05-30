@@ -450,6 +450,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmHocVien";
+            this.Text = "Hồ sơ học viên";
             ((System.ComponentModel.ISupportInitialize)(this._grid)).EndInit();
             this.root.ResumeLayout(false);
             this.root.PerformLayout();

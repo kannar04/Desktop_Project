@@ -23,6 +23,8 @@ namespace DesktopApp_Project.DAL
         public Table<BuoiHocEntity> BuoiHocs { get { return GetTable<BuoiHocEntity>(); } }
         public Table<ChiTietDiemDanhEntity> ChiTietDiemDanhs { get { return GetTable<ChiTietDiemDanhEntity>(); } }
         public Table<DeThiEntity> DeThis { get { return GetTable<DeThiEntity>(); } }
+        public Table<ReadingPassageEntity> ReadingPassages { get { return GetTable<ReadingPassageEntity>(); } }
+        public Table<ListeningSectionEntity> ListeningSections { get { return GetTable<ListeningSectionEntity>(); } }
         public Table<CauHoiEntity> CauHois { get { return GetTable<CauHoiEntity>(); } }
         public Table<ChiTietDeThiEntity> ChiTietDeThis { get { return GetTable<ChiTietDeThiEntity>(); } }
         public Table<DotKiemTraEntity> DotKiemTras { get { return GetTable<DotKiemTraEntity>(); } }
@@ -32,6 +34,7 @@ namespace DesktopApp_Project.DAL
         public Table<ThongBaoEntity> ThongBaos { get { return GetTable<ThongBaoEntity>(); } }
         public Table<ChiTietThongBaoEntity> ChiTietThongBaos { get { return GetTable<ChiTietThongBaoEntity>(); } }
         public Table<ThanhToanHocPhiEntity> ThanhToanHocPhis { get { return GetTable<ThanhToanHocPhiEntity>(); } }
+        public Table<NhatKyThanhToanEntity> NhatKyThanhToans { get { return GetTable<NhatKyThanhToanEntity>(); } }
         public Table<NhatKyBaoCaoEntity> NhatKyBaoCaos { get { return GetTable<NhatKyBaoCaoEntity>(); } }
     }
 

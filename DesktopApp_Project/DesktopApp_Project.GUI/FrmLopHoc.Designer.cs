@@ -425,6 +425,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmLopHoc";
+            this.Text = "Lớp học";
             ((System.ComponentModel.ISupportInitialize)(this._gridLop)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._gridTrongLop)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._gridNgoaiLop)).EndInit();

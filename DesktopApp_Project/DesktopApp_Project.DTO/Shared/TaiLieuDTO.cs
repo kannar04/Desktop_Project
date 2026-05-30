@@ -11,7 +11,11 @@ namespace DesktopApp_Project.DTO
             public string DuongDanFile { get; set; }
             public string VideoLink { get; set; }
             public string NhanKyNang { get; set; }
+            public string LoaiFile { get; set; }
+            public string TenFileGoc { get; set; }
+            public string DuongDanLocal { get; set; }
+            public string DuongDanCloud { get; set; }
+            public string ThumbnailPath { get; set; }
             public DateTime NgayCapNhat { get; set; }
         }
 }
-

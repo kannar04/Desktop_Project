@@ -435,7 +435,7 @@ namespace DesktopApp_Project.GUI
             {
                 Text = greetingText,
                 Dock = DockStyle.Top,
-                AutoSize = false,
+                AutoSize = true,
                 Height = 40,
                 Font = new Font("Segoe UI", 11F, FontStyle.Regular),
                 ForeColor = ThemeManager.Current.SecondaryText,
@@ -462,10 +462,11 @@ namespace DesktopApp_Project.GUI
 
             var title = new Label
             {
-                Text = "Dashboard",
+                Text = "Xin chào Admin",
                 Dock = DockStyle.Top,
-                Height = 54,
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
+                AutoSize = true,
+                Height = 44,
+                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
                 ForeColor = ThemeManager.Current.PrimaryText,
                 BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(10, 0, 0, 0),
@@ -476,6 +477,7 @@ namespace DesktopApp_Project.GUI
             {
                 Text = "Xin chào, Admin !!!",
                 Dock = DockStyle.Top,
+                AutoSize = true,
                 Height = 34,
                 Font = new Font("Segoe UI", 10F),
                 ForeColor = ThemeManager.Current.SecondaryText,
@@ -528,7 +530,6 @@ namespace DesktopApp_Project.GUI
             body.Controls.Add(CreateScheduleGrid(schedule), 1, 1);
 
             container.Controls.Add(body);
-            container.Controls.Add(subtitle);
             container.Controls.Add(title);
             pnlDesktop.Controls.Add(container);
             ThemeManager.ApplyTheme(container);

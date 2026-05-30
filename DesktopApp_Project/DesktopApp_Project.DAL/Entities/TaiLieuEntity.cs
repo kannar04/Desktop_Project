@@ -15,8 +15,12 @@ namespace DesktopApp_Project.DAL
             [Column] public string DuongDanFile { get; set; }
             [Column] public string VideoLink { get; set; }
             [Column] public string NhanKyNang { get; set; }
+            [Column] public string LoaiFile { get; set; }
+            [Column] public string TenFileGoc { get; set; }
+            [Column] public string DuongDanLocal { get; set; }
+            [Column] public string DuongDanCloud { get; set; }
+            [Column] public string ThumbnailPath { get; set; }
             [Column] public DateTime NgayCapNhat { get; set; }
         }
 }
-
 

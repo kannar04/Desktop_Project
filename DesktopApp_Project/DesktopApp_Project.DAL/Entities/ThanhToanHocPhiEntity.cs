@@ -19,8 +19,10 @@ namespace DesktopApp_Project.DAL
             [Column] public string ThongTinNganHang { get; set; }
             [Column] public DateTime NgayTao { get; set; }
             [Column] public DateTime HanThanhToan { get; set; }
+            [Column] public string MaHoaDon { get; set; }
+            [Column] public string PhuongThucThanhToan { get; set; }
+            [Column] public DateTime? NgayThanhToan { get; set; }
             [Column] public string TrangThai { get; set; }
         }
 }
-
 

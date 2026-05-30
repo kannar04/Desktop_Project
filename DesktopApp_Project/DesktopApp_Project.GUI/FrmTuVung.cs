@@ -16,6 +16,7 @@ namespace DesktopApp_Project.GUI
         private ComboBox _cboChuDeFilter;
         private ComboBox _cboChuCaiFilter;
         private bool _isFilling;
+        private bool _allowGridFill;
 
         public FrmTuVung()
         {
@@ -35,6 +36,7 @@ namespace DesktopApp_Project.GUI
             WireClick(btnLuu, BtnLuu_Click);
             WireClick(btnXoa, BtnXoa_Click);
             WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireCellClick(_grid, Grid_CellClick);
             WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
         }
 
@@ -89,6 +91,7 @@ namespace DesktopApp_Project.GUI
                 ChuDe = _cboChuDeFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboChuDeFilter.SelectedItem),
                 ChuCaiDau = _cboChuCaiFilter == null ? AppConstants.FilterAll : Convert.ToString(_cboChuCaiFilter.SelectedItem)
             }), null);
+            ResetGridSelection();
         }
 
         private void Fill()
@@ -173,6 +176,22 @@ namespace DesktopApp_Project.GUI
 
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
+            if (!_allowGridFill)
+            {
+                return;
+            }
+
+            Fill();
+        }
+
+        private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            _allowGridFill = true;
             Fill();
         }
 
@@ -194,7 +213,37 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
+            ClearForm();
+            ResetSearchFilters();
             LoadData();
+        }
+
+        private void ResetSearchFilters()
+        {
+            if (_txtTuKhoa != null)
+            {
+                _txtTuKhoa.Clear();
+            }
+
+            ResetComboToAll(_cboLoaiFilter);
+            ResetComboToAll(_cboCapDoFilter);
+            ResetComboToAll(_cboChuDeFilter);
+            ResetComboToAll(_cboChuCaiFilter);
+        }
+
+        private static void ResetComboToAll(ComboBox combo)
+        {
+            if (combo != null && combo.Items.Count > 0)
+            {
+                combo.SelectedIndex = 0;
+            }
+        }
+
+        private void ResetGridSelection()
+        {
+            _allowGridFill = false;
+            _grid.ClearSelection();
+            _grid.CurrentCell = null;
         }
     }
 }

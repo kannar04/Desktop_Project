@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Windows.Forms;
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.DTO;
 
@@ -7,6 +8,8 @@ namespace DesktopApp_Project.GUI
 {
     public partial class FrmChamBai : ModuleFormBase
     {
+        private bool _allowGridPreview;
+
         public FrmChamBai()
         {
             InitializeComponent();
@@ -24,6 +27,7 @@ namespace DesktopApp_Project.GUI
             WireClick(btnTai, BtnTai_Click);
             WireClick(btnCham, BtnCham_Click);
             WireSelectionChanged(_grid, Grid_SelectionChanged);
+            WireCellClick(_grid, Grid_CellClick);
             WireSelectedIndexChanged(_cboBaiTap, CboBaiTap_SelectedIndexChanged);
         }
 
@@ -52,6 +56,8 @@ namespace DesktopApp_Project.GUI
             {
                 _grid.DataSource = null;
             }
+
+            ResetGridSelection();
         }
 
         private void PreviewSubmission()
@@ -101,12 +107,38 @@ namespace DesktopApp_Project.GUI
 
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
+            if (!_allowGridPreview)
+            {
+                return;
+            }
+
+            PreviewSubmission();
+        }
+
+        private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0)
+            {
+                return;
+            }
+
+            _allowGridPreview = true;
             PreviewSubmission();
         }
 
         private void CboBaiTap_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadSubmissions();
+        }
+
+        private void ResetGridSelection()
+        {
+            _allowGridPreview = false;
+            _grid.ClearSelection();
+            _grid.CurrentCell = null;
+            _txtNhanXet.Clear();
+            _numDiem.Value = 0;
+            _txtPreview.Clear();
         }
     }
 }

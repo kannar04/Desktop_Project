@@ -688,6 +688,17 @@ namespace DesktopApp_Project.GUI
             grid.SelectionChanged += (sender, e) => SafeRun(() => handler(sender, e));
         }
 
+        protected void WireCellClick(DataGridView grid, DataGridViewCellEventHandler handler)
+        {
+            if (grid == null || handler == null)
+            {
+                return;
+            }
+
+            grid.CellClick -= handler;
+            grid.CellClick += (sender, e) => SafeRun(() => handler(sender, e));
+        }
+
         protected void Info(string message)
         {
             MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);

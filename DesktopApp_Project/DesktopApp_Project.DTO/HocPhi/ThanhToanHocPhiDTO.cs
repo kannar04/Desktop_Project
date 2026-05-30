@@ -17,7 +17,9 @@ namespace DesktopApp_Project.DTO
             public string ThongTinNganHang { get; set; }
             public DateTime NgayTao { get; set; }
             public DateTime HanThanhToan { get; set; }
+            public string MaHoaDon { get; set; }
+            public string PhuongThucThanhToan { get; set; }
+            public DateTime? NgayThanhToan { get; set; }
             public string TrangThai { get; set; }
         }
 }
-

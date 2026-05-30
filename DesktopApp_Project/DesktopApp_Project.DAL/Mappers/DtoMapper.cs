@@ -46,6 +46,11 @@ namespace DesktopApp_Project.DAL
                 DuongDanFile = entity.DuongDanFile,
                 VideoLink = entity.VideoLink,
                 NhanKyNang = entity.NhanKyNang,
+                LoaiFile = entity.LoaiFile,
+                TenFileGoc = entity.TenFileGoc,
+                DuongDanLocal = entity.DuongDanLocal,
+                DuongDanCloud = entity.DuongDanCloud,
+                ThumbnailPath = entity.ThumbnailPath,
                 NgayCapNhat = entity.NgayCapNhat
             };
         }
@@ -61,6 +66,9 @@ namespace DesktopApp_Project.DAL
                 MoTa = entity.MoTa,
                 Deadline = entity.Deadline,
                 FileDinhKem = entity.FileDinhKem,
+                LoaiFile = entity.LoaiFile,
+                TenFileGoc = entity.TenFileGoc,
+                DuongDanLocal = entity.DuongDanLocal,
                 NgayTao = entity.NgayTao
             };
         }
@@ -83,8 +91,35 @@ namespace DesktopApp_Project.DAL
             {
                 MaDeThi = entity.MaDeThi,
                 TenDeThi = entity.TenDeThi,
+                KyNang = entity.KyNang,
+                BandLevel = entity.BandLevel,
+                BandTu = entity.BandTu,
+                BandDen = entity.BandDen,
+                MoTa = entity.MoTa,
                 FileDuLieu = entity.FileDuLieu,
+                AudioPath = entity.AudioPath,
+                ImagePath = entity.ImagePath,
+                TrangThai = entity.TrangThai,
                 NgayTao = entity.NgayTao
+            };
+        }
+
+        public static PaymentResultDTO ToDto(NhatKyThanhToanEntity entity)
+        {
+            if (entity == null) return null;
+            return new PaymentResultDTO
+            {
+                MaGiaoDich = entity.MaGiaoDich,
+                MaThanhToan = entity.MaThanhToan,
+                PhuongThuc = entity.PhuongThuc,
+                SoTien = entity.SoTien,
+                NoiDungThanhToan = entity.NoiDungThanhToan,
+                MaGiaoDichNgoai = entity.MaGiaoDichNgoai,
+                PaymentUrl = entity.PaymentUrl,
+                QrContent = entity.QrContent,
+                TrangThai = entity.TrangThai,
+                NgayTao = entity.NgayTao,
+                NgayCapNhat = entity.NgayCapNhat
             };
         }
 
@@ -97,7 +132,52 @@ namespace DesktopApp_Project.DAL
                 NoiDung = entity.NoiDung,
                 DapAn = entity.DapAn,
                 NhanKyNang = entity.NhanKyNang,
+                QuestionType = entity.QuestionType,
+                OptionA = entity.OptionA,
+                OptionB = entity.OptionB,
+                OptionC = entity.OptionC,
+                OptionD = entity.OptionD,
+                AnswerKey = entity.AnswerKey,
+                Explanation = entity.Explanation,
+                PassageId = entity.PassageId,
+                SectionId = entity.SectionId,
                 BandLevel = entity.BandLevel
+            };
+        }
+
+        public static ReadingPassageDTO ToDto(ReadingPassageEntity entity)
+        {
+            if (entity == null) return null;
+            return new ReadingPassageDTO
+            {
+                PassageId = entity.PassageId,
+                PassageCode = entity.PassageCode,
+                Title = entity.Title,
+                Content = entity.Content,
+                ImagePath = entity.ImagePath,
+                BandLevel = entity.BandLevel,
+                Topic = entity.Topic,
+                NgayTao = entity.NgayTao,
+                CreatedAt = entity.CreatedAt
+            };
+        }
+
+        public static ListeningSectionDTO ToDto(ListeningSectionEntity entity)
+        {
+            if (entity == null) return null;
+            return new ListeningSectionDTO
+            {
+                SectionId = entity.SectionId,
+                SectionCode = entity.SectionCode,
+                Title = entity.Title,
+                SectionNumber = entity.SectionNumber,
+                PartNo = entity.PartNo,
+                AudioPath = entity.AudioPath,
+                Transcript = entity.Transcript,
+                BandLevel = entity.BandLevel,
+                Topic = entity.Topic,
+                NgayTao = entity.NgayTao,
+                CreatedAt = entity.CreatedAt
             };
         }
 

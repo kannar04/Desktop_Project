@@ -288,6 +288,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmHocPhi";
+            this.Text = "Học phí";
             this.root.ResumeLayout(false);
             this.root.PerformLayout();
             this.form.ResumeLayout(false);

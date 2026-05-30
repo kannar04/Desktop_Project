@@ -195,6 +195,7 @@ namespace DesktopApp_Project.GUI
             this.ClientSize = new System.Drawing.Size(1100, 720);
             this.Controls.Add(this.root);
             this.Name = "FrmBaoCao";
+            this.Text = "Báo cáo";
             this.root.ResumeLayout(false);
             this.root.PerformLayout();
             this.top.ResumeLayout(false);

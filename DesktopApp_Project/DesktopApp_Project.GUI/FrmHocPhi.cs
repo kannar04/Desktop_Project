@@ -1,5 +1,7 @@
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Forms;
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
@@ -9,6 +11,9 @@ namespace DesktopApp_Project.GUI
     public partial class FrmHocPhi : ModuleFormBase
     {
         private System.Windows.Forms.Button _btnTaoPhieu;
+        private System.Windows.Forms.Button _btnXemHoaDon;
+        private System.Windows.Forms.Button _btnXuatHoaDon;
+        private System.Windows.Forms.Button _btnThanhToan;
         private BindingList<HocPhiTinhDTO> _previewRows = new BindingList<HocPhiTinhDTO>();
 
         public FrmHocPhi()
@@ -49,6 +54,21 @@ namespace DesktopApp_Project.GUI
             _btnTaoPhieu.Width = 120;
             WireClick(_btnTaoPhieu, BtnTaoPhieu_Click);
             buttons.Controls.Add(_btnTaoPhieu);
+
+            _btnXemHoaDon = UiHelpers.Button("Xem hoa don");
+            _btnXemHoaDon.Width = 120;
+            WireClick(_btnXemHoaDon, BtnXemHoaDon_Click);
+            buttons.Controls.Add(_btnXemHoaDon);
+
+            _btnXuatHoaDon = UiHelpers.Button("Xuat hoa don");
+            _btnXuatHoaDon.Width = 120;
+            WireClick(_btnXuatHoaDon, BtnXuatHoaDon_Click);
+            buttons.Controls.Add(_btnXuatHoaDon);
+
+            _btnThanhToan = UiHelpers.Button("Thanh toan");
+            _btnThanhToan.Width = 120;
+            WireClick(_btnThanhToan, BtnThanhToan_Click);
+            buttons.Controls.Add(_btnThanhToan);
         }
 
         private void LoadData()
@@ -95,6 +115,63 @@ namespace DesktopApp_Project.GUI
         private void CboHocVien_SelectedIndexChanged(object sender, EventArgs e)
         {
             LoadData();
+        }
+
+        private ThanhToanHocPhiDTO GetSelectedPayment()
+        {
+            var item = UiHelpers.SelectedItem<ThanhToanHocPhiDTO>(_grid);
+            if (item == null)
+            {
+                UiHelpers.WarnSelect("phieu hoc phi");
+            }
+
+            return item;
+        }
+
+        private void BtnXemHoaDon_Click(object sender, EventArgs e)
+        {
+            var item = GetSelectedPayment();
+            if (item == null) return;
+
+            using (var form = new FrmHoaDonHocPhi(Services, CurrentUser, item.MaThanhToan))
+            {
+                form.ShowDialog(this);
+            }
+        }
+
+        private void BtnXuatHoaDon_Click(object sender, EventArgs e)
+        {
+            var item = GetSelectedPayment();
+            if (item == null) return;
+
+            using (var dialog = new FolderBrowserDialog())
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
+                var result = Services.BaoCao.XuatHoaDonHocPhiHtml(item.MaThanhToan, dialog.SelectedPath);
+                UiHelpers.ShowResult(result);
+                if (result.Success)
+                {
+                    Process.Start(new ProcessStartInfo(result.Data) { UseShellExecute = true });
+                }
+            }
+        }
+
+        private void BtnThanhToan_Click(object sender, EventArgs e)
+        {
+            var item = GetSelectedPayment();
+            if (item == null) return;
+
+            using (var form = new FrmThanhToan(Services, CurrentUser, item.MaThanhToan))
+            {
+                if (form.ShowDialog(this) == DialogResult.OK || form.HasPaymentChanged)
+                {
+                    LoadData();
+                }
+            }
         }
     }
 }
