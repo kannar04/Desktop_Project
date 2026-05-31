@@ -392,8 +392,80 @@ CREATE TABLE dbo.NhatKyThanhToan
     TrangThai NVARCHAR(40) NOT NULL,
     NgayTao DATETIME NOT NULL CONSTRAINT DF_NhatKyThanhToan_NgayTao DEFAULT GETDATE(),
     NgayCapNhat DATETIME NULL,
+    ReceiverEmail NVARCHAR(150) NULL,
+    DebugStudentName NVARCHAR(120) NULL,
+    DebugClassName NVARCHAR(120) NULL,
+    DebugNote NVARCHAR(500) NULL,
+    IsDebugPayment BIT NULL,
+    PaymentEmailSent BIT NULL,
+    PaymentEmailSentAt DATETIME NULL,
+    PaymentEmailError NVARCHAR(1000) NULL,
+    StatusEmailSent BIT NULL,
+    StatusEmailSentAt DATETIME NULL,
+    StatusEmailError NVARCHAR(1000) NULL,
+    LastStatusUpdateAt DATETIME NULL,
     CONSTRAINT FK_NhatKyThanhToan_ThanhToanHocPhi FOREIGN KEY (MaThanhToan) REFERENCES dbo.ThanhToanHocPhi(MaThanhToan)
 );
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'ReceiverEmail') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD ReceiverEmail NVARCHAR(150) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugStudentName') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugStudentName NVARCHAR(120) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugClassName') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugClassName NVARCHAR(120) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugNote') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugNote NVARCHAR(500) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'IsDebugPayment') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD IsDebugPayment BIT NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailSent') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailSent BIT NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailSentAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailSentAt DATETIME NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailError') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailError NVARCHAR(1000) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailSent') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailSent BIT NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailSentAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailSentAt DATETIME NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailError') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailError NVARCHAR(1000) NULL;
+END
+
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'LastStatusUpdateAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD LastStatusUpdateAt DATETIME NULL;
 END
 
 IF OBJECT_ID(N'dbo.NhatKyBaoCao', N'U') IS NULL
@@ -1376,3 +1448,8 @@ BEGIN
     END
 END
 GO
+ALTER TABLE dbo.NhatKyThanhToan
+ALTER COLUMN PaymentUrl NVARCHAR(2000) NULL;
+
+ALTER TABLE dbo.NhatKyThanhToan
+ALTER COLUMN QrContent NVARCHAR(2000) NULL;

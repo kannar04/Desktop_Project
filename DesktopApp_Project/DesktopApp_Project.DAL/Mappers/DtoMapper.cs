@@ -119,7 +119,15 @@ namespace DesktopApp_Project.DAL
                 QrContent = entity.QrContent,
                 TrangThai = entity.TrangThai,
                 NgayTao = entity.NgayTao,
-                NgayCapNhat = entity.NgayCapNhat
+                NgayCapNhat = entity.NgayCapNhat,
+                ReceiverEmail = entity.ReceiverEmail,
+                PaymentEmailSent = entity.PaymentEmailSent == true,
+                PaymentEmailSentAt = entity.PaymentEmailSentAt,
+                PaymentEmailError = entity.PaymentEmailError,
+                StatusEmailSent = entity.StatusEmailSent == true,
+                StatusEmailSentAt = entity.StatusEmailSentAt,
+                StatusEmailError = entity.StatusEmailError,
+                LastStatusUpdateAt = entity.LastStatusUpdateAt
             };
         }
 

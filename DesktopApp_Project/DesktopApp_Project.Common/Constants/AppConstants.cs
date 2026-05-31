@@ -82,6 +82,8 @@ namespace DesktopApp_Project.Common
             public const string PaymentPaid = "Đã thanh toán";
             public const string PaymentOverdue = "Quá hạn";
             public const string PaymentCancelled = "Đã hủy";
+            public const string PaymentExpired = "Hết hạn"; // Added for VNPAY demo.
+            public const string PaymentFailed = "Thất bại"; // Added for VNPAY demo.
             public const string PaymentMethodMoMo = "MoMo";
             public const string PaymentMethodVNPay = "VNPay";
     
@@ -89,7 +91,9 @@ namespace DesktopApp_Project.Common
             {
                 PaymentPending,
                 PaymentPaid,
-                PaymentOverdue
+                PaymentOverdue,
+                PaymentExpired,
+                PaymentFailed
             };
 
             public static readonly string[] PaymentMethods =

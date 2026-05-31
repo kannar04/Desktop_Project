@@ -6,5 +6,6 @@ namespace DesktopApp_Project.DTO
         public decimal SoTien { get; set; }
         public string PhuongThuc { get; set; }
         public string NoiDungThanhToan { get; set; }
+        public string EmailNguoiNhan { get; set; }
     }
 }

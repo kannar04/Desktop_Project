@@ -105,6 +105,12 @@ namespace DesktopApp_Project.DAL
         PaymentResultDTO TaoNhatKyThanhToan(PaymentRequestDTO request, string maGiaoDichNgoai, string paymentUrl, string qrContent);
         PaymentResultDTO LayGiaoDichThanhToan(int maGiaoDich);
         List<PaymentResultDTO> LayGiaoDichTheoThanhToan(int maThanhToan);
+        int TaoHocPhiDebug(PaymentDebugRequestDTO request, string invoiceCode);
+        PaymentDebugResultDTO TaoNhatKyThanhToanDebug(PaymentDebugRequestDTO request, int maThanhToan, string maGiaoDichNgoai, string paymentUrl, string qrContent);
+        List<PaymentDebugResultDTO> LayGiaoDichDebugGanDay(int limit);
+        PaymentDebugResultDTO LayChiTietGiaoDichDebug(int maGiaoDich);
+        void CapNhatEmailThanhToan(int maGiaoDich, bool sent, DateTime? sentAt, string error);
+        void CapNhatEmailTrangThai(int maGiaoDich, bool sent, DateTime? sentAt, string error);
         void CapNhatTrangThaiGiaoDich(int maGiaoDich, string trangThai);
         void CapNhatTrangThaiHocPhi(int maThanhToan, string trangThai, string phuongThuc, DateTime? ngayThanhToan);
         HoaDonHocPhiDTO LayHoaDonHocPhi(int maThanhToan);

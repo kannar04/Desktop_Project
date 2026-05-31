@@ -15,5 +15,13 @@ namespace DesktopApp_Project.DTO
         public string TrangThai { get; set; }
         public DateTime NgayTao { get; set; }
         public DateTime? NgayCapNhat { get; set; }
+        public string ReceiverEmail { get; set; }
+        public bool PaymentEmailSent { get; set; }
+        public DateTime? PaymentEmailSentAt { get; set; }
+        public string PaymentEmailError { get; set; }
+        public bool StatusEmailSent { get; set; }
+        public DateTime? StatusEmailSentAt { get; set; }
+        public string StatusEmailError { get; set; }
+        public DateTime? LastStatusUpdateAt { get; set; }
     }
 }

@@ -1728,6 +1728,7 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
+                EnsurePaymentDebugColumns(db);
                 var entity = new NhatKyThanhToanEntity
                 {
                     MaThanhToan = request.MaThanhToan,
@@ -1738,7 +1739,11 @@ namespace DesktopApp_Project.DAL
                     PaymentUrl = paymentUrl,
                     QrContent = qrContent,
                     TrangThai = AppConstants.PaymentPending,
-                    NgayTao = DateTime.Now
+                    NgayTao = DateTime.Now,
+                    ReceiverEmail = request.EmailNguoiNhan,
+                    IsDebugPayment = false,
+                    PaymentEmailSent = false,
+                    StatusEmailSent = false
                 };
                 db.NhatKyThanhToans.InsertOnSubmit(entity);
                 db.SubmitChanges();
@@ -1750,6 +1755,7 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
+                EnsurePaymentDebugColumns(db);
                 return DtoMapper.ToDto(db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich));
             }
         }
@@ -1758,6 +1764,7 @@ namespace DesktopApp_Project.DAL
         {
             using (var db = _factory.Create())
             {
+                EnsurePaymentDebugColumns(db);
                 return db.NhatKyThanhToans
                     .Where(x => x.MaThanhToan == maThanhToan)
                     .OrderByDescending(x => x.NgayTao)
@@ -1767,15 +1774,135 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        public int TaoHocPhiDebug(PaymentDebugRequestDTO request, string invoiceCode)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                var studentId = GetOrCreateDebugStudent(db);
+                var now = DateTime.Now;
+                var entity = new ThanhToanHocPhiEntity
+                {
+                    MaNguoiDung = studentId,
+                    MaLopHoc = null,
+                    SoTien = request.Amount,
+                    SoTienGoc = request.Amount,
+                    PhanTramGiam = 0m,
+                    SoTienGiam = 0m,
+                    SoTienCuoi = request.Amount,
+                    ThongTinNganHang = "VNPAY Sandbox Debug",
+                    NgayTao = now,
+                    HanThanhToan = now.AddDays(AppConstants.HocPhiDeadlineDays),
+                    MaHoaDon = invoiceCode,
+                    PhuongThucThanhToan = null,
+                    NgayThanhToan = null,
+                    TrangThai = AppConstants.PaymentPending
+                };
+
+                db.ThanhToanHocPhis.InsertOnSubmit(entity);
+                db.SubmitChanges();
+                return entity.MaThanhToan;
+            }
+        }
+
+        public PaymentDebugResultDTO TaoNhatKyThanhToanDebug(PaymentDebugRequestDTO request, int maThanhToan, string maGiaoDichNgoai, string paymentUrl, string qrContent)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                var entity = new NhatKyThanhToanEntity
+                {
+                    MaThanhToan = maThanhToan,
+                    PhuongThuc = request.PaymentMethod,
+                    SoTien = request.Amount,
+                    NoiDungThanhToan = request.PaymentContent,
+                    MaGiaoDichNgoai = maGiaoDichNgoai,
+                    PaymentUrl = paymentUrl,
+                    QrContent = qrContent,
+                    TrangThai = AppConstants.PaymentPending,
+                    NgayTao = DateTime.Now,
+                    ReceiverEmail = TrimForColumn(request.ReceiverEmail, 150),
+                    DebugStudentName = TrimForColumn(request.StudentName, 120),
+                    DebugClassName = TrimForColumn(request.ClassName, 120),
+                    DebugNote = TrimForColumn(request.DebugNote, 500),
+                    IsDebugPayment = true,
+                    PaymentEmailSent = false,
+                    StatusEmailSent = false
+                };
+
+                db.NhatKyThanhToans.InsertOnSubmit(entity);
+                db.SubmitChanges();
+                return BuildPaymentDebugQuery(db).FirstOrDefault(x => x.TransactionId == entity.MaGiaoDich);
+            }
+        }
+
+        public List<PaymentDebugResultDTO> LayGiaoDichDebugGanDay(int limit)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                limit = Math.Max(1, limit);
+                return BuildPaymentDebugQuery(db)
+                    .Where(x => x.IsDebugPayment)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .Take(limit)
+                    .ToList();
+            }
+        }
+
+        public PaymentDebugResultDTO LayChiTietGiaoDichDebug(int maGiaoDich)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                return BuildPaymentDebugQuery(db).FirstOrDefault(x => x.TransactionId == maGiaoDich);
+            }
+        }
+
+        public void CapNhatEmailThanhToan(int maGiaoDich, bool sent, DateTime? sentAt, string error)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                var entity = RequireEntity(
+                    db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich),
+                    "Khong tim thay giao dich thanh toan.");
+                entity.PaymentEmailSent = sent;
+                entity.PaymentEmailSentAt = sentAt;
+                entity.PaymentEmailError = sent ? null : TrimForColumn(error, 1000);
+                entity.NgayCapNhat = DateTime.Now;
+                db.SubmitChanges();
+            }
+        }
+
+        public void CapNhatEmailTrangThai(int maGiaoDich, bool sent, DateTime? sentAt, string error)
+        {
+            using (var db = _factory.Create())
+            {
+                EnsurePaymentDebugColumns(db);
+                var entity = RequireEntity(
+                    db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich),
+                    "Khong tim thay giao dich thanh toan.");
+                entity.StatusEmailSent = sent;
+                entity.StatusEmailSentAt = sentAt;
+                entity.StatusEmailError = sent ? null : TrimForColumn(error, 1000);
+                entity.LastStatusUpdateAt = DateTime.Now;
+                entity.NgayCapNhat = DateTime.Now;
+                db.SubmitChanges();
+            }
+        }
+
         public void CapNhatTrangThaiGiaoDich(int maGiaoDich, string trangThai)
         {
             using (var db = _factory.Create())
             {
+                EnsurePaymentDebugColumns(db);
                 var entity = RequireEntity(
                     db.NhatKyThanhToans.FirstOrDefault(x => x.MaGiaoDich == maGiaoDich),
                     "Khong tim thay giao dich thanh toan.");
                 entity.TrangThai = trangThai;
                 entity.NgayCapNhat = DateTime.Now;
+                entity.LastStatusUpdateAt = DateTime.Now;
                 db.SubmitChanges();
             }
         }
@@ -1853,6 +1980,130 @@ namespace DesktopApp_Project.DAL
                 entity.MaHoaDon = maHoaDon;
                 db.SubmitChanges();
             }
+        }
+
+        private static IQueryable<PaymentDebugResultDTO> BuildPaymentDebugQuery(QuanLyIeltsDataContext db)
+        {
+            return
+                from tx in db.NhatKyThanhToans
+                join hp in db.ThanhToanHocPhis on tx.MaThanhToan equals hp.MaThanhToan
+                join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
+                select new PaymentDebugResultDTO
+                {
+                    TransactionId = tx.MaGiaoDich,
+                    TuitionPaymentId = tx.MaThanhToan,
+                    ExternalTransactionRef = tx.MaGiaoDichNgoai,
+                    StudentName = tx.DebugStudentName ?? nd.HoTen,
+                    ReceiverEmail = tx.ReceiverEmail ?? nd.Email,
+                    ClassName = tx.DebugClassName,
+                    InvoiceCode = hp.MaHoaDon,
+                    Amount = tx.SoTien,
+                    PaymentMethod = tx.PhuongThuc,
+                    PaymentUrl = tx.PaymentUrl,
+                    PaymentStatus = tx.TrangThai,
+                    TuitionStatus = hp.TrangThai,
+                    PaymentEmailSent = tx.PaymentEmailSent == true,
+                    PaymentEmailSentAt = tx.PaymentEmailSentAt,
+                    PaymentEmailError = tx.PaymentEmailError,
+                    StatusEmailSent = tx.StatusEmailSent == true,
+                    StatusEmailSentAt = tx.StatusEmailSentAt,
+                    StatusEmailError = tx.StatusEmailError,
+                    CreatedAt = tx.NgayTao,
+                    UpdatedAt = tx.NgayCapNhat,
+                    LastStatusUpdateAt = tx.LastStatusUpdateAt,
+                    DebugNote = tx.DebugNote,
+                    IsDebugPayment = tx.IsDebugPayment == true
+                };
+        }
+
+        private static int GetOrCreateDebugStudent(QuanLyIeltsDataContext db)
+        {
+            const string debugAccount = "debug_payment_student";
+            const string debugEmail = "debug-payment@student.local";
+            var entity = db.NguoiDungs.FirstOrDefault(x => x.TaiKhoan == debugAccount || x.Email == debugEmail);
+            if (entity != null)
+            {
+                return entity.MaNguoiDung;
+            }
+
+            entity = new NguoiDungEntity
+            {
+                VaiTro = AppConstants.RoleStudent,
+                HoTen = "Debug Payment Student",
+                NgaySinh = null,
+                SDT = "0000000000",
+                Email = debugEmail,
+                TrinhDoDauVao = "Debug",
+                TaiKhoan = debugAccount,
+                MatKhau = "debug"
+            };
+            db.NguoiDungs.InsertOnSubmit(entity);
+            db.SubmitChanges();
+            return entity.MaNguoiDung;
+        }
+
+        private static string TrimForColumn(string value, int maxLength)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return null;
+            }
+
+            value = value.Trim();
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+        }
+
+        private static void EnsurePaymentDebugColumns(QuanLyIeltsDataContext db)
+        {
+            db.ExecuteCommand(@"
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'ReceiverEmail') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD ReceiverEmail NVARCHAR(150) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugStudentName') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugStudentName NVARCHAR(120) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugClassName') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugClassName NVARCHAR(120) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'DebugNote') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD DebugNote NVARCHAR(500) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'IsDebugPayment') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD IsDebugPayment BIT NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailSent') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailSent BIT NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailSentAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailSentAt DATETIME NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'PaymentEmailError') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD PaymentEmailError NVARCHAR(1000) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailSent') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailSent BIT NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailSentAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailSentAt DATETIME NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'StatusEmailError') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD StatusEmailError NVARCHAR(1000) NULL;
+END
+IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'LastStatusUpdateAt') IS NULL
+BEGIN
+    ALTER TABLE dbo.NhatKyThanhToan ADD LastStatusUpdateAt DATETIME NULL;
+END");
         }
 
         private static IQueryable<HoaDonHocPhiDTO> BuildHoaDonQuery(QuanLyIeltsDataContext db)

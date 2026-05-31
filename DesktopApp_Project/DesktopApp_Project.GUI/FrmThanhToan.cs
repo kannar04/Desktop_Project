@@ -30,14 +30,16 @@ namespace DesktopApp_Project.GUI
         private void WireEvents()
         {
             WireClick(btnTaoThanhToan, BtnTaoThanhToan_Click);
-            WireClick(btnXacNhan, BtnXacNhan_Click);
-            WireClick(btnHuy, BtnHuy_Click);
+            WireClick(btnFakeComplete, BtnFakeComplete_Click);
+            WireClick(btnFakeExpired, BtnFakeExpired_Click);
+            WireClick(btnFakeFailed, BtnFakeFailed_Click);
             WireClick(btnDong, (s, e) => Close());
         }
 
         protected override void OnRuntimeLoad()
         {
             cboPhuongThuc.DataSource = AppConstants.PaymentMethods;
+            SetFakeButtonsEnabled(false);
             LoadInvoice();
         }
 
@@ -68,11 +70,12 @@ namespace DesktopApp_Project.GUI
                 MaThanhToan = _invoice.MaThanhToan,
                 SoTien = amount,
                 PhuongThuc = Convert.ToString(cboPhuongThuc.SelectedItem),
-                NoiDungThanhToan = "Thanh toan hoc phi " + _invoice.MaHoaDon
+                NoiDungThanhToan = "Thanh toan hoc phi " + _invoice.MaHoaDon,
+                EmailNguoiNhan = txtReceiverEmail.Text.Trim()
             });
 
             UiHelpers.ShowResult(result);
-            if (!result.Success)
+            if (!result.Success && result.Data == null)
             {
                 return;
             }
@@ -80,11 +83,27 @@ namespace DesktopApp_Project.GUI
             _maGiaoDich = result.Data.MaGiaoDich;
             txtPaymentUrl.Text = result.Data.PaymentUrl;
             txtQrContent.Text = result.Data.QrContent;
+            SetFakeButtonsEnabled(true);
             HasPaymentChanged = true;
             LoadInvoice();
         }
 
-        private void BtnXacNhan_Click(object sender, EventArgs e)
+        private void BtnFakeComplete_Click(object sender, EventArgs e)
+        {
+            SimulatePaymentStatus("Complete");
+        }
+
+        private void BtnFakeExpired_Click(object sender, EventArgs e)
+        {
+            SimulatePaymentStatus("Expired");
+        }
+
+        private void BtnFakeFailed_Click(object sender, EventArgs e)
+        {
+            SimulatePaymentStatus("Failed");
+        }
+
+        private void SimulatePaymentStatus(string fakeStatus)
         {
             if (_maGiaoDich <= 0)
             {
@@ -92,32 +111,20 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
-            var result = Services.Payment.XacNhanThanhToan(_maGiaoDich);
+            var result = Services.Payment.SimulatePaymentStatus(_maGiaoDich, fakeStatus, txtReceiverEmail.Text.Trim());
             UiHelpers.ShowResult(result);
             if (result.Success)
             {
                 HasPaymentChanged = true;
-                DialogResult = DialogResult.OK;
-                Close();
+                LoadInvoice();
             }
         }
 
-        private void BtnHuy_Click(object sender, EventArgs e)
+        private void SetFakeButtonsEnabled(bool enabled)
         {
-            if (_maGiaoDich <= 0)
-            {
-                Info("Vui long tao thanh toan truoc.");
-                return;
-            }
-
-            var result = Services.Payment.HuyThanhToan(_maGiaoDich);
-            UiHelpers.ShowResult(result);
-            if (result.Success)
-            {
-                HasPaymentChanged = true;
-                DialogResult = DialogResult.OK;
-                Close();
-            }
+            btnFakeComplete.Enabled = enabled;
+            btnFakeExpired.Enabled = enabled;
+            btnFakeFailed.Enabled = enabled;
         }
     }
 }

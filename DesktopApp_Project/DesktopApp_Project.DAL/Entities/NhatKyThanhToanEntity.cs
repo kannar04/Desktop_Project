@@ -19,5 +19,17 @@ namespace DesktopApp_Project.DAL
         [Column] public string TrangThai { get; set; }
         [Column] public DateTime NgayTao { get; set; }
         [Column] public DateTime? NgayCapNhat { get; set; }
+        [Column] public string ReceiverEmail { get; set; }
+        [Column] public string DebugStudentName { get; set; }
+        [Column] public string DebugClassName { get; set; }
+        [Column] public string DebugNote { get; set; }
+        [Column] public bool? IsDebugPayment { get; set; }
+        [Column] public bool? PaymentEmailSent { get; set; }
+        [Column] public DateTime? PaymentEmailSentAt { get; set; }
+        [Column] public string PaymentEmailError { get; set; }
+        [Column] public bool? StatusEmailSent { get; set; }
+        [Column] public DateTime? StatusEmailSentAt { get; set; }
+        [Column] public string StatusEmailError { get; set; }
+        [Column] public DateTime? LastStatusUpdateAt { get; set; }
     }
 }

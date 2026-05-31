@@ -44,6 +44,7 @@ namespace DesktopApp_Project.GUI
         private IconButton currentBtn;
         private Panel leftBorderBtn;
         private Form currentChildForm;
+        private IconButton btnPaymentDebug;
 
         private class RGBColors
         {
@@ -78,6 +79,7 @@ namespace DesktopApp_Project.GUI
             }
 
             _runtimeLoaded = true;
+            UpdatePaymentDebugButtonVisibility();
             if (_services == null || _currentUser == null)
             {
                 ActivateButton(btnChinh, RGBColors.color1);
@@ -98,6 +100,7 @@ namespace DesktopApp_Project.GUI
             ControlBox = false;
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
+            CreatePaymentDebugButton();
             ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
             ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
             ApplyShellTheme();
@@ -155,13 +158,59 @@ namespace DesktopApp_Project.GUI
                 btnTaiLieu,
                 btnTuVung,
                 btnThongBao,
+                btnPaymentDebug,
                 btnSetting
             };
 
             foreach (var button in buttons)
             {
-                StyleMenuButton(button, button == currentBtn);
+                if (button != null)
+                {
+                    StyleMenuButton(button, button == currentBtn);
+                }
             }
+        }
+
+        private void CreatePaymentDebugButton()
+        {
+            if (btnPaymentDebug != null)
+            {
+                return;
+            }
+
+            btnPaymentDebug = new IconButton
+            {
+                Dock = DockStyle.Top,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.Gainsboro,
+                IconChar = IconChar.Wallet,
+                IconColor = Color.Gainsboro,
+                IconFont = IconFont.Auto,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                Margin = new Padding(2),
+                Name = "btnPaymentDebug",
+                Padding = new Padding(7, 0, 13, 0),
+                Size = new Size(223, 60),
+                Text = "Debug thanh toan",
+                TextAlign = ContentAlignment.MiddleLeft,
+                TextImageRelation = TextImageRelation.ImageBeforeText,
+                UseVisualStyleBackColor = true,
+                Visible = false
+            };
+            btnPaymentDebug.FlatAppearance.BorderSize = 0;
+            btnPaymentDebug.Click += btnPaymentDebug_Click;
+            pnlMenuItems.Controls.Add(btnPaymentDebug);
+            pnlMenuItems.Controls.SetChildIndex(btnPaymentDebug, 4);
+        }
+
+        private void UpdatePaymentDebugButtonVisibility()
+        {
+            if (btnPaymentDebug == null)
+            {
+                return;
+            }
+
+            btnPaymentDebug.Visible = _currentUser != null && AppConstants.AdminRoles.Contains(_currentUser.VaiTro);
         }
 
         private void StyleMenuButton(IconButton button, bool active)
@@ -709,6 +758,12 @@ namespace DesktopApp_Project.GUI
         {
             ActivateButton(sender, RGBColors.color2);
             OpenModule(new FrmHocPhi(_services, _currentUser));
+        }
+
+        private void btnPaymentDebug_Click(object sender, EventArgs e)
+        {
+            ActivateButton(sender, RGBColors.color2);
+            OpenModule(new FrmPaymentDebug(_services, _currentUser));
         }
 
         private void btnHocVien_Click(object sender, EventArgs e)
