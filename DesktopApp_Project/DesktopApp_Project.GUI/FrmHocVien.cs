@@ -123,14 +123,36 @@ namespace DesktopApp_Project.GUI
 
         private void BtnThem_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            var result = Services.HocVien.Luu(BuildDto(0));
+            UiHelpers.ShowResult(result);
+            if (result.Success)
+            {
+                LoadData();
+                ClearForm();
+                ResetGridSelection();
+                _txtHoTen.Focus();
+            }
         }
 
         private void BtnLuu_Click(object sender, EventArgs e)
         {
-            var result = Services.HocVien.Luu(new NguoiDungDTO
+            if (_selectedId == 0)
             {
-                MaNguoiDung = _selectedId,
+                UiHelpers.WarnSelect("hoc vien");
+                return;
+            }
+
+            var result = Services.HocVien.Luu(BuildDto(_selectedId));
+
+            UiHelpers.ShowResult(result);
+            if (result.Success) LoadData();
+        }
+
+        private NguoiDungDTO BuildDto(int maNguoiDung)
+        {
+            return new NguoiDungDTO
+            {
+                MaNguoiDung = maNguoiDung,
                 HoTen = _txtHoTen.Text.Trim(),
                 NgaySinh = _dtNgaySinh.Value.Date,
                 SDT = _txtSdt.Text.Trim(),
@@ -138,10 +160,7 @@ namespace DesktopApp_Project.GUI
                 TrinhDoDauVao = _txtTrinhDo.Text.Trim(),
                 TaiKhoan = _txtTaiKhoan.Text.Trim(),
                 MatKhau = _txtMatKhau.Text
-            });
-
-            UiHelpers.ShowResult(result);
-            if (result.Success) LoadData();
+            };
         }
 
         private void BtnXoa_Click(object sender, EventArgs e)
@@ -189,6 +208,7 @@ namespace DesktopApp_Project.GUI
 
         private void ResetGridSelection()
         {
+            _selectedId = 0;
             _allowGridFill = false;
             _grid.ClearSelection();
             _grid.CurrentCell = null;

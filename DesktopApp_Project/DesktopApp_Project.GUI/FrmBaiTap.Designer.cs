@@ -304,7 +304,7 @@ namespace DesktopApp_Project.GUI
             this.btnGiao.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.btnGiao.Size = new System.Drawing.Size(110, 34);
             this.btnGiao.TabIndex = 1;
-            this.btnGiao.Text = "Giao bài";
+            this.btnGiao.Text = "L\u01b0u";
             this.btnGiao.UseVisualStyleBackColor = false;
             this.btnGiao.Click += new System.EventHandler(this.BtnGiao_Click);
             this.btnXoa.AutoEllipsis = true;

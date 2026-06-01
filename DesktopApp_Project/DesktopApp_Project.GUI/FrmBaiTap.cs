@@ -83,23 +83,42 @@ namespace DesktopApp_Project.GUI
 
         private void BtnMoi_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            var result = Services.BaiTap.GiaoBai(BuildDto(0));
+            UiHelpers.ShowResult(result);
+            if (result.Success)
+            {
+                LoadData();
+                ClearForm();
+                ResetGridSelection();
+                _txtTieuDe.Focus();
+            }
         }
 
         private void BtnGiao_Click(object sender, EventArgs e)
         {
-            var result = Services.BaiTap.GiaoBai(new BaiTapDTO
+            if (_selectedId == 0)
             {
-                MaBaiTap = _selectedId,
+                UiHelpers.WarnSelect("bai tap");
+                return;
+            }
+
+            var result = Services.BaiTap.GiaoBai(BuildDto(_selectedId));
+
+            UiHelpers.ShowResult(result);
+            if (result.Success) LoadData();
+        }
+
+        private BaiTapDTO BuildDto(int maBaiTap)
+        {
+            return new BaiTapDTO
+            {
+                MaBaiTap = maBaiTap,
                 MaLopHoc = UiHelpers.SelectedId(_cboLop),
                 TieuDe = _txtTieuDe.Text.Trim(),
                 MoTa = _txtMoTa.Text.Trim(),
                 Deadline = _dtDeadline.Value,
                 FileDinhKem = _txtFile.Text.Trim()
-            });
-
-            UiHelpers.ShowResult(result);
-            if (result.Success) LoadData();
+            };
         }
 
         private void BtnXoa_Click(object sender, EventArgs e)
@@ -169,6 +188,7 @@ namespace DesktopApp_Project.GUI
 
         private void ResetGridSelection()
         {
+            _selectedId = 0;
             _allowGridFill = false;
             _grid.ClearSelection();
             _grid.CurrentCell = null;

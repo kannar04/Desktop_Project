@@ -44,8 +44,6 @@ namespace DesktopApp_Project.GUI
         private IconButton currentBtn;
         private Panel leftBorderBtn;
         private Form currentChildForm;
-        private IconButton btnFlashcard;
-        private IconButton btnPaymentDebug;
 
         private class RGBColors
         {
@@ -101,10 +99,7 @@ namespace DesktopApp_Project.GUI
             ControlBox = false;
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
-            CreateFlashcardButton();
-            CreatePaymentDebugButton();
             DisableChamBaiNavigation();
-            ArrangeDynamicNavigationButtons();
             ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
             ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
             ApplyShellTheme();
@@ -176,67 +171,6 @@ namespace DesktopApp_Project.GUI
             }
         }
 
-        private void CreateFlashcardButton()
-        {
-            if (btnFlashcard != null)
-            {
-                return;
-            }
-
-            btnFlashcard = new IconButton
-            {
-                Dock = DockStyle.Top,
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.Gainsboro,
-                IconChar = IconChar.Wpforms,
-                IconColor = Color.Gainsboro,
-                IconFont = IconFont.Auto,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                Margin = new Padding(2),
-                Name = "btnFlashcard",
-                Padding = new Padding(7, 0, 13, 0),
-                Size = new Size(223, 60),
-                Text = "Flashcard",
-                TextAlign = ContentAlignment.MiddleLeft,
-                TextImageRelation = TextImageRelation.ImageBeforeText,
-                UseVisualStyleBackColor = true
-            };
-            btnFlashcard.FlatAppearance.BorderSize = 0;
-            btnFlashcard.Click += btnFlashcard_Click;
-            pnlMenuItems.Controls.Add(btnFlashcard);
-        }
-
-        private void CreatePaymentDebugButton()
-        {
-            if (btnPaymentDebug != null)
-            {
-                return;
-            }
-
-            btnPaymentDebug = new IconButton
-            {
-                Dock = DockStyle.Top,
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.Gainsboro,
-                IconChar = IconChar.Wallet,
-                IconColor = Color.Gainsboro,
-                IconFont = IconFont.Auto,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                Margin = new Padding(2),
-                Name = "btnPaymentDebug",
-                Padding = new Padding(7, 0, 13, 0),
-                Size = new Size(223, 60),
-                Text = "Debug thanh toan",
-                TextAlign = ContentAlignment.MiddleLeft,
-                TextImageRelation = TextImageRelation.ImageBeforeText,
-                UseVisualStyleBackColor = true,
-                Visible = false
-            };
-            btnPaymentDebug.FlatAppearance.BorderSize = 0;
-            btnPaymentDebug.Click += btnPaymentDebug_Click;
-            pnlMenuItems.Controls.Add(btnPaymentDebug);
-        }
-
         private void DisableChamBaiNavigation()
         {
             // Cham Bai module disabled by request. Keep form source for future restoration.
@@ -245,25 +179,6 @@ namespace DesktopApp_Project.GUI
                 btnChamBai.Visible = false;
                 btnChamBai.Enabled = false;
             }
-        }
-
-        private void ArrangeDynamicNavigationButtons()
-        {
-            PlaceBelow(btnFlashcard, btnTuVung);
-            PlaceBelow(btnThongBao, btnFlashcard);
-            PlaceBelow(btnPaymentDebug, btnThongBao);
-        }
-
-        private void PlaceBelow(Control button, Control anchor)
-        {
-            if (button == null || anchor == null || !pnlMenuItems.Controls.Contains(button) || !pnlMenuItems.Controls.Contains(anchor))
-            {
-                return;
-            }
-
-            var targetIndex = pnlMenuItems.Controls.GetChildIndex(anchor) + 1;
-            targetIndex = Math.Min(targetIndex, pnlMenuItems.Controls.Count - 1);
-            pnlMenuItems.Controls.SetChildIndex(button, targetIndex);
         }
 
         private void UpdatePaymentDebugButtonVisibility()

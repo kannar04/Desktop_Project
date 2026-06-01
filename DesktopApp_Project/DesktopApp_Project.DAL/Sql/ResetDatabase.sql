@@ -11,6 +11,3 @@ BEGIN
     DROP DATABASE QuanLyLopIELTS;
 END
 GO
-
-:r .\Schema.sql
-GO

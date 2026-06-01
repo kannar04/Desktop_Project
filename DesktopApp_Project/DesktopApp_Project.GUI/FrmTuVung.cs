@@ -131,14 +131,40 @@ namespace DesktopApp_Project.GUI
 
         private void BtnMoi_Click(object sender, EventArgs e)
         {
-            ClearForm();
+            var result = Services.TuVung.Luu(BuildDto(0));
+            UiHelpers.ShowResult(result);
+            if (result.Success)
+            {
+                LoadData();
+                ClearForm();
+                ResetGridSelection();
+                _txtTu.Focus();
+            }
         }
 
         private void BtnLuu_Click(object sender, EventArgs e)
         {
-            var result = Services.TuVung.Luu(new TuVungDTO
+            if (_selectedId == 0)
             {
-                MaTuVung = _selectedId,
+                UiHelpers.WarnSelect("tu vung");
+                return;
+            }
+
+            var result = Services.TuVung.Luu(BuildDto(_selectedId));
+
+            UiHelpers.ShowResult(result);
+            if (result.Success)
+            {
+                ResetComboToAll(_cboChuDeFilter);
+                LoadData();
+            }
+        }
+
+        private TuVungDTO BuildDto(int maTuVung)
+        {
+            return new TuVungDTO
+            {
+                MaTuVung = maTuVung,
                 MaLopHoc = UiHelpers.SelectedId(_cboLop),
                 TuTiengAnh = _txtTu.Text.Trim(),
                 TuLoai = _txtLoai.Text.Trim(),
@@ -146,10 +172,7 @@ namespace DesktopApp_Project.GUI
                 Nghia = _txtNghia.Text.Trim(),
                 CapDo = SelectedOrDefault(_cboCapDoFilter, "B1"),
                 ChuDe = SelectedOrDefault(_cboChuDeFilter, "Academic/IELTS General")
-            });
-
-            UiHelpers.ShowResult(result);
-            if (result.Success) LoadData();
+            };
         }
 
         private void BtnXoa_Click(object sender, EventArgs e)
@@ -241,6 +264,7 @@ namespace DesktopApp_Project.GUI
 
         private void ResetGridSelection()
         {
+            _selectedId = 0;
             _allowGridFill = false;
             _grid.ClearSelection();
             _grid.CurrentCell = null;

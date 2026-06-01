@@ -1,4 +1,4 @@
-﻿namespace DesktopApp_Project.GUI
+namespace DesktopApp_Project.GUI
 {
     partial class FrmThanhToan
     {
@@ -242,9 +242,9 @@
             this.cboPhuongThuc.Name = "cboPhuongThuc";
             this.cboPhuongThuc.Size = new System.Drawing.Size(566, 21);
             this.cboPhuongThuc.TabIndex = 11;
-            //
+            // 
             // lblReceiverEmail
-            //
+            // 
             this.lblReceiverEmail.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblReceiverEmail.Location = new System.Drawing.Point(19, 232);
             this.lblReceiverEmail.Name = "lblReceiverEmail";
@@ -252,17 +252,17 @@
             this.lblReceiverEmail.TabIndex = 12;
             this.lblReceiverEmail.Text = "Email nhan";
             this.lblReceiverEmail.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            //
+            // 
             // txtReceiverEmail
-            //
+            // 
             this.txtReceiverEmail.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtReceiverEmail.Location = new System.Drawing.Point(169, 235);
             this.txtReceiverEmail.Name = "txtReceiverEmail";
             this.txtReceiverEmail.Size = new System.Drawing.Size(566, 20);
             this.txtReceiverEmail.TabIndex = 13;
-            //
+            // 
             // lblPaymentUrl
-            //
+            // 
             this.lblPaymentUrl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblPaymentUrl.Location = new System.Drawing.Point(19, 268);
             this.lblPaymentUrl.Name = "lblPaymentUrl";
@@ -272,7 +272,7 @@
             this.lblPaymentUrl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // txtPaymentUrl
-            //
+            // 
             this.txtPaymentUrl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtPaymentUrl.Location = new System.Drawing.Point(169, 271);
             this.txtPaymentUrl.Multiline = true;
@@ -282,27 +282,27 @@
             this.txtPaymentUrl.TabIndex = 15;
             // 
             // lblQrContent
-            //
+            // 
             this.lblQrContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.lblQrContent.Location = new System.Drawing.Point(19, 338);
             this.lblQrContent.Name = "lblQrContent";
-            this.lblQrContent.Size = new System.Drawing.Size(144, 70);
+            this.lblQrContent.Size = new System.Drawing.Size(144, 74);
             this.lblQrContent.TabIndex = 16;
             this.lblQrContent.Text = "QR content";
             this.lblQrContent.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // txtQrContent
-            //
+            // 
             this.txtQrContent.Dock = System.Windows.Forms.DockStyle.Fill;
             this.txtQrContent.Location = new System.Drawing.Point(169, 341);
             this.txtQrContent.Multiline = true;
             this.txtQrContent.Name = "txtQrContent";
             this.txtQrContent.ReadOnly = true;
-            this.txtQrContent.Size = new System.Drawing.Size(566, 64);
+            this.txtQrContent.Size = new System.Drawing.Size(566, 68);
             this.txtQrContent.TabIndex = 17;
             // 
             // buttons
-            //
+            // 
             this.buttons.AutoSize = true;
             this.buttons.Controls.Add(this.btnTaoThanhToan);
             this.buttons.Controls.Add(this.btnFakeComplete);
@@ -324,31 +324,31 @@
             this.btnTaoThanhToan.Text = "Tao thanh toan";
             // 
             // btnFakeComplete
-            //
+            // 
             this.btnFakeComplete.Location = new System.Drawing.Point(129, 3);
             this.btnFakeComplete.Name = "btnFakeComplete";
             this.btnFakeComplete.Size = new System.Drawing.Size(130, 34);
             this.btnFakeComplete.TabIndex = 1;
             this.btnFakeComplete.Text = "Gia lap hoan tat";
-            //
+            // 
             // btnFakeExpired
-            //
+            // 
             this.btnFakeExpired.Location = new System.Drawing.Point(265, 3);
             this.btnFakeExpired.Name = "btnFakeExpired";
             this.btnFakeExpired.Size = new System.Drawing.Size(120, 34);
             this.btnFakeExpired.TabIndex = 2;
             this.btnFakeExpired.Text = "Gia lap het han";
-            //
+            // 
             // btnFakeFailed
-            //
+            // 
             this.btnFakeFailed.Location = new System.Drawing.Point(391, 3);
             this.btnFakeFailed.Name = "btnFakeFailed";
             this.btnFakeFailed.Size = new System.Drawing.Size(120, 34);
             this.btnFakeFailed.TabIndex = 3;
             this.btnFakeFailed.Text = "Gia lap that bai";
-            //
+            // 
             // btnDong
-            //
+            // 
             this.btnDong.Location = new System.Drawing.Point(517, 3);
             this.btnDong.Name = "btnDong";
             this.btnDong.Size = new System.Drawing.Size(90, 34);

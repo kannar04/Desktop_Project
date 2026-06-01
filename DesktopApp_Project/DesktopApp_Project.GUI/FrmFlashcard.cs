@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
@@ -53,6 +54,7 @@ namespace DesktopApp_Project.GUI
                 _isLoading = false;
             }
 
+            ApplyFlashcardVisualStyle();
             LoadCards();
         }
 
@@ -94,28 +96,32 @@ namespace DesktopApp_Project.GUI
             btnXaoTron.Enabled = hasCards;
             btnTruoc.Enabled = hasCards && _currentIndex > 0;
             btnTiepTheo.Enabled = hasCards && _currentIndex < _cards.Count - 1;
-            lblCounter.Text = hasCards ? (_currentIndex + 1).ToString("N0") + " / " + _cards.Count.ToString("N0") : "0 / 0";
+            lblCounter.Text = hasCards
+                ? "Thẻ " + (_currentIndex + 1).ToString("N0") + " / " + _cards.Count.ToString("N0")
+                : "Thẻ 0 / 0";
 
             if (!hasCards)
             {
                 lblSide.Text = "Flashcard";
-                lblCardTitle.Text = "Chua co tu vung";
-                lblCardValue.Text = "Them tu vung hoac chon bo loc khac.";
+                lblCardTitle.Text = "Chưa có từ vựng";
+                lblCardValue.Text = "Thêm từ vựng hoặc chọn bộ lọc khác.";
                 lblCardMeta.Text = string.Empty;
                 return;
             }
 
             var card = _cards[_currentIndex];
-            lblSide.Text = _showBack ? "Nghia" : "Tu vung";
             if (_showBack)
             {
-                lblCardTitle.Text = SafeText(card.Nghia);
-                lblCardValue.Text = SafeText(card.TuTiengAnh);
+                lblSide.Text = "Mặt sau";
+                lblCardTitle.Text = "Nghĩa: " + SafeText(card.Nghia);
+                lblCardValue.Text = "Từ vựng: " + SafeText(card.TuTiengAnh) + Environment.NewLine +
+                                    "Phiên âm: " + SafeText(card.PhienAm);
             }
             else
             {
+                lblSide.Text = "Mặt trước";
                 lblCardTitle.Text = SafeText(card.TuTiengAnh);
-                lblCardValue.Text = SafeText(card.PhienAm);
+                lblCardValue.Text = "Phiên âm: " + SafeText(card.PhienAm);
             }
 
             lblCardMeta.Text = SafeText(card.TuLoai) + "  |  " + SafeText(card.CapDo) + "  |  " + SafeText(card.ChuDe);
@@ -177,6 +183,28 @@ namespace DesktopApp_Project.GUI
         private void Filter_Changed(object sender, EventArgs e)
         {
             LoadCards();
+        }
+
+        private void ApplyFlashcardVisualStyle()
+        {
+            cardPanel.BackColor = UiHelpers.SurfaceAltColor;
+            lblTitle.Font = new Font("Segoe UI", 17F, FontStyle.Bold);
+            lblSide.Font = new Font("Segoe UI", 14F, FontStyle.Bold);
+            lblSide.ForeColor = UiHelpers.AccentColor;
+            lblCardTitle.Font = new Font("Segoe UI", 34F, FontStyle.Bold);
+            lblCardValue.Font = new Font("Segoe UI", 17F, FontStyle.Regular);
+            lblCardMeta.Font = new Font("Segoe UI", 11F, FontStyle.Bold);
+            foreach (Control control in buttons.Controls)
+            {
+                var button = control as Button;
+                if (button != null)
+                {
+                    button.Height = 38;
+                    button.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+                }
+            }
+
+            UiHelpers.EnableDoubleBuffering(cardPanel);
         }
 
         private static string SelectedFilter(ComboBox combo)
