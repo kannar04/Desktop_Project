@@ -15,6 +15,7 @@ namespace DesktopApp_Project.GUI
         private System.Windows.Forms.Button _btnXuatHoaDon;
         private System.Windows.Forms.Button _btnThanhToan;
         private BindingList<HocPhiTinhDTO> _previewRows = new BindingList<HocPhiTinhDTO>();
+        private bool _isCreatingTuition;
 
         public FrmHocPhi()
         {
@@ -90,15 +91,30 @@ namespace DesktopApp_Project.GUI
 
         private void BtnTaoPhieu_Click(object sender, EventArgs e)
         {
-            var result = Services.HocPhi.TaoYeuCauTheoLop(
-                UiHelpers.SelectedId(_cboHocVien),
-                _numSoTien.Value,
-                _txtNganHang.Text.Trim());
-
-            UiHelpers.ShowResult(result);
-            if (result.Success)
+            if (_isCreatingTuition)
             {
-                LoadData();
+                return;
+            }
+
+            _isCreatingTuition = true;
+            _btnTaoPhieu.Enabled = false;
+            try
+            {
+                var result = Services.HocPhi.TaoYeuCauTheoLop(
+                    UiHelpers.SelectedId(_cboHocVien),
+                    _numSoTien.Value,
+                    _txtNganHang.Text.Trim());
+
+                UiHelpers.ShowResult(result);
+                if (result.Success)
+                {
+                    LoadData();
+                }
+            }
+            finally
+            {
+                _isCreatingTuition = false;
+                _btnTaoPhieu.Enabled = true;
             }
         }
 

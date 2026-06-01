@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using DesktopApp_Project.Common;
 using DesktopApp_Project.DAL;
@@ -12,13 +13,11 @@ namespace DesktopApp_Project.BUS
         private static readonly Random DemoRandom = new Random();
         private static readonly object DemoRandomLock = new object();
         private readonly VnpayUrlService _vnpayUrlService;
-        private readonly QrCodeService _qrCodeService;
         private readonly PaymentEmailService _emailService;
 
         public PaymentService(IQuanLyIeltsRepository repository) : base(repository)
         {
             _vnpayUrlService = new VnpayUrlService();
-            _qrCodeService = new QrCodeService();
             _emailService = new PaymentEmailService();
         }
 
@@ -297,7 +296,7 @@ namespace DesktopApp_Project.BUS
         {
             try
             {
-                var qrBytes = _qrCodeService.GenerateQrBytes(detail.PaymentUrl);
+                var qrBytes = LoadStaticPaymentQrBytes();
                 _emailService.SendPaymentRequest(
                     detail.ReceiverEmail,
                     detail.StudentName,
@@ -313,6 +312,17 @@ namespace DesktopApp_Project.BUS
                 Repository.CapNhatEmailThanhToan(detail.TransactionId, false, null, ex.Message);
                 return EmailOutcome.Fail(ex.Message);
             }
+        }
+
+        private static byte[] LoadStaticPaymentQrBytes()
+        {
+            var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Payment", "myQR.png");
+            if (!File.Exists(path))
+            {
+                throw new FileNotFoundException("Khong tim thay anh QR thanh toan tinh.", path);
+            }
+
+            return File.ReadAllBytes(path);
         }
 
         private EmailOutcome TrySendStatusNotification(PaymentDebugResultDTO detail, string status)

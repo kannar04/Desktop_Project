@@ -10,6 +10,7 @@ namespace DesktopApp_Project.DTO
             public string NoiDungMoTa { get; set; }
             public string DuongDanFile { get; set; }
             public string VideoLink { get; set; }
+            public string AudioPath { get; set; }
             public string NhanKyNang { get; set; }
             public string LoaiFile { get; set; }
             public string TenFileGoc { get; set; }

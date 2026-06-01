@@ -399,6 +399,7 @@ namespace DesktopApp_Project.DAL
                     NoiDungMoTa = dto.NoiDungMoTa,
                     DuongDanFile = dto.DuongDanFile,
                     VideoLink = dto.VideoLink,
+                    AudioPath = dto.AudioPath,
                     NhanKyNang = dto.NhanKyNang,
                     LoaiFile = dto.LoaiFile,
                     TenFileGoc = dto.TenFileGoc,
@@ -425,6 +426,7 @@ namespace DesktopApp_Project.DAL
                 entity.NoiDungMoTa = dto.NoiDungMoTa;
                 entity.DuongDanFile = dto.DuongDanFile;
                 entity.VideoLink = dto.VideoLink;
+                entity.AudioPath = dto.AudioPath;
                 entity.NhanKyNang = dto.NhanKyNang;
                 entity.LoaiFile = dto.LoaiFile;
                 entity.TenFileGoc = dto.TenFileGoc;
@@ -1548,6 +1550,30 @@ namespace DesktopApp_Project.DAL
                             KetQua = "Chưa học"
                         });
                     }
+                }
+
+                db.SubmitChanges();
+            }
+        }
+
+        public void UpsertTienTrinhFlashcard(int maNguoiDung, int maTuVung, string ketQua)
+        {
+            using (var db = _factory.Create())
+            {
+                var entity = db.TienTrinhFlashcards.FirstOrDefault(x =>
+                    x.MaNguoiDung == maNguoiDung && x.MaTuVung == maTuVung);
+                if (entity == null)
+                {
+                    db.TienTrinhFlashcards.InsertOnSubmit(new TienTrinhFlashcardEntity
+                    {
+                        MaNguoiDung = maNguoiDung,
+                        MaTuVung = maTuVung,
+                        KetQua = ketQua
+                    });
+                }
+                else
+                {
+                    entity.KetQua = ketQua;
                 }
 
                 db.SubmitChanges();

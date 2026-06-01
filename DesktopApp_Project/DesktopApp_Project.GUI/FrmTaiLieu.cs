@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
@@ -12,6 +13,7 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
         private bool _isFilling;
         private bool _allowGridFill;
+        private static readonly string[] SupportedAudioExtensions = { ".mp3", ".wav", ".m4a", ".aac", ".flac" };
 
         public FrmTaiLieu()
         {
@@ -31,7 +33,9 @@ namespace DesktopApp_Project.GUI
             WireClick(btnLuu, BtnLuu_Click);
             WireClick(btnXoa, BtnXoa_Click);
             WireClick(btnFile, BtnFile_Click);
+            WireClick(btnAudio, BtnAudio_Click);
             WireClick(btnMoFile, BtnMoFile_Click);
+            WireClick(btnMoAudio, BtnMoAudio_Click);
             WireClick(btnUploadCloud, BtnUploadCloud_Click);
             WireSelectionChanged(_grid, Grid_SelectionChanged);
             WireCellClick(_grid, Grid_CellClick);
@@ -70,6 +74,7 @@ namespace DesktopApp_Project.GUI
                 _txtMoTa.Text = item.NoiDungMoTa;
                 _txtFile.Text = item.DuongDanFile;
                 _txtVideo.Text = item.VideoLink;
+                _txtAudio.Text = item.AudioPath;
                 _txtLoaiFile.Text = item.LoaiFile;
                 _txtTenFileGoc.Text = item.TenFileGoc;
                 _txtDuongDanLocal.Text = item.DuongDanLocal;
@@ -89,6 +94,7 @@ namespace DesktopApp_Project.GUI
             _txtMoTa.Clear();
             _txtFile.Clear();
             _txtVideo.Clear();
+            if (_txtAudio != null) _txtAudio.Clear();
             if (_txtLoaiFile != null) _txtLoaiFile.Clear();
             if (_txtTenFileGoc != null) _txtTenFileGoc.Clear();
             if (_txtDuongDanLocal != null) _txtDuongDanLocal.Clear();
@@ -110,11 +116,17 @@ namespace DesktopApp_Project.GUI
         private void SaveCurrentDocument()
         {
             var localPath = !string.IsNullOrWhiteSpace(_txtDuongDanLocal.Text) ? _txtDuongDanLocal.Text.Trim() : _txtFile.Text.Trim();
+            var audioPath = _txtAudio == null ? string.Empty : _txtAudio.Text.Trim();
             var topic = _txtChuDe.Text.Trim();
             if (string.IsNullOrWhiteSpace(topic) && !string.IsNullOrWhiteSpace(_txtTenFileGoc.Text))
             {
                 topic = Path.GetFileNameWithoutExtension(_txtTenFileGoc.Text.Trim());
                 _txtChuDe.Text = topic;
+            }
+
+            if (!ValidateAudioPath(audioPath))
+            {
+                return;
             }
 
             var result = Services.TaiLieu.Luu(new TaiLieuDTO
@@ -125,6 +137,7 @@ namespace DesktopApp_Project.GUI
                 NoiDungMoTa = _txtMoTa.Text.Trim(),
                 DuongDanFile = string.IsNullOrWhiteSpace(_txtFile.Text) ? localPath : _txtFile.Text.Trim(),
                 VideoLink = _txtVideo.Text.Trim(),
+                AudioPath = audioPath,
                 NhanKyNang = Convert.ToString(_cboKyNang.SelectedItem),
                 LoaiFile = _txtLoaiFile.Text.Trim(),
                 TenFileGoc = _txtTenFileGoc.Text.Trim(),
@@ -165,7 +178,7 @@ namespace DesktopApp_Project.GUI
 
         private void BtnFile_Click(object sender, EventArgs e)
         {
-            using (var dialog = new OpenFileDialog { Filter = "Tai lieu va media|*.pdf;*.doc;*.docx;*.ppt;*.pptx;*.xls;*.xlsx;*.txt;*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.mp3;*.wav;*.m4a;*.mp4;*.mov;*.avi;*.mkv|Tat ca|*.*" })
+            using (var dialog = new OpenFileDialog { Filter = "Tai lieu va media|*.pdf;*.doc;*.docx;*.ppt;*.pptx;*.xls;*.xlsx;*.txt;*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.mp3;*.wav;*.m4a;*.aac;*.flac;*.mp4;*.mov;*.avi;*.mkv|Tat ca|*.*" })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
@@ -189,10 +202,39 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        private void BtnAudio_Click(object sender, EventArgs e)
+        {
+            using (var dialog = new OpenFileDialog { Filter = "Audio|*.mp3;*.wav;*.m4a;*.aac;*.flac|Tat ca|*.*" })
+            {
+                if (dialog.ShowDialog(this) != DialogResult.OK)
+                {
+                    return;
+                }
+
+                if (!IsSupportedAudioPath(dialog.FileName))
+                {
+                    UiHelpers.ShowResult(ServiceResult.Fail("Audio chi ho tro .mp3, .wav, .m4a, .aac, .flac."));
+                    return;
+                }
+
+                var result = Services.Media.CopyFileToUploadFolder(dialog.FileName, "TaiLieu");
+                UiHelpers.ShowResult(result);
+                if (result.Success)
+                {
+                    _txtAudio.Text = result.Data.LocalPath;
+                }
+            }
+        }
+
         private void BtnMoFile_Click(object sender, EventArgs e)
         {
             var path = !string.IsNullOrWhiteSpace(_txtDuongDanLocal.Text) ? _txtDuongDanLocal.Text : _txtFile.Text;
             UiHelpers.ShowResult(Services.Media.OpenFile(path));
+        }
+
+        private void BtnMoAudio_Click(object sender, EventArgs e)
+        {
+            UiHelpers.ShowResult(Services.Media.OpenFile(_txtAudio.Text));
         }
 
         private void BtnUploadCloud_Click(object sender, EventArgs e)
@@ -232,6 +274,43 @@ namespace DesktopApp_Project.GUI
                     return;
                 }
             }
+        }
+
+        private bool ValidateAudioPath(string audioPath)
+        {
+            if (string.IsNullOrWhiteSpace(audioPath))
+            {
+                return true;
+            }
+
+            if (!IsSupportedAudioPath(audioPath))
+            {
+                UiHelpers.ShowResult(ServiceResult.Fail("Audio chi ho tro .mp3, .wav, .m4a, .aac, .flac."));
+                return false;
+            }
+
+            var resolved = Services.Media.ResolvePath(audioPath);
+            if (!File.Exists(resolved))
+            {
+                UiHelpers.ShowResult(ServiceResult.Fail("Khong tim thay file audio da chon."));
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsSupportedAudioPath(string path)
+        {
+            var extension = Path.GetExtension(path);
+            foreach (var allowed in SupportedAudioExtensions)
+            {
+                if (string.Equals(extension, allowed, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private void UpdatePreview(string localPath)

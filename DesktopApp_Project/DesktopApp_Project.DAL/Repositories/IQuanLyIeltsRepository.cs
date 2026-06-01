@@ -92,6 +92,7 @@ namespace DesktopApp_Project.DAL
         void UpdateTuVung(TuVungDTO dto);
         void DeleteTuVung(int maTuVung);
         void DongBoFlashcardChoLop(int maTuVung, int maLopHoc);
+        void UpsertTienTrinhFlashcard(int maNguoiDung, int maTuVung, string ketQua);
 
         List<ThongBaoDTO> GetThongBao();
         int InsertThongBao(ThongBaoDTO dto);

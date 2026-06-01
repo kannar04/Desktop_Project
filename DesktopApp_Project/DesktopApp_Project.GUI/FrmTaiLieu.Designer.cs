@@ -10,6 +10,7 @@
         private System.Windows.Forms.Label _lblDesigner4;
         private System.Windows.Forms.Label _lblDesigner5;
         private System.Windows.Forms.Label _lblDesigner6;
+        private System.Windows.Forms.Label _lblAudio;
         private System.Windows.Forms.Label _lblLoaiFile;
         private System.Windows.Forms.Label _lblTenFileGoc;
         private System.Windows.Forms.Label _lblDuongDanLocal;
@@ -22,7 +23,9 @@
         private System.Windows.Forms.Button btnLuu;
         private System.Windows.Forms.Button btnXoa;
         private System.Windows.Forms.Button btnFile;
+        private System.Windows.Forms.Button btnAudio;
         private System.Windows.Forms.Button btnMoFile;
+        private System.Windows.Forms.Button btnMoAudio;
         private System.Windows.Forms.Button btnUploadCloud;
         private System.Windows.Forms.DataGridView _grid;
         private System.Windows.Forms.ComboBox _cboLop;
@@ -31,6 +34,7 @@
         private System.Windows.Forms.TextBox _txtMoTa;
         private System.Windows.Forms.TextBox _txtFile;
         private System.Windows.Forms.TextBox _txtVideo;
+        private System.Windows.Forms.TextBox _txtAudio;
         private System.Windows.Forms.TextBox _txtLoaiFile;
         private System.Windows.Forms.TextBox _txtTenFileGoc;
         private System.Windows.Forms.TextBox _txtDuongDanLocal;
@@ -65,6 +69,8 @@
             this._txtFile = new System.Windows.Forms.TextBox();
             this._lblDesigner6 = new System.Windows.Forms.Label();
             this._txtVideo = new System.Windows.Forms.TextBox();
+            this._lblAudio = new System.Windows.Forms.Label();
+            this._txtAudio = new System.Windows.Forms.TextBox();
             this._lblLoaiFile = new System.Windows.Forms.Label();
             this._txtLoaiFile = new System.Windows.Forms.TextBox();
             this._lblTenFileGoc = new System.Windows.Forms.Label();
@@ -80,7 +86,9 @@
             this.btnLuu = new System.Windows.Forms.Button();
             this.btnXoa = new System.Windows.Forms.Button();
             this.btnFile = new System.Windows.Forms.Button();
+            this.btnAudio = new System.Windows.Forms.Button();
             this.btnMoFile = new System.Windows.Forms.Button();
+            this.btnMoAudio = new System.Windows.Forms.Button();
             this.btnUploadCloud = new System.Windows.Forms.Button();
             this._grid = new System.Windows.Forms.DataGridView();
             this.root.SuspendLayout();
@@ -102,7 +110,7 @@
             this.root.Name = "root";
             this.root.RowCount = 3;
             this.root.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52F));
-            this.root.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 324F));
+            this.root.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 356F));
             this.root.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.root.Size = new System.Drawing.Size(1100, 720);
             this.root.TabIndex = 0;
@@ -140,23 +148,26 @@
             this.form.Controls.Add(this._txtFile, 1, 2);
             this.form.Controls.Add(this._lblDesigner6, 2, 2);
             this.form.Controls.Add(this._txtVideo, 3, 2);
-            this.form.Controls.Add(this._lblLoaiFile, 0, 3);
-            this.form.Controls.Add(this._txtLoaiFile, 1, 3);
-            this.form.Controls.Add(this._lblTenFileGoc, 2, 3);
-            this.form.Controls.Add(this._txtTenFileGoc, 3, 3);
-            this.form.Controls.Add(this._lblDuongDanLocal, 0, 4);
-            this.form.Controls.Add(this._txtDuongDanLocal, 1, 4);
-            this.form.Controls.Add(this._lblCloudUrl, 2, 4);
-            this.form.Controls.Add(this._txtCloudUrl, 3, 4);
-            this.form.Controls.Add(this._lblPreview, 0, 5);
-            this.form.Controls.Add(this._picPreview, 1, 5);
-            this.form.Controls.Add(this.buttons, 0, 6);
+            this.form.Controls.Add(this._lblAudio, 0, 3);
+            this.form.Controls.Add(this._txtAudio, 1, 3);
+            this.form.Controls.Add(this._lblLoaiFile, 0, 4);
+            this.form.Controls.Add(this._txtLoaiFile, 1, 4);
+            this.form.Controls.Add(this._lblTenFileGoc, 2, 4);
+            this.form.Controls.Add(this._txtTenFileGoc, 3, 4);
+            this.form.Controls.Add(this._lblDuongDanLocal, 0, 5);
+            this.form.Controls.Add(this._txtDuongDanLocal, 1, 5);
+            this.form.Controls.Add(this._lblCloudUrl, 2, 5);
+            this.form.Controls.Add(this._txtCloudUrl, 3, 5);
+            this.form.Controls.Add(this._lblPreview, 0, 6);
+            this.form.Controls.Add(this._picPreview, 1, 6);
+            this.form.Controls.Add(this.buttons, 0, 7);
             this.form.Dock = System.Windows.Forms.DockStyle.Fill;
             this.form.Location = new System.Drawing.Point(0, 52);
             this.form.Margin = new System.Windows.Forms.Padding(0);
             this.form.Name = "form";
             this.form.Padding = new System.Windows.Forms.Padding(12, 10, 12, 10);
-            this.form.RowCount = 7;
+            this.form.RowCount = 8;
+            this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
@@ -164,7 +175,7 @@
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 92F));
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 44F));
-            this.form.Size = new System.Drawing.Size(1100, 324);
+            this.form.Size = new System.Drawing.Size(1100, 356);
             this.form.TabIndex = 1;
             // 
             // _lblDesigner1
@@ -294,7 +305,28 @@
             this._txtVideo.Name = "_txtVideo";
             this._txtVideo.Size = new System.Drawing.Size(412, 20);
             this._txtVideo.TabIndex = 11;
-            // 
+            //
+            // _lblAudio
+            //
+            this._lblAudio.AutoEllipsis = true;
+            this._lblAudio.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._lblAudio.Location = new System.Drawing.Point(16, 110);
+            this._lblAudio.Margin = new System.Windows.Forms.Padding(4);
+            this._lblAudio.Name = "_lblAudio";
+            this._lblAudio.Size = new System.Drawing.Size(110, 24);
+            this._lblAudio.TabIndex = 12;
+            this._lblAudio.Text = "Audio";
+            this._lblAudio.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            //
+            // _txtAudio
+            //
+            this._txtAudio.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._txtAudio.Location = new System.Drawing.Point(134, 110);
+            this._txtAudio.Margin = new System.Windows.Forms.Padding(4);
+            this._txtAudio.Name = "_txtAudio";
+            this._txtAudio.Size = new System.Drawing.Size(412, 20);
+            this._txtAudio.TabIndex = 13;
+            //
             // _lblLoaiFile
             // 
             this._lblLoaiFile.AutoEllipsis = true;
@@ -303,7 +335,7 @@
             this._lblLoaiFile.Margin = new System.Windows.Forms.Padding(4);
             this._lblLoaiFile.Name = "_lblLoaiFile";
             this._lblLoaiFile.Size = new System.Drawing.Size(110, 24);
-            this._lblLoaiFile.TabIndex = 12;
+            this._lblLoaiFile.TabIndex = 14;
             this._lblLoaiFile.Text = "Loại file";
             this._lblLoaiFile.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -315,7 +347,7 @@
             this._txtLoaiFile.Name = "_txtLoaiFile";
             this._txtLoaiFile.ReadOnly = true;
             this._txtLoaiFile.Size = new System.Drawing.Size(412, 20);
-            this._txtLoaiFile.TabIndex = 13;
+            this._txtLoaiFile.TabIndex = 15;
             // 
             // _lblTenFileGoc
             // 
@@ -325,7 +357,7 @@
             this._lblTenFileGoc.Margin = new System.Windows.Forms.Padding(4);
             this._lblTenFileGoc.Name = "_lblTenFileGoc";
             this._lblTenFileGoc.Size = new System.Drawing.Size(110, 24);
-            this._lblTenFileGoc.TabIndex = 14;
+            this._lblTenFileGoc.TabIndex = 16;
             this._lblTenFileGoc.Text = "Tên file gốc";
             this._lblTenFileGoc.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -337,7 +369,7 @@
             this._txtTenFileGoc.Name = "_txtTenFileGoc";
             this._txtTenFileGoc.ReadOnly = true;
             this._txtTenFileGoc.Size = new System.Drawing.Size(412, 20);
-            this._txtTenFileGoc.TabIndex = 15;
+            this._txtTenFileGoc.TabIndex = 17;
             // 
             // _lblDuongDanLocal
             // 
@@ -347,7 +379,7 @@
             this._lblDuongDanLocal.Margin = new System.Windows.Forms.Padding(4);
             this._lblDuongDanLocal.Name = "_lblDuongDanLocal";
             this._lblDuongDanLocal.Size = new System.Drawing.Size(110, 24);
-            this._lblDuongDanLocal.TabIndex = 16;
+            this._lblDuongDanLocal.TabIndex = 18;
             this._lblDuongDanLocal.Text = "Đường dẫn local";
             this._lblDuongDanLocal.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -359,7 +391,7 @@
             this._txtDuongDanLocal.Name = "_txtDuongDanLocal";
             this._txtDuongDanLocal.ReadOnly = true;
             this._txtDuongDanLocal.Size = new System.Drawing.Size(412, 20);
-            this._txtDuongDanLocal.TabIndex = 17;
+            this._txtDuongDanLocal.TabIndex = 19;
             // 
             // _lblCloudUrl
             // 
@@ -369,7 +401,7 @@
             this._lblCloudUrl.Margin = new System.Windows.Forms.Padding(4);
             this._lblCloudUrl.Name = "_lblCloudUrl";
             this._lblCloudUrl.Size = new System.Drawing.Size(110, 24);
-            this._lblCloudUrl.TabIndex = 18;
+            this._lblCloudUrl.TabIndex = 20;
             this._lblCloudUrl.Text = "Cloud URL";
             this._lblCloudUrl.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -381,7 +413,7 @@
             this._txtCloudUrl.Name = "_txtCloudUrl";
             this._txtCloudUrl.ReadOnly = true;
             this._txtCloudUrl.Size = new System.Drawing.Size(412, 20);
-            this._txtCloudUrl.TabIndex = 19;
+            this._txtCloudUrl.TabIndex = 21;
             // 
             // _lblPreview
             // 
@@ -416,13 +448,15 @@
             this.buttons.Controls.Add(this.btnLuu);
             this.buttons.Controls.Add(this.btnXoa);
             this.buttons.Controls.Add(this.btnFile);
+            this.buttons.Controls.Add(this.btnAudio);
             this.buttons.Controls.Add(this.btnMoFile);
+            this.buttons.Controls.Add(this.btnMoAudio);
             this.buttons.Controls.Add(this.btnUploadCloud);
             this.buttons.Dock = System.Windows.Forms.DockStyle.Right;
             this.buttons.Location = new System.Drawing.Point(408, 266);
             this.buttons.Margin = new System.Windows.Forms.Padding(4);
             this.buttons.Name = "buttons";
-            this.buttons.Size = new System.Drawing.Size(676, 44);
+            this.buttons.Size = new System.Drawing.Size(884, 44);
             this.buttons.TabIndex = 23;
             // 
             // btnMoi
@@ -476,30 +510,56 @@
             this.btnFile.TabIndex = 3;
             this.btnFile.Text = "Chọn file";
             this.btnFile.UseVisualStyleBackColor = true;
-            // 
+            //
+            // btnAudio
+            //
+            this.btnAudio.AutoEllipsis = true;
+            this.btnAudio.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnAudio.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAudio.Location = new System.Drawing.Point(412, 4);
+            this.btnAudio.Margin = new System.Windows.Forms.Padding(4);
+            this.btnAudio.Name = "btnAudio";
+            this.btnAudio.Size = new System.Drawing.Size(100, 34);
+            this.btnAudio.TabIndex = 4;
+            this.btnAudio.Text = "Chọn audio";
+            this.btnAudio.UseVisualStyleBackColor = true;
+            //
             // btnMoFile
             // 
             this.btnMoFile.AutoEllipsis = true;
             this.btnMoFile.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnMoFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnMoFile.Location = new System.Drawing.Point(412, 4);
+            this.btnMoFile.Location = new System.Drawing.Point(520, 4);
             this.btnMoFile.Margin = new System.Windows.Forms.Padding(4);
             this.btnMoFile.Name = "btnMoFile";
             this.btnMoFile.Size = new System.Drawing.Size(92, 34);
-            this.btnMoFile.TabIndex = 4;
+            this.btnMoFile.TabIndex = 5;
             this.btnMoFile.Text = "Mở file";
             this.btnMoFile.UseVisualStyleBackColor = true;
-            // 
+            //
+            // btnMoAudio
+            //
+            this.btnMoAudio.AutoEllipsis = true;
+            this.btnMoAudio.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.btnMoAudio.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnMoAudio.Location = new System.Drawing.Point(620, 4);
+            this.btnMoAudio.Margin = new System.Windows.Forms.Padding(4);
+            this.btnMoAudio.Name = "btnMoAudio";
+            this.btnMoAudio.Size = new System.Drawing.Size(96, 34);
+            this.btnMoAudio.TabIndex = 6;
+            this.btnMoAudio.Text = "Mở audio";
+            this.btnMoAudio.UseVisualStyleBackColor = true;
+            //
             // btnUploadCloud
             // 
             this.btnUploadCloud.AutoEllipsis = true;
             this.btnUploadCloud.Cursor = System.Windows.Forms.Cursors.Hand;
             this.btnUploadCloud.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnUploadCloud.Location = new System.Drawing.Point(512, 4);
+            this.btnUploadCloud.Location = new System.Drawing.Point(724, 4);
             this.btnUploadCloud.Margin = new System.Windows.Forms.Padding(4);
             this.btnUploadCloud.Name = "btnUploadCloud";
             this.btnUploadCloud.Size = new System.Drawing.Size(160, 34);
-            this.btnUploadCloud.TabIndex = 5;
+            this.btnUploadCloud.TabIndex = 7;
             this.btnUploadCloud.Text = "Upload cloud giả lập";
             this.btnUploadCloud.UseVisualStyleBackColor = true;
             // 

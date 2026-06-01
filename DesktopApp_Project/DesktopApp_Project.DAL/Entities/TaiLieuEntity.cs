@@ -14,6 +14,7 @@ namespace DesktopApp_Project.DAL
             [Column] public string NoiDungMoTa { get; set; }
             [Column] public string DuongDanFile { get; set; }
             [Column] public string VideoLink { get; set; }
+            [Column] public string AudioPath { get; set; }
             [Column] public string NhanKyNang { get; set; }
             [Column] public string LoaiFile { get; set; }
             [Column] public string TenFileGoc { get; set; }

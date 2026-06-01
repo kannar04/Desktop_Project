@@ -44,6 +44,7 @@ namespace DesktopApp_Project.GUI
         private IconButton currentBtn;
         private Panel leftBorderBtn;
         private Form currentChildForm;
+        private IconButton btnFlashcard;
         private IconButton btnPaymentDebug;
 
         private class RGBColors
@@ -100,7 +101,10 @@ namespace DesktopApp_Project.GUI
             ControlBox = false;
             DoubleBuffered = true;
             FormBorderStyle = FormBorderStyle.None;
+            CreateFlashcardButton();
             CreatePaymentDebugButton();
+            DisableChamBaiNavigation();
+            ArrangeDynamicNavigationButtons();
             ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
             ThemeManager.ThemeChanged += ThemeManager_ThemeChanged;
             ApplyShellTheme();
@@ -157,6 +161,7 @@ namespace DesktopApp_Project.GUI
                 btnLopHoc,
                 btnTaiLieu,
                 btnTuVung,
+                btnFlashcard,
                 btnThongBao,
                 btnPaymentDebug,
                 btnSetting
@@ -169,6 +174,36 @@ namespace DesktopApp_Project.GUI
                     StyleMenuButton(button, button == currentBtn);
                 }
             }
+        }
+
+        private void CreateFlashcardButton()
+        {
+            if (btnFlashcard != null)
+            {
+                return;
+            }
+
+            btnFlashcard = new IconButton
+            {
+                Dock = DockStyle.Top,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.Gainsboro,
+                IconChar = IconChar.Wpforms,
+                IconColor = Color.Gainsboro,
+                IconFont = IconFont.Auto,
+                ImageAlign = ContentAlignment.MiddleLeft,
+                Margin = new Padding(2),
+                Name = "btnFlashcard",
+                Padding = new Padding(7, 0, 13, 0),
+                Size = new Size(223, 60),
+                Text = "Flashcard",
+                TextAlign = ContentAlignment.MiddleLeft,
+                TextImageRelation = TextImageRelation.ImageBeforeText,
+                UseVisualStyleBackColor = true
+            };
+            btnFlashcard.FlatAppearance.BorderSize = 0;
+            btnFlashcard.Click += btnFlashcard_Click;
+            pnlMenuItems.Controls.Add(btnFlashcard);
         }
 
         private void CreatePaymentDebugButton()
@@ -200,7 +235,35 @@ namespace DesktopApp_Project.GUI
             btnPaymentDebug.FlatAppearance.BorderSize = 0;
             btnPaymentDebug.Click += btnPaymentDebug_Click;
             pnlMenuItems.Controls.Add(btnPaymentDebug);
-            pnlMenuItems.Controls.SetChildIndex(btnPaymentDebug, 4);
+        }
+
+        private void DisableChamBaiNavigation()
+        {
+            // Cham Bai module disabled by request. Keep form source for future restoration.
+            if (btnChamBai != null)
+            {
+                btnChamBai.Visible = false;
+                btnChamBai.Enabled = false;
+            }
+        }
+
+        private void ArrangeDynamicNavigationButtons()
+        {
+            PlaceBelow(btnFlashcard, btnTuVung);
+            PlaceBelow(btnThongBao, btnFlashcard);
+            PlaceBelow(btnPaymentDebug, btnThongBao);
+        }
+
+        private void PlaceBelow(Control button, Control anchor)
+        {
+            if (button == null || anchor == null || !pnlMenuItems.Controls.Contains(button) || !pnlMenuItems.Controls.Contains(anchor))
+            {
+                return;
+            }
+
+            var targetIndex = pnlMenuItems.Controls.GetChildIndex(anchor) + 1;
+            targetIndex = Math.Min(targetIndex, pnlMenuItems.Controls.Count - 1);
+            pnlMenuItems.Controls.SetChildIndex(button, targetIndex);
         }
 
         private void UpdatePaymentDebugButtonVisibility()
@@ -732,8 +795,7 @@ namespace DesktopApp_Project.GUI
 
         private void btnChamBai_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color4);
-            OpenModule(new FrmChamBai(_services, _currentUser));
+            // Cham Bai module disabled by request. Keep handler as no-op for designer compatibility.
         }
 
         private void btnDeThi_Click(object sender, EventArgs e)
@@ -788,6 +850,12 @@ namespace DesktopApp_Project.GUI
         {
             ActivateButton(sender, RGBColors.color5);
             OpenModule(new FrmTuVung(_services, _currentUser));
+        }
+
+        private void btnFlashcard_Click(object sender, EventArgs e)
+        {
+            ActivateButton(sender, RGBColors.color5);
+            OpenModule(new FrmFlashcard(_services, _currentUser));
         }
 
         private void btnThongBao_Click(object sender, EventArgs e)

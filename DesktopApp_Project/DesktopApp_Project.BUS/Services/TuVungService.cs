@@ -22,6 +22,29 @@ namespace DesktopApp_Project.BUS
             {
                 return Repository.SearchTuVung(criteria);
             }
+
+            public ServiceResult<List<TuVungDTO>> LayDanhSachFlashcard(TuVungSearchCriteriaDTO criteria)
+            {
+                return Try(() =>
+                {
+                    var rows = Repository.SearchTuVung(criteria ?? new TuVungSearchCriteriaDTO());
+                    return ServiceResult<List<TuVungDTO>>.Ok(rows, "Tai danh sach flashcard thanh cong.");
+                });
+            }
+
+            public ServiceResult GhiNhanFlashcardDaHoc(int maNguoiDung, int maTuVung)
+            {
+                return Try(() =>
+                {
+                    if (maNguoiDung <= 0 || maTuVung <= 0)
+                    {
+                        return ServiceResult.Fail("Khong co thong tin nguoi dung hoac tu vung.");
+                    }
+
+                    Repository.UpsertTienTrinhFlashcard(maNguoiDung, maTuVung, "Đã học");
+                    return ServiceResult.Ok("Da cap nhat tien trinh flashcard.");
+                });
+            }
     
             public ServiceResult Luu(TuVungDTO dto)
             {

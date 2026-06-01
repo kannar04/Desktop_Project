@@ -63,6 +63,12 @@ namespace DesktopApp_Project.BUS
                     }
     
                     var now = DateTime.Now;
+                    var existing = LayHocPhiTrongThang(maLopHoc, now);
+                    if (rows.Any(x => CoHocPhiTrung(existing, x.MaNguoiDung, x.MaLopHoc)))
+                    {
+                        return ServiceResult.Fail("Học phí này đã tồn tại cho học viên/lớp/kỳ tương ứng.");
+                    }
+
                     var payments = rows.Select(x => new ThanhToanHocPhiDTO
                     {
                         MaNguoiDung = x.MaNguoiDung,
@@ -98,6 +104,12 @@ namespace DesktopApp_Project.BUS
                     dto.SoTienGoc = dto.SoTienGoc ?? dto.SoTien;
                     dto.SoTienCuoi = dto.SoTienCuoi ?? dto.SoTien;
                     dto.TrangThai = AppConstants.PaymentPending;
+                    var existing = LayHocPhiTrongThang(dto.MaLopHoc, dto.NgayTao);
+                    if (CoHocPhiTrung(existing, dto.MaNguoiDung, dto.MaLopHoc))
+                    {
+                        return ServiceResult.Fail("Học phí này đã tồn tại cho học viên/lớp/kỳ tương ứng.");
+                    }
+
                     Repository.InsertHocPhi(dto);
                     return ServiceResult.Ok("Tạo yêu cầu thanh toán học phí thành công. Hạn thanh toán là 10 ngày.");
                 });
@@ -140,6 +152,26 @@ namespace DesktopApp_Project.BUS
                         GhiChu = discount > 0 ? "Giảm 20% do học trên 2 năm" : string.Empty
                     };
                 }).ToList();
+            }
+
+            private List<ThanhToanHocPhiDTO> LayHocPhiTrongThang(int? maLopHoc, DateTime ngayTao)
+            {
+                var dauThang = new DateTime(ngayTao.Year, ngayTao.Month, 1);
+                var cuoiThang = dauThang.AddMonths(1).AddDays(-1);
+                return Repository.GetHocPhi(maLopHoc, dauThang, cuoiThang);
+            }
+
+            private static bool CoHocPhiTrung(IEnumerable<ThanhToanHocPhiDTO> existing, int maNguoiDung, int? maLopHoc)
+            {
+                return existing != null && existing.Any(x =>
+                    x.MaNguoiDung == maNguoiDung
+                    && x.MaLopHoc == maLopHoc
+                    && !LaHocPhiDaHuy(x.TrangThai));
+            }
+
+            private static bool LaHocPhiDaHuy(string trangThai)
+            {
+                return AppConstants.GetTextAliases(AppConstants.PaymentCancelled).Contains(trangThai);
             }
         }
 }

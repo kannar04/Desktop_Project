@@ -38,13 +38,13 @@ namespace DesktopApp_Project.BUS
                         "So tien: " + amount.ToString("N0") + " VND" + Environment.NewLine + Environment.NewLine +
                         "Link thanh toan VNPAY Sandbox:" + Environment.NewLine +
                         paymentUrl + Environment.NewLine + Environment.NewLine +
-                        "QR code duoc dinh kem de mo trang thanh toan." + Environment.NewLine + Environment.NewLine +
+                        "Anh QR thanh toan co dinh duoc dinh kem trong email nay." + Environment.NewLine + Environment.NewLine +
                         "Day la email thanh toan VNPAY Sandbox/demo cho do an ung dung desktop. Khong phai yeu cau thanh toan san xuat."
                 };
 
                 if (qrImageBytes != null && qrImageBytes.Length > 0)
                 {
-                    builder.Attachments.Add("vnpay-qr.png", qrImageBytes, new ContentType("image", "png"));
+                    builder.Attachments.Add("myQR.png", qrImageBytes, new ContentType("image", "png"));
                 }
 
                 message.Body = builder.ToMessageBody();

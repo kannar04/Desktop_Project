@@ -104,7 +104,7 @@ namespace DesktopApp_Project.BUS
         public bool IsAudio(string path)
         {
             var extension = Path.GetExtension(path).ToLowerInvariant();
-            return new[] { ".mp3", ".wav", ".m4a" }.Contains(extension);
+            return new[] { ".mp3", ".wav", ".m4a", ".aac", ".flac" }.Contains(extension);
         }
 
         public string GetFileType(string path)

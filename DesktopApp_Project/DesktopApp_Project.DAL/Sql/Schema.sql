@@ -72,6 +72,7 @@ CREATE TABLE dbo.TaiLieu
     NoiDungMoTa NVARCHAR(1000) NULL,
     DuongDanFile NVARCHAR(500) NULL,
     VideoLink NVARCHAR(500) NULL,
+    AudioPath NVARCHAR(500) NULL,
     NhanKyNang NVARCHAR(30) NOT NULL,
     LoaiFile NVARCHAR(30) NULL,
     TenFileGoc NVARCHAR(255) NULL,
@@ -519,6 +520,11 @@ END
 IF OBJECT_ID(N'dbo.TaiLieu', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.TaiLieu', N'ThumbnailPath') IS NULL
 BEGIN
     ALTER TABLE dbo.TaiLieu ADD ThumbnailPath NVARCHAR(500) NULL;
+END
+
+IF OBJECT_ID(N'dbo.TaiLieu', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.TaiLieu', N'AudioPath') IS NULL
+BEGIN
+    ALTER TABLE dbo.TaiLieu ADD AudioPath NVARCHAR(500) NULL;
 END
 
 IF OBJECT_ID(N'dbo.BaiTap', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.BaiTap', N'LoaiFile') IS NULL

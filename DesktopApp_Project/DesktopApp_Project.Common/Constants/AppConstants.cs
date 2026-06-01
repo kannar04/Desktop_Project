@@ -120,6 +120,8 @@ namespace DesktopApp_Project.Common
                 ".mp3",
                 ".wav",
                 ".m4a",
+                ".aac",
+                ".flac",
                 ".mp4",
                 ".mov",
                 ".avi",

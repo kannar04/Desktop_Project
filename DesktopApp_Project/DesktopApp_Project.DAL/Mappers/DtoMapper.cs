@@ -45,6 +45,7 @@ namespace DesktopApp_Project.DAL
                 NoiDungMoTa = entity.NoiDungMoTa,
                 DuongDanFile = entity.DuongDanFile,
                 VideoLink = entity.VideoLink,
+                AudioPath = entity.AudioPath,
                 NhanKyNang = entity.NhanKyNang,
                 LoaiFile = entity.LoaiFile,
                 TenFileGoc = entity.TenFileGoc,
