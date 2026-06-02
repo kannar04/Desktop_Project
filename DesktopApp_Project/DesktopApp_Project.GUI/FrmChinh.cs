@@ -78,7 +78,6 @@ namespace DesktopApp_Project.GUI
             }
 
             _runtimeLoaded = true;
-            UpdatePaymentDebugButtonVisibility();
             if (_services == null || _currentUser == null)
             {
                 ActivateButton(btnChinh, RGBColors.color1);
@@ -158,7 +157,6 @@ namespace DesktopApp_Project.GUI
                 btnTuVung,
                 btnFlashcard,
                 btnThongBao,
-                btnPaymentDebug,
                 btnSetting
             };
 
@@ -179,16 +177,6 @@ namespace DesktopApp_Project.GUI
                 btnChamBai.Visible = false;
                 btnChamBai.Enabled = false;
             }
-        }
-
-        private void UpdatePaymentDebugButtonVisibility()
-        {
-            if (btnPaymentDebug == null)
-            {
-                return;
-            }
-
-            btnPaymentDebug.Visible = _currentUser != null && AppConstants.AdminRoles.Contains(_currentUser.VaiTro);
         }
 
         private void StyleMenuButton(IconButton button, bool active)
@@ -735,12 +723,6 @@ namespace DesktopApp_Project.GUI
         {
             ActivateButton(sender, RGBColors.color2);
             OpenModule(new FrmHocPhi(_services, _currentUser));
-        }
-
-        private void btnPaymentDebug_Click(object sender, EventArgs e)
-        {
-            ActivateButton(sender, RGBColors.color2);
-            OpenModule(new FrmPaymentDebug(_services, _currentUser));
         }
 
         private void btnHocVien_Click(object sender, EventArgs e)

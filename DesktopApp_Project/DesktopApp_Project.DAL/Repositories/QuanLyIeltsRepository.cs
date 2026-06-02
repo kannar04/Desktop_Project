@@ -287,6 +287,9 @@ namespace DesktopApp_Project.DAL
                     from ct in db.ChiTietLopHocs
                     join nd in db.NguoiDungs on ct.MaNguoiDung equals nd.MaNguoiDung
                     where ct.MaLopHoc == maLopHoc
+                          && nd.VaiTro == AppConstants.RoleStudent
+                          && AppConstants.EnrollmentActiveAliases.Contains(ct.TrangThai)
+                          && ct.NgayNghiHoc == null
                     orderby nd.HoTen
                     select nd;
 
@@ -328,50 +331,103 @@ namespace DesktopApp_Project.DAL
             }
         }
 
-        public List<NguoiDungDTO> GetHocVienChuaTrongLop(int maLopHoc)
+        public int? GetLopHocDangHocCuaHocVien(int maNguoiDung)
         {
             using (var db = _factory.Create())
             {
-                var query =
-                    from nd in db.NguoiDungs
-                    where nd.VaiTro == AppConstants.RoleStudent
-                          && !db.ChiTietLopHocs.Any(ct => ct.MaNguoiDung == nd.MaNguoiDung && ct.MaLopHoc == maLopHoc)
-                    orderby nd.HoTen
-                    select nd;
-
-                return query.AsEnumerable().Select(DtoMapper.ToDto).ToList();
+                return db.ChiTietLopHocs
+                    .Where(x => x.MaNguoiDung == maNguoiDung
+                                && AppConstants.EnrollmentActiveAliases.Contains(x.TrangThai)
+                                && x.NgayNghiHoc == null)
+                    .OrderByDescending(x => x.NgayVaoLop)
+                    .Select(x => (int?)x.MaLopHoc)
+                    .FirstOrDefault();
             }
         }
 
-        public void ThemHocVienVaoLop(int maNguoiDung, int maLopHoc)
+        public int SaveHocVienVaChuyenLop(NguoiDungDTO dto, int maLopHoc)
         {
             using (var db = _factory.Create())
             {
-                if (!db.ChiTietLopHocs.Any(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc))
+                NguoiDungEntity entity;
+                if (dto.MaNguoiDung == 0)
                 {
-                    db.ChiTietLopHocs.InsertOnSubmit(new ChiTietLopHocEntity
-                    {
-                        MaNguoiDung = maNguoiDung,
-                        MaLopHoc = maLopHoc,
-                        NgayVaoLop = DateTime.Today,
-                        TrangThai = AppConstants.EnrollmentActive
-                    });
+                    entity = new NguoiDungEntity();
+                    ApplyNguoiDungValues(entity, dto);
+                    db.NguoiDungs.InsertOnSubmit(entity);
                     db.SubmitChanges();
                 }
+                else
+                {
+                    entity = RequireEntity(
+                        db.NguoiDungs.FirstOrDefault(x => x.MaNguoiDung == dto.MaNguoiDung),
+                        "Khong tim thay nguoi dung can cap nhat.");
+                    ApplyNguoiDungValues(entity, dto);
+                }
+
+                MoveActiveEnrollment(db, entity.MaNguoiDung, maLopHoc);
+                db.SubmitChanges();
+                return entity.MaNguoiDung;
             }
         }
 
-        public void XoaHocVienKhoiLop(int maNguoiDung, int maLopHoc)
+        public void ChuyenHocVienSangLop(int maNguoiDung, int maLopHoc)
         {
             using (var db = _factory.Create())
             {
-                var entity = db.ChiTietLopHocs.FirstOrDefault(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc);
-                if (entity != null)
-                {
-                    db.ChiTietLopHocs.DeleteOnSubmit(entity);
-                    db.SubmitChanges();
-                }
+                MoveActiveEnrollment(db, maNguoiDung, maLopHoc);
+                db.SubmitChanges();
             }
+        }
+
+        private static void ApplyNguoiDungValues(NguoiDungEntity entity, NguoiDungDTO dto)
+        {
+            entity.VaiTro = dto.VaiTro;
+            entity.HoTen = dto.HoTen;
+            entity.NgaySinh = dto.NgaySinh;
+            entity.SDT = dto.SDT;
+            entity.Email = dto.Email;
+            entity.TrinhDoDauVao = dto.TrinhDoDauVao;
+            entity.TaiKhoan = dto.TaiKhoan;
+            entity.MatKhau = dto.MatKhau;
+        }
+
+        private static void MoveActiveEnrollment(QuanLyIeltsDataContext db, int maNguoiDung, int maLopHoc)
+        {
+            var today = DateTime.Today;
+            var activeRows = db.ChiTietLopHocs
+                .Where(x => x.MaNguoiDung == maNguoiDung
+                            && AppConstants.EnrollmentActiveAliases.Contains(x.TrangThai)
+                            && x.NgayNghiHoc == null)
+                .ToList();
+
+            foreach (var row in activeRows.Where(x => x.MaLopHoc != maLopHoc))
+            {
+                row.TrangThai = AppConstants.EnrollmentStopped;
+                row.NgayNghiHoc = today;
+            }
+
+            var selected = db.ChiTietLopHocs.FirstOrDefault(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc);
+            if (selected == null)
+            {
+                db.ChiTietLopHocs.InsertOnSubmit(new ChiTietLopHocEntity
+                {
+                    MaNguoiDung = maNguoiDung,
+                    MaLopHoc = maLopHoc,
+                    NgayVaoLop = today,
+                    NgayNghiHoc = null,
+                    TrangThai = AppConstants.EnrollmentActive
+                });
+                return;
+            }
+
+            if (!AppConstants.EnrollmentActiveAliases.Contains(selected.TrangThai) || selected.NgayNghiHoc.HasValue)
+            {
+                selected.NgayVaoLop = today;
+            }
+
+            selected.TrangThai = AppConstants.EnrollmentActive;
+            selected.NgayNghiHoc = null;
         }
 
         public List<TaiLieuDTO> GetTaiLieu(int? maLopHoc)
@@ -1800,82 +1856,6 @@ namespace DesktopApp_Project.DAL
             }
         }
 
-        public int TaoHocPhiDebug(PaymentDebugRequestDTO request, string invoiceCode)
-        {
-            using (var db = _factory.Create())
-            {
-                EnsurePaymentDebugColumns(db);
-                var studentId = GetOrCreateDebugStudent(db);
-                var now = DateTime.Now;
-                var entity = new ThanhToanHocPhiEntity
-                {
-                    MaNguoiDung = studentId,
-                    MaLopHoc = null,
-                    SoTien = request.Amount,
-                    SoTienGoc = request.Amount,
-                    PhanTramGiam = 0m,
-                    SoTienGiam = 0m,
-                    SoTienCuoi = request.Amount,
-                    ThongTinNganHang = "VNPAY Sandbox Debug",
-                    NgayTao = now,
-                    HanThanhToan = now.AddDays(AppConstants.HocPhiDeadlineDays),
-                    MaHoaDon = invoiceCode,
-                    PhuongThucThanhToan = null,
-                    NgayThanhToan = null,
-                    TrangThai = AppConstants.PaymentPending
-                };
-
-                db.ThanhToanHocPhis.InsertOnSubmit(entity);
-                db.SubmitChanges();
-                return entity.MaThanhToan;
-            }
-        }
-
-        public PaymentDebugResultDTO TaoNhatKyThanhToanDebug(PaymentDebugRequestDTO request, int maThanhToan, string maGiaoDichNgoai, string paymentUrl, string qrContent)
-        {
-            using (var db = _factory.Create())
-            {
-                EnsurePaymentDebugColumns(db);
-                var entity = new NhatKyThanhToanEntity
-                {
-                    MaThanhToan = maThanhToan,
-                    PhuongThuc = request.PaymentMethod,
-                    SoTien = request.Amount,
-                    NoiDungThanhToan = request.PaymentContent,
-                    MaGiaoDichNgoai = maGiaoDichNgoai,
-                    PaymentUrl = paymentUrl,
-                    QrContent = qrContent,
-                    TrangThai = AppConstants.PaymentPending,
-                    NgayTao = DateTime.Now,
-                    ReceiverEmail = TrimForColumn(request.ReceiverEmail, 150),
-                    DebugStudentName = TrimForColumn(request.StudentName, 120),
-                    DebugClassName = TrimForColumn(request.ClassName, 120),
-                    DebugNote = TrimForColumn(request.DebugNote, 500),
-                    IsDebugPayment = true,
-                    PaymentEmailSent = false,
-                    StatusEmailSent = false
-                };
-
-                db.NhatKyThanhToans.InsertOnSubmit(entity);
-                db.SubmitChanges();
-                return BuildPaymentDebugQuery(db).FirstOrDefault(x => x.TransactionId == entity.MaGiaoDich);
-            }
-        }
-
-        public List<PaymentDebugResultDTO> LayGiaoDichDebugGanDay(int limit)
-        {
-            using (var db = _factory.Create())
-            {
-                EnsurePaymentDebugColumns(db);
-                limit = Math.Max(1, limit);
-                return BuildPaymentDebugQuery(db)
-                    .Where(x => x.IsDebugPayment)
-                    .OrderByDescending(x => x.CreatedAt)
-                    .Take(limit)
-                    .ToList();
-            }
-        }
-
         public PaymentDebugResultDTO LayChiTietGiaoDichDebug(int maGiaoDich)
         {
             using (var db = _factory.Create())
@@ -2040,32 +2020,6 @@ namespace DesktopApp_Project.DAL
                     DebugNote = tx.DebugNote,
                     IsDebugPayment = tx.IsDebugPayment == true
                 };
-        }
-
-        private static int GetOrCreateDebugStudent(QuanLyIeltsDataContext db)
-        {
-            const string debugAccount = "debug_payment_student";
-            const string debugEmail = "debug-payment@student.local";
-            var entity = db.NguoiDungs.FirstOrDefault(x => x.TaiKhoan == debugAccount || x.Email == debugEmail);
-            if (entity != null)
-            {
-                return entity.MaNguoiDung;
-            }
-
-            entity = new NguoiDungEntity
-            {
-                VaiTro = AppConstants.RoleStudent,
-                HoTen = "Debug Payment Student",
-                NgaySinh = null,
-                SDT = "0000000000",
-                Email = debugEmail,
-                TrinhDoDauVao = "Debug",
-                TaiKhoan = debugAccount,
-                MatKhau = "debug"
-            };
-            db.NguoiDungs.InsertOnSubmit(entity);
-            db.SubmitChanges();
-            return entity.MaNguoiDung;
         }
 
         private static string TrimForColumn(string value, int maxLength)

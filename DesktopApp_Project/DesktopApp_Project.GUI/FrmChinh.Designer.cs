@@ -21,7 +21,6 @@ namespace DesktopApp_Project.GUI
         {
             this.pnlSideMenu = new System.Windows.Forms.Panel();
             this.pnlMenuItems = new System.Windows.Forms.Panel();
-            this.btnPaymentDebug = new FontAwesome.Sharp.IconButton();
             this.btnThongBao = new FontAwesome.Sharp.IconButton();
             this.btnFlashcard = new FontAwesome.Sharp.IconButton();
             this.btnTuVung = new FontAwesome.Sharp.IconButton();
@@ -73,7 +72,6 @@ namespace DesktopApp_Project.GUI
             // 
             this.pnlMenuItems.AutoScroll = true;
             this.pnlMenuItems.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
-            this.pnlMenuItems.Controls.Add(this.btnPaymentDebug);
             this.pnlMenuItems.Controls.Add(this.btnThongBao);
             this.pnlMenuItems.Controls.Add(this.btnFlashcard);
             this.pnlMenuItems.Controls.Add(this.btnTuVung);
@@ -94,30 +92,6 @@ namespace DesktopApp_Project.GUI
             this.pnlMenuItems.Name = "pnlMenuItems";
             this.pnlMenuItems.Size = new System.Drawing.Size(240, 736);
             this.pnlMenuItems.TabIndex = 14;
-            //
-            // btnPaymentDebug
-            //
-            this.btnPaymentDebug.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnPaymentDebug.FlatAppearance.BorderSize = 0;
-            this.btnPaymentDebug.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnPaymentDebug.ForeColor = System.Drawing.Color.Gainsboro;
-            this.btnPaymentDebug.IconChar = FontAwesome.Sharp.IconChar.Wallet;
-            this.btnPaymentDebug.IconColor = System.Drawing.Color.Gainsboro;
-            this.btnPaymentDebug.IconFont = FontAwesome.Sharp.IconFont.Auto;
-            this.btnPaymentDebug.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnPaymentDebug.Location = new System.Drawing.Point(0, 840);
-            this.btnPaymentDebug.Margin = new System.Windows.Forms.Padding(2);
-            this.btnPaymentDebug.Name = "btnPaymentDebug";
-            this.btnPaymentDebug.Padding = new System.Windows.Forms.Padding(7, 0, 13, 0);
-            this.btnPaymentDebug.Size = new System.Drawing.Size(223, 60);
-            this.btnPaymentDebug.TabIndex = 15;
-            this.btnPaymentDebug.Text = "Debug thanh toan";
-            this.btnPaymentDebug.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.btnPaymentDebug.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.btnPaymentDebug.UseVisualStyleBackColor = true;
-            this.btnPaymentDebug.Visible = false;
-            this.btnPaymentDebug.Click += new System.EventHandler(this.btnPaymentDebug_Click);
-            //
             // btnThongBao
             //
             this.btnThongBao.Dock = System.Windows.Forms.DockStyle.Top;
@@ -630,7 +604,6 @@ namespace DesktopApp_Project.GUI
         private FontAwesome.Sharp.IconButton btnBaiTap;
         private FontAwesome.Sharp.IconButton btnThongBao;
         private FontAwesome.Sharp.IconButton btnFlashcard;
-        private FontAwesome.Sharp.IconButton btnPaymentDebug;
         private FontAwesome.Sharp.IconButton btnTuVung;
         private FontAwesome.Sharp.IconButton btnTaiLieu;
         private FontAwesome.Sharp.IconButton btnLopHoc;

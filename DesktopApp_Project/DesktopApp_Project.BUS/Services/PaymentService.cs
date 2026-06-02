@@ -62,84 +62,208 @@ namespace DesktopApp_Project.BUS
             });
         }
 
-        public ServiceResult<PaymentDebugResultDTO> CreateDebugPayment(PaymentDebugRequestDTO request)
+        public ServiceResult<PaymentResultDTO> GuiThongTinHocPhi(int maThanhToan)
         {
             return Try(() =>
             {
-                var validation = ValidateDebugRequest(request);
-                if (!string.IsNullOrEmpty(validation))
+                var outcome = SendTuitionPaymentInfo(maThanhToan);
+                return outcome.Success
+                    ? ServiceResult<PaymentResultDTO>.Ok(outcome.PaymentResult, "Đã gửi thông tin học phí thành công.")
+                    : FailGuiHocPhi(outcome.Message);
+            });
+        }
+
+        public ServiceResult<BatchSendTuitionResultDTO> GuiHocPhiHangLoat(List<int> hocPhiIds)
+        {
+            return Try(() =>
+            {
+                var ids = (hocPhiIds ?? new List<int>())
+                    .Where(x => x > 0)
+                    .Distinct()
+                    .ToList();
+
+                if (ids.Count == 0)
                 {
-                    return ServiceResult<PaymentDebugResultDTO>.Fail(validation);
+                    return ServiceResult<BatchSendTuitionResultDTO>.Fail("Vui lòng chọn ít nhất một học phí để gửi.");
                 }
 
-                NormalizeDebugRequest(request);
-                var maThanhToan = Repository.TaoHocPhiDebug(request, request.InvoiceCode);
-                var txnRef = TaoMaGiaoDichDemo();
-                var paymentUrl = _vnpayUrlService.BuildPaymentUrl(
-                    txnRef,
-                    request.Amount,
-                    request.PaymentContent,
-                    "127.0.0.1");
+                var result = new BatchSendTuitionResultDTO { TotalCount = ids.Count };
+                foreach (var id in ids)
+                {
+                    var outcome = SendTuitionPaymentInfo(id);
+                    result.Items.Add(new BatchSendTuitionItemResultDTO
+                    {
+                        HocPhiId = id,
+                        HocVienName = outcome.StudentName,
+                        Email = outcome.Email,
+                        Success = outcome.Success,
+                        Message = outcome.Success ? "Đã gửi thông tin học phí thành công." : outcome.Message
+                    });
+                }
 
-                var detail = Repository.TaoNhatKyThanhToanDebug(request, maThanhToan, txnRef, paymentUrl, paymentUrl);
+                result.SuccessCount = result.Items.Count(x => x.Success);
+                result.FailedCount = result.TotalCount - result.SuccessCount;
+
+                var message = "Đã gửi thành công " + result.SuccessCount + "/" + result.TotalCount
+                    + " học phí. Thất bại: " + result.FailedCount + ".";
+                if (result.FailedCount > 0)
+                {
+                    message += " Một số học phí gửi thất bại. Vui lòng xem chi tiết.";
+                }
+
+                return new ServiceResult<BatchSendTuitionResultDTO>
+                {
+                    Success = result.FailedCount == 0,
+                    Data = result,
+                    Message = message
+                };
+            });
+        }
+
+        private TuitionSendOutcome SendTuitionPaymentInfo(int maThanhToan)
+        {
+            var outcome = new TuitionSendOutcome { TuitionPaymentId = maThanhToan };
+            try
+            {
+                if (maThanhToan <= 0)
+                {
+                    outcome.Message = "Vui lòng chọn phiếu học phí.";
+                    return outcome;
+                }
+
+                var invoice = Repository.LayHoaDonHocPhi(maThanhToan);
+                if (invoice == null)
+                {
+                    outcome.Message = "Không tìm thấy thông tin học phí đã chọn.";
+                    return outcome;
+                }
+
+                var student = Repository.GetNguoiDungById(invoice.MaNguoiDung);
+                outcome.StudentName = student == null ? invoice.HoTen : student.HoTen;
+                outcome.Email = student == null ? string.Empty : student.Email;
+
+                if (student == null)
+                {
+                    outcome.Message = "Không tìm thấy học viên.";
+                    return outcome;
+                }
+
+                if (!ValidationHelper.IsValidEmail(student.Email))
+                {
+                    outcome.Message = "Email học viên không hợp lệ hoặc đang trống.";
+                    return outcome;
+                }
+
+                var amount = invoice.SoTienCuoi.HasValue ? invoice.SoTienCuoi.Value : invoice.SoTien;
+                if (amount <= 0)
+                {
+                    outcome.Message = "Số tiền học phí không hợp lệ.";
+                    return outcome;
+                }
+
+                var reusable = Repository.LayGiaoDichTheoThanhToan(maThanhToan)
+                    .FirstOrDefault(IsReusablePaymentTransaction);
+                if (reusable == null)
+                {
+                    var created = TaoThanhToanVnpay(new PaymentRequestDTO
+                    {
+                        MaThanhToan = maThanhToan,
+                        SoTien = amount,
+                        PhuongThuc = AppConstants.PaymentMethodVNPay,
+                        NoiDungThanhToan = "Thanh toán học phí " + LayMaHoaDon(invoice),
+                        EmailNguoiNhan = student.Email.Trim()
+                    }, invoice);
+
+                    if (!created.Success)
+                    {
+                        outcome.Message = SafeReason(created.Message);
+                        outcome.PaymentResult = created.Data;
+                        return outcome;
+                    }
+
+                    outcome.Success = true;
+                    outcome.Message = "Đã gửi thông tin học phí thành công.";
+                    outcome.PaymentResult = created.Data;
+                    return outcome;
+                }
+
+                var detail = BuildPaymentEmailDetail(invoice, student, reusable);
                 var email = TrySendPaymentRequest(detail);
-                detail = Repository.LayChiTietGiaoDichDebug(detail.TransactionId) ?? detail;
+                var refreshed = Repository.LayGiaoDichThanhToan(reusable.MaGiaoDich) ?? reusable;
 
                 if (!email.Success)
                 {
-                    return WithData(false, detail, "Da tao link thanh toan nhung gui email that bai: " + email.Error);
+                    outcome.Message = SafeReason(email.Error);
+                    outcome.PaymentResult = refreshed;
+                    return outcome;
                 }
 
-                return ServiceResult<PaymentDebugResultDTO>.Ok(detail, "Da tao link thanh toan va gui email thanh cong.");
-            });
-        }
-
-        public ServiceResult<List<PaymentDebugResultDTO>> GetRecentDebugPayments()
-        {
-            return Try(() => ServiceResult<List<PaymentDebugResultDTO>>.Ok(Repository.LayGiaoDichDebugGanDay(100), "OK"));
-        }
-
-        public ServiceResult<PaymentDebugResultDTO> GetPaymentDebugDetail(int transactionId)
-        {
-            return Try(() =>
+                outcome.Success = true;
+                outcome.Message = "Đã gửi thông tin học phí thành công.";
+                outcome.PaymentResult = refreshed;
+                return outcome;
+            }
+            catch (Exception ex)
             {
-                var detail = Repository.LayChiTietGiaoDichDebug(transactionId);
-                return detail == null
-                    ? ServiceResult<PaymentDebugResultDTO>.Fail("Khong tim thay giao dich thanh toan.")
-                    : ServiceResult<PaymentDebugResultDTO>.Ok(detail, "OK");
-            });
+                outcome.Message = SafeReason(ex.Message);
+                return outcome;
+            }
         }
 
-        public ServiceResult<PaymentDebugResultDTO> ResendPaymentEmail(int transactionId)
+        private static PaymentDebugResultDTO BuildPaymentEmailDetail(
+            HoaDonHocPhiDTO invoice,
+            NguoiDungDTO student,
+            PaymentResultDTO transaction)
         {
-            return Try(() =>
+            return new PaymentDebugResultDTO
             {
-                var detail = Repository.LayChiTietGiaoDichDebug(transactionId);
-                if (detail == null)
-                {
-                    return ServiceResult<PaymentDebugResultDTO>.Fail("Khong tim thay giao dich thanh toan.");
-                }
+                TransactionId = transaction.MaGiaoDich,
+                TuitionPaymentId = transaction.MaThanhToan,
+                ExternalTransactionRef = transaction.MaGiaoDichNgoai,
+                StudentName = student.HoTen,
+                ReceiverEmail = student.Email,
+                ClassName = invoice.TenLop,
+                InvoiceCode = LayMaHoaDon(invoice),
+                Amount = transaction.SoTien,
+                PaymentMethod = transaction.PhuongThuc,
+                PaymentUrl = transaction.PaymentUrl,
+                PaymentStatus = transaction.TrangThai,
+                TuitionStatus = invoice.TrangThai,
+                PaymentEmailSent = transaction.PaymentEmailSent,
+                PaymentEmailSentAt = transaction.PaymentEmailSentAt,
+                PaymentEmailError = transaction.PaymentEmailError,
+                StatusEmailSent = transaction.StatusEmailSent,
+                StatusEmailSentAt = transaction.StatusEmailSentAt,
+                StatusEmailError = transaction.StatusEmailError,
+                CreatedAt = transaction.NgayTao,
+                UpdatedAt = transaction.NgayCapNhat,
+                LastStatusUpdateAt = transaction.LastStatusUpdateAt
+            };
+        }
 
-                if (string.IsNullOrWhiteSpace(detail.PaymentUrl))
-                {
-                    return WithData(false, detail, "Giao dich chua co link thanh toan de gui lai email.");
-                }
+        private static bool IsReusablePaymentTransaction(PaymentResultDTO transaction)
+        {
+            return transaction != null
+                && !string.IsNullOrWhiteSpace(transaction.PaymentUrl)
+                && !IsFinalPaymentStatus(transaction.TrangThai);
+        }
 
-                if (!ValidationHelper.IsValidEmail(detail.ReceiverEmail))
-                {
-                    return WithData(false, detail, "Email nguoi nhan khong hop le.");
-                }
+        private static bool IsFinalPaymentStatus(string status)
+        {
+            return AppConstants.GetTextAliases(AppConstants.PaymentPaid).Contains(status)
+                || AppConstants.GetTextAliases(AppConstants.PaymentExpired).Contains(status)
+                || AppConstants.GetTextAliases(AppConstants.PaymentFailed).Contains(status)
+                || AppConstants.GetTextAliases(AppConstants.PaymentCancelled).Contains(status);
+        }
 
-                var email = TrySendPaymentRequest(detail);
-                detail = Repository.LayChiTietGiaoDichDebug(transactionId) ?? detail;
+        private static ServiceResult<PaymentResultDTO> FailGuiHocPhi(string reason)
+        {
+            return ServiceResult<PaymentResultDTO>.Fail("Gửi thông tin học phí thất bại: " + SafeReason(reason));
+        }
 
-                if (!email.Success)
-                {
-                    return WithData(false, detail, "Gui lai email thanh toan that bai: " + email.Error);
-                }
-
-                return ServiceResult<PaymentDebugResultDTO>.Ok(detail, "Da gui lai email thanh toan.");
-            });
+        private static string SafeReason(string reason)
+        {
+            return string.IsNullOrWhiteSpace(reason) ? "Lỗi không xác định." : reason.Trim();
         }
 
         private ServiceResult<PaymentResultDTO> TaoThanhToanVnpay(PaymentRequestDTO request, HoaDonHocPhiDTO invoice)
@@ -345,53 +469,6 @@ namespace DesktopApp_Project.BUS
             }
         }
 
-        private static string ValidateDebugRequest(PaymentDebugRequestDTO request)
-        {
-            if (request == null)
-            {
-                return "Du lieu thanh toan debug khong hop le.";
-            }
-
-            if (string.IsNullOrWhiteSpace(request.StudentName))
-            {
-                return "Vui long nhap ten hoc sinh.";
-            }
-
-            if (!ValidationHelper.IsValidEmail(request.ReceiverEmail))
-            {
-                return "Email nguoi nhan khong hop le.";
-            }
-
-            if (request.Amount <= 0)
-            {
-                return "So tien thanh toan phai lon hon 0.";
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.PaymentMethod)
-                && request.PaymentMethod != AppConstants.PaymentMethodVNPay)
-            {
-                return "Cong cu debug hien chi ho tro VNPay sandbox.";
-            }
-
-            return string.Empty;
-        }
-
-        private static void NormalizeDebugRequest(PaymentDebugRequestDTO request)
-        {
-            request.StudentName = request.StudentName.Trim();
-            request.ReceiverEmail = request.ReceiverEmail.Trim();
-            request.ClassName = string.IsNullOrWhiteSpace(request.ClassName) ? "Debug" : request.ClassName.Trim();
-            request.InvoiceCode = string.IsNullOrWhiteSpace(request.InvoiceCode)
-                ? "DBG" + DateTime.Now.ToString("yyyyMMddHHmmss")
-                : request.InvoiceCode.Trim();
-            request.PaymentMethod = AppConstants.PaymentMethodVNPay;
-            request.PaymentContent = string.IsNullOrWhiteSpace(request.PaymentContent)
-                ? "Thanh toan hoc phi debug " + request.InvoiceCode
-                : request.PaymentContent.Trim();
-            request.DebugNote = string.IsNullOrWhiteSpace(request.DebugNote) ? string.Empty : request.DebugNote.Trim();
-            request.IsDebugPayment = true;
-        }
-
         private static string TaoMaGiaoDichDemo()
         {
             int suffix;
@@ -434,6 +511,16 @@ namespace DesktopApp_Project.BUS
             {
                 return new EmailOutcome { Success = false, Error = error };
             }
+        }
+
+        private class TuitionSendOutcome
+        {
+            public int TuitionPaymentId { get; set; }
+            public string StudentName { get; set; }
+            public string Email { get; set; }
+            public bool Success { get; set; }
+            public string Message { get; set; }
+            public PaymentResultDTO PaymentResult { get; set; }
         }
     }
 }

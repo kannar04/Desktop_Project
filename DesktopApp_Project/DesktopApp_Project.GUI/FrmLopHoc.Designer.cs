@@ -7,7 +7,6 @@ namespace DesktopApp_Project.GUI
         private System.Windows.Forms.Label _lblDesigner3;
         private System.Windows.Forms.Label _lblDesigner2;
         private System.Windows.Forms.Label _lblDesigner1;
-        private System.Windows.Forms.Label _lblHuongDanPhanLop;
         private System.Windows.Forms.TableLayoutPanel root;
         private System.Windows.Forms.TableLayoutPanel form;
         private System.Windows.Forms.FlowLayoutPanel buttons;
@@ -16,12 +15,8 @@ namespace DesktopApp_Project.GUI
         private System.Windows.Forms.Button btnXoa;
         private System.Windows.Forms.Panel bottom;
         private System.Windows.Forms.TableLayoutPanel split;
-        private System.Windows.Forms.FlowLayoutPanel assignButtons;
-        private System.Windows.Forms.Button btnThemHv;
-        private System.Windows.Forms.Button btnXoaHv;
         private System.Windows.Forms.DataGridView _gridLop;
         private System.Windows.Forms.DataGridView _gridTrongLop;
-        private System.Windows.Forms.DataGridView _gridNgoaiLop;
         private System.Windows.Forms.TextBox _txtTenLop;
         private System.Windows.Forms.TextBox _txtTrinhDo;
         private System.Windows.Forms.TextBox _txtLichHoc;
@@ -43,10 +38,8 @@ namespace DesktopApp_Project.GUI
             this._lblDesigner3 = new System.Windows.Forms.Label();
             this._lblDesigner2 = new System.Windows.Forms.Label();
             this._lblDesigner1 = new System.Windows.Forms.Label();
-            this._lblHuongDanPhanLop = new System.Windows.Forms.Label();
             this._gridLop = new System.Windows.Forms.DataGridView();
             this._gridTrongLop = new System.Windows.Forms.DataGridView();
-            this._gridNgoaiLop = new System.Windows.Forms.DataGridView();
             this._txtTenLop = new System.Windows.Forms.TextBox();
             this._txtTrinhDo = new System.Windows.Forms.TextBox();
             this._txtLichHoc = new System.Windows.Forms.TextBox();
@@ -58,18 +51,13 @@ namespace DesktopApp_Project.GUI
             this.btnXoa = new System.Windows.Forms.Button();
             this.bottom = new System.Windows.Forms.Panel();
             this.split = new System.Windows.Forms.TableLayoutPanel();
-            this.assignButtons = new System.Windows.Forms.FlowLayoutPanel();
-            this.btnThemHv = new System.Windows.Forms.Button();
-            this.btnXoaHv = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._gridLop)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._gridTrongLop)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this._gridNgoaiLop)).BeginInit();
             this.root.SuspendLayout();
             this.form.SuspendLayout();
             this.buttons.SuspendLayout();
             this.bottom.SuspendLayout();
             this.split.SuspendLayout();
-            this.assignButtons.SuspendLayout();
             this.SuspendLayout();
             // 
             // _lblTitle
@@ -114,17 +102,6 @@ namespace DesktopApp_Project.GUI
             this._lblDesigner1.Size = new System.Drawing.Size(43, 13);
             this._lblDesigner1.TabIndex = 0;
             this._lblDesigner1.Text = "Tên lớp";
-            // 
-            // _lblHuongDanPhanLop
-            // 
-            this._lblHuongDanPhanLop.AutoSize = true;
-            this._lblHuongDanPhanLop.Location = new System.Drawing.Point(11, 8);
-            this._lblHuongDanPhanLop.Name = "_lblHuongDanPhanLop";
-            this._lblHuongDanPhanLop.Padding = new System.Windows.Forms.Padding(4, 9, 16, 0);
-            this._lblHuongDanPhanLop.Size = new System.Drawing.Size(326, 22);
-            this._lblHuongDanPhanLop.TabIndex = 0;
-            this._lblHuongDanPhanLop.Text = "Bên trái: học viên trong lớp. Bên phải: học viên chưa thuộc lớp.";
-            // 
             // _gridLop
             // 
             this._gridLop.AllowUserToAddRows = false;
@@ -170,32 +147,8 @@ namespace DesktopApp_Project.GUI
             this._gridTrongLop.RowHeadersVisible = false;
             this._gridTrongLop.RowTemplate.Height = 30;
             this._gridTrongLop.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._gridTrongLop.Size = new System.Drawing.Size(541, 243);
+            this._gridTrongLop.Size = new System.Drawing.Size(1088, 301);
             this._gridTrongLop.TabIndex = 0;
-            // 
-            // _gridNgoaiLop
-            // 
-            this._gridNgoaiLop.AllowUserToAddRows = false;
-            this._gridNgoaiLop.AllowUserToDeleteRows = false;
-            this._gridNgoaiLop.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._gridNgoaiLop.BackgroundColor = System.Drawing.Color.White;
-            this._gridNgoaiLop.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this._gridNgoaiLop.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
-            this._gridNgoaiLop.ColumnHeadersHeight = 34;
-            this._gridNgoaiLop.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._gridNgoaiLop.EnableHeadersVisualStyles = false;
-            this._gridNgoaiLop.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this._gridNgoaiLop.GridColor = System.Drawing.Color.FromArgb(((int)(((byte)(213)))), ((int)(((byte)(220)))), ((int)(((byte)(230)))));
-            this._gridNgoaiLop.Location = new System.Drawing.Point(550, 3);
-            this._gridNgoaiLop.MinimumSize = new System.Drawing.Size(320, 180);
-            this._gridNgoaiLop.MultiSelect = false;
-            this._gridNgoaiLop.Name = "_gridNgoaiLop";
-            this._gridNgoaiLop.ReadOnly = true;
-            this._gridNgoaiLop.RowHeadersVisible = false;
-            this._gridNgoaiLop.RowTemplate.Height = 30;
-            this._gridNgoaiLop.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this._gridNgoaiLop.Size = new System.Drawing.Size(541, 243);
-            this._gridNgoaiLop.TabIndex = 1;
             // 
             // _txtTenLop
             // 
@@ -348,7 +301,6 @@ namespace DesktopApp_Project.GUI
             // bottom
             // 
             this.bottom.Controls.Add(this.split);
-            this.bottom.Controls.Add(this.assignButtons);
             this.bottom.Dock = System.Windows.Forms.DockStyle.Fill;
             this.bottom.Location = new System.Drawing.Point(3, 410);
             this.bottom.Name = "bottom";
@@ -357,65 +309,16 @@ namespace DesktopApp_Project.GUI
             // 
             // split
             // 
-            this.split.ColumnCount = 2;
-            this.split.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.split.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.split.ColumnCount = 1;
+            this.split.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.split.Controls.Add(this._gridTrongLop, 0, 0);
-            this.split.Controls.Add(this._gridNgoaiLop, 1, 0);
             this.split.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.split.Location = new System.Drawing.Point(0, 58);
+            this.split.Location = new System.Drawing.Point(0, 0);
             this.split.Name = "split";
             this.split.RowCount = 1;
             this.split.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.split.Size = new System.Drawing.Size(1094, 249);
+            this.split.Size = new System.Drawing.Size(1094, 307);
             this.split.TabIndex = 0;
-            // 
-            // assignButtons
-            // 
-            this.assignButtons.AutoSize = true;
-            this.assignButtons.Controls.Add(this._lblHuongDanPhanLop);
-            this.assignButtons.Controls.Add(this.btnThemHv);
-            this.assignButtons.Controls.Add(this.btnXoaHv);
-            this.assignButtons.Dock = System.Windows.Forms.DockStyle.Top;
-            this.assignButtons.Location = new System.Drawing.Point(0, 0);
-            this.assignButtons.Name = "assignButtons";
-            this.assignButtons.Padding = new System.Windows.Forms.Padding(8);
-            this.assignButtons.Size = new System.Drawing.Size(1094, 58);
-            this.assignButtons.TabIndex = 1;
-            // 
-            // btnThemHv
-            // 
-            this.btnThemHv.AutoEllipsis = true;
-            this.btnThemHv.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(252)))));
-            this.btnThemHv.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnThemHv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnThemHv.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnThemHv.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
-            this.btnThemHv.Location = new System.Drawing.Point(344, 12);
-            this.btnThemHv.Margin = new System.Windows.Forms.Padding(4);
-            this.btnThemHv.Name = "btnThemHv";
-            this.btnThemHv.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.btnThemHv.Size = new System.Drawing.Size(130, 34);
-            this.btnThemHv.TabIndex = 1;
-            this.btnThemHv.Text = "Thêm vào lớp";
-            this.btnThemHv.UseVisualStyleBackColor = false;
-            // 
-            // btnXoaHv
-            // 
-            this.btnXoaHv.AutoEllipsis = true;
-            this.btnXoaHv.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(235)))), ((int)(((byte)(242)))), ((int)(((byte)(252)))));
-            this.btnXoaHv.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.btnXoaHv.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnXoaHv.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.btnXoaHv.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(41)))), ((int)(((byte)(55)))));
-            this.btnXoaHv.Location = new System.Drawing.Point(482, 12);
-            this.btnXoaHv.Margin = new System.Windows.Forms.Padding(4);
-            this.btnXoaHv.Name = "btnXoaHv";
-            this.btnXoaHv.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
-            this.btnXoaHv.Size = new System.Drawing.Size(130, 34);
-            this.btnXoaHv.TabIndex = 2;
-            this.btnXoaHv.Text = "Xóa khỏi lớp";
-            this.btnXoaHv.UseVisualStyleBackColor = false;
             // 
             // FrmLopHoc
             // 
@@ -428,17 +331,13 @@ namespace DesktopApp_Project.GUI
             this.Text = "Lớp học";
             ((System.ComponentModel.ISupportInitialize)(this._gridLop)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._gridTrongLop)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this._gridNgoaiLop)).EndInit();
             this.root.ResumeLayout(false);
             this.root.PerformLayout();
             this.form.ResumeLayout(false);
             this.form.PerformLayout();
             this.buttons.ResumeLayout(false);
             this.bottom.ResumeLayout(false);
-            this.bottom.PerformLayout();
             this.split.ResumeLayout(false);
-            this.assignButtons.ResumeLayout(false);
-            this.assignButtons.PerformLayout();
             this.ResumeLayout(false);
 
         }

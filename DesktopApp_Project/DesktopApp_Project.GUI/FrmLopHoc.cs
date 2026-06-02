@@ -27,8 +27,6 @@ namespace DesktopApp_Project.GUI
             WireClick(btnThem, BtnThem_Click);
             WireClick(btnLuu, BtnLuu_Click);
             WireClick(btnXoa, BtnXoa_Click);
-            WireClick(btnThemHv, BtnThemHv_Click);
-            WireClick(btnXoaHv, BtnXoaHv_Click);
             WireSelectionChanged(_gridLop, GridLop_SelectionChanged);
             WireCellClick(_gridLop, GridLop_CellClick);
         }
@@ -63,12 +61,10 @@ namespace DesktopApp_Project.GUI
             if (_selectedClassId <= 0)
             {
                 _gridTrongLop.DataSource = null;
-                _gridNgoaiLop.DataSource = null;
                 return;
             }
 
             _gridTrongLop.DataSource = SafeLoad<object>(() => Services.LopHoc.LayHocVienTrongLop(_selectedClassId), null);
-            _gridNgoaiLop.DataSource = SafeLoad<object>(() => Services.LopHoc.LayHocVienChuaTrongLop(_selectedClassId), null);
         }
 
         private void ClearForm()
@@ -125,35 +121,6 @@ namespace DesktopApp_Project.GUI
                 LoadClasses();
                 LoadStudents();
             }
-        }
-
-        private void BtnThemHv_Click(object sender, EventArgs e)
-        {
-            var item = UiHelpers.SelectedItem<NguoiDungDTO>(_gridNgoaiLop);
-            if (item == null || _selectedClassId == 0) return;
-
-            var result = Services.LopHoc.ThemHocVien(item.MaNguoiDung, _selectedClassId);
-            UiHelpers.ShowResult(result);
-            if (result.Success) LoadStudents();
-        }
-
-        private void BtnXoaHv_Click(object sender, EventArgs e)
-        {
-            var item = UiHelpers.SelectedItem<NguoiDungDTO>(_gridTrongLop);
-            if (item == null || _selectedClassId == 0)
-            {
-                UiHelpers.WarnSelect("học viên trong lớp");
-                return;
-            }
-
-            if (!UiHelpers.ConfirmDelete("học viên khỏi lớp"))
-            {
-                return;
-            }
-
-            var result = Services.LopHoc.XoaHocVien(item.MaNguoiDung, _selectedClassId);
-            UiHelpers.ShowResult(result);
-            if (result.Success) LoadStudents();
         }
 
         private void GridLop_SelectionChanged(object sender, EventArgs e)

@@ -11,6 +11,7 @@ namespace DesktopApp_Project.GUI
         private int _selectedId;
         private TextBox _txtLienHe;
         private ComboBox _cboLopFilter;
+        private ComboBox _cboLop;
         private ComboBox _cboTrangThaiFilter;
         private bool _allowGridFill;
 
@@ -39,6 +40,7 @@ namespace DesktopApp_Project.GUI
         protected override void OnRuntimeLoad()
         {
             ConfigureFilters();
+            ConfigureClassSelector();
             LoadData();
         }
 
@@ -67,6 +69,58 @@ namespace DesktopApp_Project.GUI
             search.Controls.Add(UiHelpers.Label("Trạng thái"));
             search.Controls.Add(_cboTrangThaiFilter);
             search.Controls.SetChildIndex(btnTim, search.Controls.Count - 1);
+        }
+
+        private void ConfigureClassSelector()
+        {
+            _cboLop = UiHelpers.ComboBox();
+            _cboLop.Dock = DockStyle.Fill;
+            LoadClassSelector();
+
+            form.Controls.Remove(buttons);
+            form.RowCount = Math.Max(form.RowCount, 5);
+            while (form.RowStyles.Count < form.RowCount)
+            {
+                form.RowStyles.Add(new RowStyle());
+            }
+
+            form.Controls.Add(UiHelpers.Label("Lớp"), 2, 3);
+            form.Controls.Add(_cboLop, 3, 3);
+            form.Controls.Add(buttons, 3, 4);
+        }
+
+        private void LoadClassSelector()
+        {
+            if (_cboLop == null)
+            {
+                return;
+            }
+
+            var lopHoc = Services.LopHoc.LayDanhSach();
+            lopHoc.Insert(0, new LopHocDTO { MaLopHoc = 0, TenLop = "-- Chọn lớp --" });
+            _cboLop.DisplayMember = "TenLop";
+            _cboLop.ValueMember = "MaLopHoc";
+            _cboLop.DataSource = lopHoc;
+        }
+
+        private void SelectClass(int maLopHoc)
+        {
+            if (_cboLop == null)
+            {
+                return;
+            }
+
+            foreach (var item in _cboLop.Items)
+            {
+                var lopHoc = item as LopHocDTO;
+                if (lopHoc != null && lopHoc.MaLopHoc == maLopHoc)
+                {
+                    _cboLop.SelectedValue = maLopHoc;
+                    return;
+                }
+            }
+
+            _cboLop.SelectedValue = 0;
         }
 
         private void LoadData()
@@ -104,6 +158,8 @@ namespace DesktopApp_Project.GUI
             _txtTrinhDo.Text = item.TrinhDoDauVao;
             _txtTaiKhoan.Text = item.TaiKhoan;
             _txtMatKhau.Text = item.MatKhau;
+            var maLopHoc = SafeLoad<int?>(() => Services.HocVien.LayLopDangHoc(item.MaNguoiDung), null);
+            SelectClass(maLopHoc.HasValue ? maLopHoc.Value : 0);
         }
 
         private void ClearForm()
@@ -114,6 +170,10 @@ namespace DesktopApp_Project.GUI
                 text.Clear();
             }
             _dtNgaySinh.Value = DateTime.Today;
+            if (_cboLop != null)
+            {
+                SelectClass(0);
+            }
         }
 
         private void BtnTim_Click(object sender, EventArgs e)
@@ -123,7 +183,7 @@ namespace DesktopApp_Project.GUI
 
         private void BtnThem_Click(object sender, EventArgs e)
         {
-            var result = Services.HocVien.Luu(BuildDto(0));
+            var result = Services.HocVien.LuuVoiLop(BuildDto(0), UiHelpers.SelectedId(_cboLop));
             UiHelpers.ShowResult(result);
             if (result.Success)
             {
@@ -142,7 +202,7 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
-            var result = Services.HocVien.Luu(BuildDto(_selectedId));
+            var result = Services.HocVien.LuuVoiLop(BuildDto(_selectedId), UiHelpers.SelectedId(_cboLop));
 
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();

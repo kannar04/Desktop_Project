@@ -23,11 +23,6 @@ namespace DesktopApp_Project.BUS
                 return Repository.GetHocVienTrongLop(maLopHoc);
             }
     
-            public List<NguoiDungDTO> LayHocVienChuaTrongLop(int maLopHoc)
-            {
-                return Repository.GetHocVienChuaTrongLop(maLopHoc);
-            }
-    
             public ServiceResult Luu(LopHocDTO dto)
             {
                 return Try(() =>
@@ -67,23 +62,6 @@ namespace DesktopApp_Project.BUS
                 });
             }
     
-            public ServiceResult ThemHocVien(int maNguoiDung, int maLopHoc)
-            {
-                return Try(() =>
-                {
-                    Repository.ThemHocVienVaoLop(maNguoiDung, maLopHoc);
-                    return ServiceResult.Ok("Phân bổ học viên vào lớp thành công.");
-                });
-            }
-    
-            public ServiceResult XoaHocVien(int maNguoiDung, int maLopHoc)
-            {
-                return Try(() =>
-                {
-                    Repository.XoaHocVienKhoiLop(maNguoiDung, maLopHoc);
-                    return ServiceResult.Ok("Đã xóa học viên khỏi lớp.");
-                });
-            }
         }
 }
 

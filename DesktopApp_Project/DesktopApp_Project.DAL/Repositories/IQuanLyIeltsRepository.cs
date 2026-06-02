@@ -27,9 +27,9 @@ namespace DesktopApp_Project.DAL
         bool ExistsLichHoc(string lichHoc, int exceptId);
         List<NguoiDungDTO> GetHocVienTrongLop(int maLopHoc);
         List<HocVienLopDTO> GetHocVienLop(int maLopHoc, bool onlyActive);
-        List<NguoiDungDTO> GetHocVienChuaTrongLop(int maLopHoc);
-        void ThemHocVienVaoLop(int maNguoiDung, int maLopHoc);
-        void XoaHocVienKhoiLop(int maNguoiDung, int maLopHoc);
+        int? GetLopHocDangHocCuaHocVien(int maNguoiDung);
+        int SaveHocVienVaChuyenLop(NguoiDungDTO dto, int maLopHoc);
+        void ChuyenHocVienSangLop(int maNguoiDung, int maLopHoc);
 
         List<TaiLieuDTO> GetTaiLieu(int? maLopHoc);
         int InsertTaiLieu(TaiLieuDTO dto);
@@ -106,9 +106,6 @@ namespace DesktopApp_Project.DAL
         PaymentResultDTO TaoNhatKyThanhToan(PaymentRequestDTO request, string maGiaoDichNgoai, string paymentUrl, string qrContent);
         PaymentResultDTO LayGiaoDichThanhToan(int maGiaoDich);
         List<PaymentResultDTO> LayGiaoDichTheoThanhToan(int maThanhToan);
-        int TaoHocPhiDebug(PaymentDebugRequestDTO request, string invoiceCode);
-        PaymentDebugResultDTO TaoNhatKyThanhToanDebug(PaymentDebugRequestDTO request, int maThanhToan, string maGiaoDichNgoai, string paymentUrl, string qrContent);
-        List<PaymentDebugResultDTO> LayGiaoDichDebugGanDay(int limit);
         PaymentDebugResultDTO LayChiTietGiaoDichDebug(int maGiaoDich);
         void CapNhatEmailThanhToan(int maGiaoDich, bool sent, DateTime? sentAt, string error);
         void CapNhatEmailTrangThai(int maGiaoDich, bool sent, DateTime? sentAt, string error);
