@@ -9,10 +9,6 @@ namespace DesktopApp_Project.GUI
     public partial class FrmHocVien : ModuleFormBase
     {
         private int _selectedId;
-        private TextBox _txtLienHe;
-        private ComboBox _cboLopFilter;
-        private ComboBox _cboLop;
-        private ComboBox _cboTrangThaiFilter;
         private bool _allowGridFill;
 
         public FrmHocVien()
@@ -47,46 +43,17 @@ namespace DesktopApp_Project.GUI
         private void ConfigureFilters()
         {
             _lblDesigner1.Text = "Tên";
-            _txtLienHe = UiHelpers.TextBox();
-            _txtLienHe.Width = 180;
-            _cboLopFilter = UiHelpers.ComboBox();
-            _cboLopFilter.Width = 180;
-            _cboTrangThaiFilter = UiHelpers.ComboBox();
-            _cboTrangThaiFilter.Width = 150;
-
             var lopHoc = Services.LopHoc.LayDanhSach();
             lopHoc.Insert(0, new LopHocDTO { MaLopHoc = 0, TenLop = AppConstants.FilterAll });
             _cboLopFilter.DisplayMember = "TenLop";
             _cboLopFilter.ValueMember = "MaLopHoc";
             _cboLopFilter.DataSource = lopHoc;
             _cboTrangThaiFilter.DataSource = AppConstants.StudentStatusFilters;
-
-            search.Controls.SetChildIndex(btnTim, search.Controls.Count - 1);
-            search.Controls.Add(UiHelpers.Label("SĐT/Email"));
-            search.Controls.Add(_txtLienHe);
-            search.Controls.Add(UiHelpers.Label("Lớp"));
-            search.Controls.Add(_cboLopFilter);
-            search.Controls.Add(UiHelpers.Label("Trạng thái"));
-            search.Controls.Add(_cboTrangThaiFilter);
-            search.Controls.SetChildIndex(btnTim, search.Controls.Count - 1);
         }
 
         private void ConfigureClassSelector()
         {
-            _cboLop = UiHelpers.ComboBox();
-            _cboLop.Dock = DockStyle.Fill;
             LoadClassSelector();
-
-            form.Controls.Remove(buttons);
-            form.RowCount = Math.Max(form.RowCount, 5);
-            while (form.RowStyles.Count < form.RowCount)
-            {
-                form.RowStyles.Add(new RowStyle());
-            }
-
-            form.Controls.Add(UiHelpers.Label("Lớp"), 2, 3);
-            form.Controls.Add(_cboLop, 3, 3);
-            form.Controls.Add(buttons, 3, 4);
         }
 
         private void LoadClassSelector()

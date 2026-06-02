@@ -13,14 +13,6 @@ namespace DesktopApp_Project.GUI
 {
     public partial class FrmHocPhi : ModuleFormBase
     {
-        private System.Windows.Forms.Button _btnTaoPhieu;
-        private System.Windows.Forms.Button _btnXemHoaDon;
-        private System.Windows.Forms.Button _btnXuatHoaDon;
-        private System.Windows.Forms.Button _btnThanhToan;
-        private System.Windows.Forms.Button _btnGuiHocPhi;
-        private System.Windows.Forms.Button _btnChonTatCa;
-        private System.Windows.Forms.Button _btnBoChonTatCa;
-        private System.Windows.Forms.Button _btnGuiHocPhiDaChon;
         private BindingList<HocPhiTinhDTO> _previewRows = new BindingList<HocPhiTinhDTO>();
         private bool _isCreatingTuition;
         private bool _isPreviewMode;
@@ -60,45 +52,14 @@ namespace DesktopApp_Project.GUI
             btnTao.Width = 130;
             _cboTrangThai.DataSource = AppConstants.PaymentStatuses;
 
-            _btnTaoPhieu = UiHelpers.Button("Tạo phiếu");
-            _btnTaoPhieu.Width = 120;
             WireClick(_btnTaoPhieu, BtnTaoPhieu_Click);
-            buttons.Controls.Add(_btnTaoPhieu);
-
-            _btnXemHoaDon = UiHelpers.Button("Xem hoa don");
-            _btnXemHoaDon.Width = 120;
             WireClick(_btnXemHoaDon, BtnXemHoaDon_Click);
-            buttons.Controls.Add(_btnXemHoaDon);
-
-            _btnXuatHoaDon = UiHelpers.Button("Xuat hoa don");
-            _btnXuatHoaDon.Width = 120;
             WireClick(_btnXuatHoaDon, BtnXuatHoaDon_Click);
-            buttons.Controls.Add(_btnXuatHoaDon);
-
-            _btnThanhToan = UiHelpers.Button("Thanh toan");
-            _btnThanhToan.Width = 120;
             WireClick(_btnThanhToan, BtnThanhToan_Click);
-            buttons.Controls.Add(_btnThanhToan);
-
-            _btnGuiHocPhi = UiHelpers.Button("Gửi học phí");
-            _btnGuiHocPhi.Width = 120;
             WireClick(_btnGuiHocPhi, BtnGuiHocPhi_Click);
-            buttons.Controls.Add(_btnGuiHocPhi);
-
-            _btnChonTatCa = UiHelpers.Button("Chọn tất cả");
-            _btnChonTatCa.Width = 110;
             WireClick(_btnChonTatCa, BtnChonTatCa_Click);
-            buttons.Controls.Add(_btnChonTatCa);
-
-            _btnBoChonTatCa = UiHelpers.Button("Bỏ chọn tất cả");
-            _btnBoChonTatCa.Width = 120;
             WireClick(_btnBoChonTatCa, BtnBoChonTatCa_Click);
-            buttons.Controls.Add(_btnBoChonTatCa);
-
-            _btnGuiHocPhiDaChon = UiHelpers.Button("Gửi học phí đã chọn");
-            _btnGuiHocPhiDaChon.Width = 160;
             WireClick(_btnGuiHocPhiDaChon, BtnGuiHocPhiDaChon_Click);
-            buttons.Controls.Add(_btnGuiHocPhiDaChon);
         }
 
         private void LoadData()

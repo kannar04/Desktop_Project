@@ -110,7 +110,6 @@ namespace DesktopApp_Project.GUI
         {
             get { return ColorTranslator.FromHtml("#FFB74D"); }
         }
-
         public static void Apply(bool darkMode, int accentIndex, string language)
         {
             DarkMode = darkMode;
@@ -210,7 +209,7 @@ namespace DesktopApp_Project.GUI
                 Width = 110,
                 Font = DefaultFont,
                 BackColor = ThemeManager.Current.Accent,
-                ForeColor = ThemeManager.Current.PrimaryText,
+                ForeColor = ThemeManager.Current.ButtonText,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(4),
                 Padding = new Padding(8, 0, 8, 0),
@@ -427,8 +426,8 @@ namespace DesktopApp_Project.GUI
             if (button != null)
             {
                 button.Font = DefaultFont;
-                button.BackColor = SurfaceColor;
-                button.ForeColor = TextColor;
+                button.BackColor = AccentColor;
+                button.ForeColor = ThemeManager.Current.ButtonText;
                 button.FlatStyle = FlatStyle.Flat;
                 ApplyButtonStyle(button);
             }

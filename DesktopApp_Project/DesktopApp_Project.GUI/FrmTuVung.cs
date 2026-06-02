@@ -13,25 +13,9 @@ namespace DesktopApp_Project.GUI
     public partial class FrmTuVung : ModuleFormBase
     {
         private int _selectedId;
-        private TextBox _txtTuKhoa;
-        private ComboBox _cboLoaiFilter;
-        private ComboBox _cboCapDoFilter;
-        private ComboBox _cboChuDeFilter;
-        private ComboBox _cboChuCaiFilter;
-        private Button _btnToggleAdvancedSearch;
-        private TableLayoutPanel _advancedSearchPanel;
-        private ComboBox _cboAdvancedField;
-        private TextBox _txtAdvancedValue;
-        private ComboBox _cboAdvancedValue;
-        private DataGridView _gridAdvancedConditions;
-        private ComboBox _cboAdvancedJoin;
-        private ComboBox _cboAdvancedOpenParentheses;
-        private ComboBox _cboAdvancedCloseParentheses;
-        private Button _btnAddAdvancedCondition;
-        private Button _btnRemoveAdvancedCondition;
-        private Button _btnClearAdvancedConditions;
-        private Button _btnRunAdvancedSearch;
         private BindingList<SearchConditionRow> _advancedConditions = new BindingList<SearchConditionRow>();
+        private int _pendingOpenParentheses;
+        private int _pendingCloseParentheses;
         private bool _isFilling;
         private bool _allowGridFill;
 
@@ -67,138 +51,29 @@ namespace DesktopApp_Project.GUI
 
         private void ConfigureFilters()
         {
-            _txtTuKhoa = UiHelpers.TextBox();
-            _txtTuKhoa.Width = 160;
-            _cboLoaiFilter = UiHelpers.ComboBox();
-            _cboLoaiFilter.Width = 120;
             _cboLoaiFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.WordTypes).ToList();
-            _cboCapDoFilter = UiHelpers.ComboBox();
-            _cboCapDoFilter.Width = 90;
             _cboCapDoFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.CefrLevels).ToList();
-            _cboChuDeFilter = UiHelpers.ComboBox();
-            _cboChuDeFilter.Width = 180;
             _cboChuDeFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.VocabularyTopics).ToList();
-            _cboChuCaiFilter = UiHelpers.ComboBox();
-            _cboChuCaiFilter.Width = 80;
             _cboChuCaiFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(Enumerable.Range('A', 26).Select(x => ((char)x).ToString())).ToList();
 
-            var btnLoc = UiHelpers.Button("Lọc");
-            btnLoc.Width = 70;
             btnLoc.Click += (sender, e) => SafeRun(() => BtnLoc_Click(sender, e));
-            buttons.Controls.Add(UiHelpers.Label("Từ khóa"));
-            buttons.Controls.Add(_txtTuKhoa);
-            buttons.Controls.Add(UiHelpers.Label("Loại"));
-            buttons.Controls.Add(_cboLoaiFilter);
-            buttons.Controls.Add(UiHelpers.Label("CEFR"));
-            buttons.Controls.Add(_cboCapDoFilter);
-            buttons.Controls.Add(UiHelpers.Label("Chủ đề"));
-            buttons.Controls.Add(_cboChuDeFilter);
-            buttons.Controls.Add(UiHelpers.Label("A-Z"));
-            buttons.Controls.Add(_cboChuCaiFilter);
-            buttons.Controls.Add(btnLoc);
-
-            _btnToggleAdvancedSearch = UiHelpers.Button("Tìm kiếm nâng cao");
-            _btnToggleAdvancedSearch.Width = 150;
             _btnToggleAdvancedSearch.Click += (sender, e) => SafeRun(() => ToggleAdvancedSearch());
-            buttons.Controls.Add(_btnToggleAdvancedSearch);
         }
 
         private void ConfigureAdvancedSearch()
         {
-            _advancedSearchPanel = new TableLayoutPanel
-            {
-                AutoSize = true,
-                BackColor = form.BackColor,
-                ColumnCount = 1,
-                Dock = DockStyle.Top,
-                Padding = new Padding(12, 8, 12, 8),
-                Visible = false
-            };
-            _advancedSearchPanel.RowStyles.Add(new RowStyle());
-            _advancedSearchPanel.RowStyles.Add(new RowStyle());
-            _advancedSearchPanel.RowStyles.Add(new RowStyle());
-
-            var editRow = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top };
-            _cboAdvancedJoin = UiHelpers.ComboBox();
-            _cboAdvancedJoin.Width = 80;
-            _cboAdvancedJoin.DisplayMember = "Label";
-            _cboAdvancedJoin.ValueMember = "Value";
             _cboAdvancedJoin.DataSource = GetAdvancedJoinOptions();
-            _cboAdvancedOpenParentheses = UiHelpers.ComboBox();
-            _cboAdvancedOpenParentheses.Width = 70;
-            _cboAdvancedOpenParentheses.MinimumSize = new System.Drawing.Size(60, 0);
-            _cboAdvancedOpenParentheses.DisplayMember = "Label";
-            _cboAdvancedOpenParentheses.ValueMember = "Value";
-            _cboAdvancedOpenParentheses.DataSource = GetAdvancedParenthesisOptions("(");
-            _cboAdvancedField = UiHelpers.ComboBox();
-            _cboAdvancedField.Width = 140;
-            _cboAdvancedField.DisplayMember = "Label";
-            _cboAdvancedField.ValueMember = "Value";
+            _btnAdvancedOpenParenthesis.Click += (sender, e) => SafeRun(() => IncrementPendingParenthesis(true));
             _cboAdvancedField.DataSource = GetAdvancedFieldOptions();
-            _txtAdvancedValue = UiHelpers.TextBox();
-            _txtAdvancedValue.Width = 180;
-            _cboAdvancedValue = UiHelpers.ComboBox();
-            _cboAdvancedValue.Width = 180;
-            _cboAdvancedCloseParentheses = UiHelpers.ComboBox();
-            _cboAdvancedCloseParentheses.Width = 70;
-            _cboAdvancedCloseParentheses.MinimumSize = new System.Drawing.Size(60, 0);
-            _cboAdvancedCloseParentheses.DisplayMember = "Label";
-            _cboAdvancedCloseParentheses.ValueMember = "Value";
-            _cboAdvancedCloseParentheses.DataSource = GetAdvancedParenthesisOptions(")");
-            _btnAddAdvancedCondition = UiHelpers.Button("Thêm điều kiện");
-            _btnAddAdvancedCondition.Width = 130;
+            _btnAdvancedCloseParenthesis.Click += (sender, e) => SafeRun(() => IncrementPendingParenthesis(false));
             _btnAddAdvancedCondition.Click += (sender, e) => SafeRun(() => AddAdvancedCondition());
 
-            editRow.Controls.Add(UiHelpers.Label("Kết hợp"));
-            editRow.Controls.Add(_cboAdvancedJoin);
-            editRow.Controls.Add(UiHelpers.Label("Mở ("));
-            editRow.Controls.Add(_cboAdvancedOpenParentheses);
-            editRow.Controls.Add(UiHelpers.Label("Trường"));
-            editRow.Controls.Add(_cboAdvancedField);
-            editRow.Controls.Add(UiHelpers.Label("Giá trị"));
-            editRow.Controls.Add(_txtAdvancedValue);
-            editRow.Controls.Add(_cboAdvancedValue);
-            editRow.Controls.Add(UiHelpers.Label("Đóng )"));
-            editRow.Controls.Add(_cboAdvancedCloseParentheses);
-            editRow.Controls.Add(_btnAddAdvancedCondition);
-
-            _gridAdvancedConditions = UiHelpers.Grid();
-            _gridAdvancedConditions.AutoGenerateColumns = false;
-            _gridAdvancedConditions.Height = 115;
-            _gridAdvancedConditions.MinimumSize = new System.Drawing.Size(320, 90);
-            _gridAdvancedConditions.ReadOnly = true;
             _gridAdvancedConditions.DataSource = _advancedConditions;
-            _gridAdvancedConditions.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "JoinLabel", HeaderText = "Kết hợp", Width = 85 });
-            _gridAdvancedConditions.Columns.Add(new DataGridViewTextBoxColumn { DataPropertyName = "ConditionLabel", HeaderText = "Điều kiện", AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill });
             ThemeManager.ApplyTheme(_gridAdvancedConditions);
 
-            var actionRow = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top };
-            _btnRemoveAdvancedCondition = UiHelpers.Button("Xóa điều kiện");
-            _btnRemoveAdvancedCondition.Width = 120;
             _btnRemoveAdvancedCondition.Click += (sender, e) => SafeRun(() => RemoveAdvancedCondition());
-            _btnClearAdvancedConditions = UiHelpers.Button("Xóa tất cả");
-            _btnClearAdvancedConditions.Width = 110;
             _btnClearAdvancedConditions.Click += (sender, e) => SafeRun(() => ClearAdvancedConditions());
-            _btnRunAdvancedSearch = UiHelpers.Button("Tìm kiếm");
-            _btnRunAdvancedSearch.Width = 110;
             _btnRunAdvancedSearch.Click += (sender, e) => SafeRun(() => RunAdvancedSearch());
-            actionRow.Controls.Add(_btnRemoveAdvancedCondition);
-            actionRow.Controls.Add(_btnClearAdvancedConditions);
-            actionRow.Controls.Add(_btnRunAdvancedSearch);
-
-            _advancedSearchPanel.Controls.Add(editRow, 0, 0);
-            _advancedSearchPanel.Controls.Add(_gridAdvancedConditions, 0, 1);
-            _advancedSearchPanel.Controls.Add(actionRow, 0, 2);
-
-            root.Controls.Remove(_grid);
-            root.RowStyles.Clear();
-            root.RowCount = 4;
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 52F));
-            root.RowStyles.Add(new RowStyle());
-            root.RowStyles.Add(new RowStyle());
-            root.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            root.Controls.Add(_advancedSearchPanel, 0, 2);
-            root.Controls.Add(_grid, 0, 3);
 
             _cboAdvancedField.SelectedIndexChanged += (sender, e) => SafeRun(() => UpdateAdvancedValueInput());
             UpdateAdvancedValueInput();
@@ -246,17 +121,6 @@ namespace DesktopApp_Project.GUI
             };
         }
 
-        private static List<SearchOption> GetAdvancedParenthesisOptions(string symbol)
-        {
-            return new List<SearchOption>
-            {
-                new SearchOption("0", string.Empty),
-                new SearchOption("1", symbol),
-                new SearchOption("2", symbol + symbol),
-                new SearchOption("3", symbol + symbol + symbol)
-            };
-        }
-
         private void UpdateAdvancedJoinInput()
         {
             if (_cboAdvancedJoin == null)
@@ -296,8 +160,7 @@ namespace DesktopApp_Project.GUI
         {
             _advancedConditions.Clear();
             UpdateAdvancedJoinInput();
-            ResetComboToAll(_cboAdvancedOpenParentheses);
-            ResetComboToAll(_cboAdvancedCloseParentheses);
+            ResetPendingParentheses();
         }
 
         private bool AutoCloseAdvancedParentheses()
@@ -390,8 +253,8 @@ namespace DesktopApp_Project.GUI
             var joinOperator = _advancedConditions.Count == 0
                 ? (SearchJoinOperator?)null
                 : SelectedJoinOperator(_cboAdvancedJoin);
-            var openParentheses = SelectedIntOption(_cboAdvancedOpenParentheses);
-            var closeParentheses = SelectedIntOption(_cboAdvancedCloseParentheses);
+            var openParentheses = _pendingOpenParentheses;
+            var closeParentheses = _pendingCloseParentheses;
 
             _advancedConditions.Add(new SearchConditionRow
             {
@@ -404,8 +267,7 @@ namespace DesktopApp_Project.GUI
                 CloseParentheses = closeParentheses
             });
             UpdateAdvancedJoinInput();
-            ResetComboToAll(_cboAdvancedOpenParentheses);
-            ResetComboToAll(_cboAdvancedCloseParentheses);
+            ResetPendingParentheses();
         }
 
         private void RemoveAdvancedCondition()
@@ -452,15 +314,47 @@ namespace DesktopApp_Project.GUI
             return option == null ? string.Empty : option.Label;
         }
 
-        private static int SelectedIntOption(ComboBox combo)
-        {
-            int value;
-            return int.TryParse(SelectedOptionValue(combo), out value) ? value : 0;
-        }
-
         private static SearchJoinOperator SelectedJoinOperator(ComboBox combo)
         {
             return SelectedOptionValue(combo) == "Or" ? SearchJoinOperator.Or : SearchJoinOperator.And;
+        }
+
+        private void IncrementPendingParenthesis(bool open)
+        {
+            if (open)
+            {
+                _pendingOpenParentheses++;
+            }
+            else
+            {
+                _pendingCloseParentheses++;
+            }
+
+            RefreshPendingParenthesisButtons();
+        }
+
+        private void ResetPendingParentheses()
+        {
+            _pendingOpenParentheses = 0;
+            _pendingCloseParentheses = 0;
+            RefreshPendingParenthesisButtons();
+        }
+
+        private void RefreshPendingParenthesisButtons()
+        {
+            if (_btnAdvancedOpenParenthesis != null)
+            {
+                _btnAdvancedOpenParenthesis.Text = _pendingOpenParentheses > 1
+                    ? new string('(', _pendingOpenParentheses)
+                    : "(";
+            }
+
+            if (_btnAdvancedCloseParenthesis != null)
+            {
+                _btnAdvancedCloseParenthesis.Text = _pendingCloseParentheses > 1
+                    ? new string(')', _pendingCloseParentheses)
+                    : ")";
+            }
         }
 
         private void Fill()

@@ -111,6 +111,16 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        public Color ButtonText
+        {
+            get
+            {
+                return AppTheme.DarkMode
+                    ? ColorTranslator.FromHtml("#101B3A")
+                    : Color.White;
+            }
+        }
+
         // =========================
         // STATUS COLORS
         // =========================

@@ -15,6 +15,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
         Color Accent { get; }
         Color AccentHover { get; }
         Color AccentPressed { get; }
+        Color ButtonText { get; }
         Color Success { get; }
         Color Warning { get; }
         Color Danger { get; }

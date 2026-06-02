@@ -13,6 +13,14 @@ namespace DesktopApp_Project.GUI
         private System.Windows.Forms.FlowLayoutPanel buttons;
         private System.Windows.Forms.Button btnTao;
         private System.Windows.Forms.Button btnCapNhat;
+        private System.Windows.Forms.Button _btnTaoPhieu;
+        private System.Windows.Forms.Button _btnXemHoaDon;
+        private System.Windows.Forms.Button _btnXuatHoaDon;
+        private System.Windows.Forms.Button _btnThanhToan;
+        private System.Windows.Forms.Button _btnGuiHocPhi;
+        private System.Windows.Forms.Button _btnChonTatCa;
+        private System.Windows.Forms.Button _btnBoChonTatCa;
+        private System.Windows.Forms.Button _btnGuiHocPhiDaChon;
         private System.Windows.Forms.DataGridView _grid;
         private System.Windows.Forms.ComboBox _cboHocVien;
         private System.Windows.Forms.NumericUpDown _numSoTien;
@@ -46,6 +54,14 @@ namespace DesktopApp_Project.GUI
             this.buttons = new System.Windows.Forms.FlowLayoutPanel();
             this.btnTao = new System.Windows.Forms.Button();
             this.btnCapNhat = new System.Windows.Forms.Button();
+            this._btnTaoPhieu = new System.Windows.Forms.Button();
+            this._btnXemHoaDon = new System.Windows.Forms.Button();
+            this._btnXuatHoaDon = new System.Windows.Forms.Button();
+            this._btnThanhToan = new System.Windows.Forms.Button();
+            this._btnGuiHocPhi = new System.Windows.Forms.Button();
+            this._btnChonTatCa = new System.Windows.Forms.Button();
+            this._btnBoChonTatCa = new System.Windows.Forms.Button();
+            this._btnGuiHocPhiDaChon = new System.Windows.Forms.Button();
             this._grid = new System.Windows.Forms.DataGridView();
             this.root.SuspendLayout();
             this.form.SuspendLayout();
@@ -218,9 +234,17 @@ namespace DesktopApp_Project.GUI
             this.buttons.AutoSize = true;
             this.buttons.Controls.Add(this.btnTao);
             this.buttons.Controls.Add(this.btnCapNhat);
+            this.buttons.Controls.Add(this._btnTaoPhieu);
+            this.buttons.Controls.Add(this._btnXemHoaDon);
+            this.buttons.Controls.Add(this._btnXuatHoaDon);
+            this.buttons.Controls.Add(this._btnThanhToan);
+            this.buttons.Controls.Add(this._btnGuiHocPhi);
+            this.buttons.Controls.Add(this._btnChonTatCa);
+            this.buttons.Controls.Add(this._btnBoChonTatCa);
+            this.buttons.Controls.Add(this._btnGuiHocPhiDaChon);
             this.buttons.Location = new System.Drawing.Point(639, 75);
             this.buttons.Name = "buttons";
-            this.buttons.Size = new System.Drawing.Size(256, 42);
+            this.buttons.Size = new System.Drawing.Size(1238, 42);
             this.buttons.TabIndex = 8;
             // 
             // btnTao
@@ -256,6 +280,126 @@ namespace DesktopApp_Project.GUI
             this.btnCapNhat.TabIndex = 1;
             this.btnCapNhat.Text = "Cập nhật";
             this.btnCapNhat.UseVisualStyleBackColor = false;
+            // 
+            // _btnTaoPhieu
+            // 
+            this._btnTaoPhieu.AutoEllipsis = true;
+            this._btnTaoPhieu.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnTaoPhieu.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnTaoPhieu.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnTaoPhieu.Location = new System.Drawing.Point(260, 4);
+            this._btnTaoPhieu.Margin = new System.Windows.Forms.Padding(4);
+            this._btnTaoPhieu.Name = "_btnTaoPhieu";
+            this._btnTaoPhieu.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnTaoPhieu.Size = new System.Drawing.Size(120, 34);
+            this._btnTaoPhieu.TabIndex = 2;
+            this._btnTaoPhieu.Text = "Tạo phiếu";
+            this._btnTaoPhieu.UseVisualStyleBackColor = false;
+            // 
+            // _btnXemHoaDon
+            // 
+            this._btnXemHoaDon.AutoEllipsis = true;
+            this._btnXemHoaDon.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnXemHoaDon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnXemHoaDon.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnXemHoaDon.Location = new System.Drawing.Point(388, 4);
+            this._btnXemHoaDon.Margin = new System.Windows.Forms.Padding(4);
+            this._btnXemHoaDon.Name = "_btnXemHoaDon";
+            this._btnXemHoaDon.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnXemHoaDon.Size = new System.Drawing.Size(120, 34);
+            this._btnXemHoaDon.TabIndex = 3;
+            this._btnXemHoaDon.Text = "Xem hóa đơn";
+            this._btnXemHoaDon.UseVisualStyleBackColor = false;
+            // 
+            // _btnXuatHoaDon
+            // 
+            this._btnXuatHoaDon.AutoEllipsis = true;
+            this._btnXuatHoaDon.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnXuatHoaDon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnXuatHoaDon.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnXuatHoaDon.Location = new System.Drawing.Point(516, 4);
+            this._btnXuatHoaDon.Margin = new System.Windows.Forms.Padding(4);
+            this._btnXuatHoaDon.Name = "_btnXuatHoaDon";
+            this._btnXuatHoaDon.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnXuatHoaDon.Size = new System.Drawing.Size(120, 34);
+            this._btnXuatHoaDon.TabIndex = 4;
+            this._btnXuatHoaDon.Text = "Xuất hóa đơn";
+            this._btnXuatHoaDon.UseVisualStyleBackColor = false;
+            // 
+            // _btnThanhToan
+            // 
+            this._btnThanhToan.AutoEllipsis = true;
+            this._btnThanhToan.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnThanhToan.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnThanhToan.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnThanhToan.Location = new System.Drawing.Point(644, 4);
+            this._btnThanhToan.Margin = new System.Windows.Forms.Padding(4);
+            this._btnThanhToan.Name = "_btnThanhToan";
+            this._btnThanhToan.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnThanhToan.Size = new System.Drawing.Size(120, 34);
+            this._btnThanhToan.TabIndex = 5;
+            this._btnThanhToan.Text = "Thanh toán";
+            this._btnThanhToan.UseVisualStyleBackColor = false;
+            // 
+            // _btnGuiHocPhi
+            // 
+            this._btnGuiHocPhi.AutoEllipsis = true;
+            this._btnGuiHocPhi.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnGuiHocPhi.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnGuiHocPhi.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnGuiHocPhi.Location = new System.Drawing.Point(772, 4);
+            this._btnGuiHocPhi.Margin = new System.Windows.Forms.Padding(4);
+            this._btnGuiHocPhi.Name = "_btnGuiHocPhi";
+            this._btnGuiHocPhi.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnGuiHocPhi.Size = new System.Drawing.Size(120, 34);
+            this._btnGuiHocPhi.TabIndex = 6;
+            this._btnGuiHocPhi.Text = "Gửi học phí";
+            this._btnGuiHocPhi.UseVisualStyleBackColor = false;
+            // 
+            // _btnChonTatCa
+            // 
+            this._btnChonTatCa.AutoEllipsis = true;
+            this._btnChonTatCa.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnChonTatCa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnChonTatCa.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnChonTatCa.Location = new System.Drawing.Point(900, 4);
+            this._btnChonTatCa.Margin = new System.Windows.Forms.Padding(4);
+            this._btnChonTatCa.Name = "_btnChonTatCa";
+            this._btnChonTatCa.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnChonTatCa.Size = new System.Drawing.Size(110, 34);
+            this._btnChonTatCa.TabIndex = 7;
+            this._btnChonTatCa.Text = "Chọn tất cả";
+            this._btnChonTatCa.UseVisualStyleBackColor = false;
+            // 
+            // _btnBoChonTatCa
+            // 
+            this._btnBoChonTatCa.AutoEllipsis = true;
+            this._btnBoChonTatCa.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnBoChonTatCa.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnBoChonTatCa.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnBoChonTatCa.Location = new System.Drawing.Point(1018, 4);
+            this._btnBoChonTatCa.Margin = new System.Windows.Forms.Padding(4);
+            this._btnBoChonTatCa.Name = "_btnBoChonTatCa";
+            this._btnBoChonTatCa.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnBoChonTatCa.Size = new System.Drawing.Size(120, 34);
+            this._btnBoChonTatCa.TabIndex = 8;
+            this._btnBoChonTatCa.Text = "Bỏ chọn tất cả";
+            this._btnBoChonTatCa.UseVisualStyleBackColor = false;
+            // 
+            // _btnGuiHocPhiDaChon
+            // 
+            this._btnGuiHocPhiDaChon.AutoEllipsis = true;
+            this._btnGuiHocPhiDaChon.Cursor = System.Windows.Forms.Cursors.Hand;
+            this._btnGuiHocPhiDaChon.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._btnGuiHocPhiDaChon.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._btnGuiHocPhiDaChon.Location = new System.Drawing.Point(1146, 4);
+            this._btnGuiHocPhiDaChon.Margin = new System.Windows.Forms.Padding(4);
+            this._btnGuiHocPhiDaChon.Name = "_btnGuiHocPhiDaChon";
+            this._btnGuiHocPhiDaChon.Padding = new System.Windows.Forms.Padding(8, 0, 8, 0);
+            this._btnGuiHocPhiDaChon.Size = new System.Drawing.Size(160, 34);
+            this._btnGuiHocPhiDaChon.TabIndex = 9;
+            this._btnGuiHocPhiDaChon.Text = "Gửi học phí đã chọn";
+            this._btnGuiHocPhiDaChon.UseVisualStyleBackColor = false;
             // 
             // _grid
             // 

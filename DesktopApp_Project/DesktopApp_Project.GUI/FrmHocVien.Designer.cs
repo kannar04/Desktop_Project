@@ -29,6 +29,14 @@ namespace DesktopApp_Project.GUI
         private System.Windows.Forms.TextBox _txtTaiKhoan;
         private System.Windows.Forms.TextBox _txtMatKhau;
         private System.Windows.Forms.DateTimePicker _dtNgaySinh;
+        private System.Windows.Forms.Label _lblLienHeFilter;
+        private System.Windows.Forms.TextBox _txtLienHe;
+        private System.Windows.Forms.Label _lblLopFilter;
+        private System.Windows.Forms.ComboBox _cboLopFilter;
+        private System.Windows.Forms.Label _lblTrangThaiFilter;
+        private System.Windows.Forms.ComboBox _cboTrangThaiFilter;
+        private System.Windows.Forms.Label _lblLop;
+        private System.Windows.Forms.ComboBox _cboLop;
 
         protected override void Dispose(bool disposing)
         {
@@ -61,6 +69,14 @@ namespace DesktopApp_Project.GUI
             this._txtTaiKhoan = new System.Windows.Forms.TextBox();
             this._txtMatKhau = new System.Windows.Forms.TextBox();
             this._dtNgaySinh = new System.Windows.Forms.DateTimePicker();
+            this._lblLienHeFilter = new System.Windows.Forms.Label();
+            this._txtLienHe = new System.Windows.Forms.TextBox();
+            this._lblLopFilter = new System.Windows.Forms.Label();
+            this._cboLopFilter = new System.Windows.Forms.ComboBox();
+            this._lblTrangThaiFilter = new System.Windows.Forms.Label();
+            this._cboTrangThaiFilter = new System.Windows.Forms.ComboBox();
+            this._lblLop = new System.Windows.Forms.Label();
+            this._cboLop = new System.Windows.Forms.ComboBox();
             this.root = new System.Windows.Forms.TableLayoutPanel();
             this.search = new System.Windows.Forms.FlowLayoutPanel();
             this.btnTim = new System.Windows.Forms.Button();
@@ -296,6 +312,93 @@ namespace DesktopApp_Project.GUI
             this._dtNgaySinh.Size = new System.Drawing.Size(454, 20);
             this._dtNgaySinh.TabIndex = 3;
             // 
+            // _lblLienHeFilter
+            // 
+            this._lblLienHeFilter.AutoSize = true;
+            this._lblLienHeFilter.Location = new System.Drawing.Point(293, 8);
+            this._lblLienHeFilter.Margin = new System.Windows.Forms.Padding(4, 8, 4, 2);
+            this._lblLienHeFilter.Name = "_lblLienHeFilter";
+            this._lblLienHeFilter.Size = new System.Drawing.Size(55, 13);
+            this._lblLienHeFilter.TabIndex = 2;
+            this._lblLienHeFilter.Text = "SĐT/Email";
+            // 
+            // _txtLienHe
+            // 
+            this._txtLienHe.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this._txtLienHe.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._txtLienHe.Location = new System.Drawing.Point(356, 4);
+            this._txtLienHe.Margin = new System.Windows.Forms.Padding(4);
+            this._txtLienHe.MinimumSize = new System.Drawing.Size(150, 2);
+            this._txtLienHe.Name = "_txtLienHe";
+            this._txtLienHe.Size = new System.Drawing.Size(180, 23);
+            this._txtLienHe.TabIndex = 3;
+            // 
+            // _lblLopFilter
+            // 
+            this._lblLopFilter.AutoSize = true;
+            this._lblLopFilter.Location = new System.Drawing.Point(544, 8);
+            this._lblLopFilter.Margin = new System.Windows.Forms.Padding(4, 8, 4, 2);
+            this._lblLopFilter.Name = "_lblLopFilter";
+            this._lblLopFilter.Size = new System.Drawing.Size(25, 13);
+            this._lblLopFilter.TabIndex = 4;
+            this._lblLopFilter.Text = "Lớp";
+            // 
+            // _cboLopFilter
+            // 
+            this._cboLopFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._cboLopFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._cboLopFilter.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._cboLopFilter.Location = new System.Drawing.Point(577, 4);
+            this._cboLopFilter.Margin = new System.Windows.Forms.Padding(4);
+            this._cboLopFilter.MinimumSize = new System.Drawing.Size(150, 0);
+            this._cboLopFilter.Name = "_cboLopFilter";
+            this._cboLopFilter.Size = new System.Drawing.Size(180, 23);
+            this._cboLopFilter.TabIndex = 5;
+            // 
+            // _lblTrangThaiFilter
+            // 
+            this._lblTrangThaiFilter.AutoSize = true;
+            this._lblTrangThaiFilter.Location = new System.Drawing.Point(765, 8);
+            this._lblTrangThaiFilter.Margin = new System.Windows.Forms.Padding(4, 8, 4, 2);
+            this._lblTrangThaiFilter.Name = "_lblTrangThaiFilter";
+            this._lblTrangThaiFilter.Size = new System.Drawing.Size(55, 13);
+            this._lblTrangThaiFilter.TabIndex = 6;
+            this._lblTrangThaiFilter.Text = "Trạng thái";
+            // 
+            // _cboTrangThaiFilter
+            // 
+            this._cboTrangThaiFilter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._cboTrangThaiFilter.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._cboTrangThaiFilter.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._cboTrangThaiFilter.Location = new System.Drawing.Point(828, 4);
+            this._cboTrangThaiFilter.Margin = new System.Windows.Forms.Padding(4);
+            this._cboTrangThaiFilter.MinimumSize = new System.Drawing.Size(150, 0);
+            this._cboTrangThaiFilter.Name = "_cboTrangThaiFilter";
+            this._cboTrangThaiFilter.Size = new System.Drawing.Size(150, 23);
+            this._cboTrangThaiFilter.TabIndex = 7;
+            // 
+            // _lblLop
+            // 
+            this._lblLop.AutoSize = true;
+            this._lblLop.Location = new System.Drawing.Point(570, 103);
+            this._lblLop.Name = "_lblLop";
+            this._lblLop.Size = new System.Drawing.Size(25, 13);
+            this._lblLop.TabIndex = 14;
+            this._lblLop.Text = "Lớp";
+            // 
+            // _cboLop
+            // 
+            this._cboLop.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._cboLop.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this._cboLop.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this._cboLop.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this._cboLop.Location = new System.Drawing.Point(632, 107);
+            this._cboLop.Margin = new System.Windows.Forms.Padding(4);
+            this._cboLop.MinimumSize = new System.Drawing.Size(150, 0);
+            this._cboLop.Name = "_cboLop";
+            this._cboLop.Size = new System.Drawing.Size(452, 23);
+            this._cboLop.TabIndex = 15;
+            // 
             // root
             // 
             this.root.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 1100F));
@@ -319,6 +422,12 @@ namespace DesktopApp_Project.GUI
             this.search.AutoSize = true;
             this.search.Controls.Add(this._lblDesigner1);
             this.search.Controls.Add(this._txtTim);
+            this.search.Controls.Add(this._lblLienHeFilter);
+            this.search.Controls.Add(this._txtLienHe);
+            this.search.Controls.Add(this._lblLopFilter);
+            this.search.Controls.Add(this._cboLopFilter);
+            this.search.Controls.Add(this._lblTrangThaiFilter);
+            this.search.Controls.Add(this._cboTrangThaiFilter);
             this.search.Controls.Add(this.btnTim);
             this.search.Dock = System.Windows.Forms.DockStyle.Top;
             this.search.Location = new System.Drawing.Point(3, 55);
@@ -367,17 +476,21 @@ namespace DesktopApp_Project.GUI
             this.form.Controls.Add(this._txtTaiKhoan, 3, 2);
             this.form.Controls.Add(this._lblDesigner8, 0, 3);
             this.form.Controls.Add(this._txtMatKhau, 1, 3);
-            this.form.Controls.Add(this.buttons, 3, 3);
+            this.form.Controls.Add(this._lblLop, 2, 3);
+            this.form.Controls.Add(this._cboLop, 3, 3);
+            this.form.Controls.Add(this.buttons, 3, 4);
             this.form.Dock = System.Windows.Forms.DockStyle.Top;
             this.form.Location = new System.Drawing.Point(0, 116);
             this.form.Margin = new System.Windows.Forms.Padding(0);
             this.form.Name = "form";
             this.form.Padding = new System.Windows.Forms.Padding(12, 10, 12, 10);
+            this.form.RowCount = 5;
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.form.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.form.Size = new System.Drawing.Size(1100, 161);
+            this.form.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.form.Size = new System.Drawing.Size(1100, 192);
             this.form.TabIndex = 2;
             // 
             // buttons

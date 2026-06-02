@@ -189,8 +189,8 @@ namespace DesktopApp_Project.GUI
             button.Font = theme.BodyFont;
             button.Cursor = Cursors.Hand;
             button.BackColor = active ? theme.Accent : Color.Transparent;
-            button.ForeColor = active ? ThemeManager.GetReadableTextColor(theme.Accent) : theme.PrimaryText;
-            button.IconColor = active ? ThemeManager.GetReadableTextColor(theme.Accent) : theme.Accent;
+            button.ForeColor = active ? theme.ButtonText : theme.PrimaryText;
+            button.IconColor = active ? theme.ButtonText : theme.Accent;
             button.FlatAppearance.MouseOverBackColor = active ? theme.Accent : theme.ControlBackground;
             button.FlatAppearance.MouseDownBackColor = active ? theme.AccentPressed : theme.ControlBackground;
 
@@ -364,9 +364,9 @@ namespace DesktopApp_Project.GUI
             DisableButton();
             currentBtn = (IconButton)senderBtn;
             currentBtn.BackColor = ThemeManager.Current.Accent;
-            currentBtn.ForeColor = ThemeManager.GetReadableTextColor(ThemeManager.Current.Accent);
+            currentBtn.ForeColor = ThemeManager.Current.ButtonText;
             currentBtn.TextAlign = ContentAlignment.MiddleCenter;
-            currentBtn.IconColor = ThemeManager.GetReadableTextColor(ThemeManager.Current.Accent);
+            currentBtn.IconColor = ThemeManager.Current.ButtonText;
             currentBtn.TextImageRelation = TextImageRelation.TextBeforeImage;
             currentBtn.ImageAlign = ContentAlignment.MiddleRight;
 

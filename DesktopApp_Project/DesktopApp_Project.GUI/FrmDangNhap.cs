@@ -136,8 +136,8 @@ namespace DesktopApp_Project.GUI
             icoShowPass.Cursor = Cursors.Hand;
 
             btnLogin.BackColor = theme.Accent;
-            btnLogin.ForeColor = theme.BackgroundDark;
-            btnLogin.IconColor = theme.BackgroundDark;
+            btnLogin.ForeColor = theme.ButtonText;
+            btnLogin.IconColor = theme.ButtonText;
             btnLogin.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
             btnLogin.FlatStyle = FlatStyle.Flat;
             btnLogin.FlatAppearance.BorderSize = 0;

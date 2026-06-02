@@ -356,7 +356,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 Current.Accent;
 
             button.ForeColor =
-                GetReadableTextColor(Current.Accent);
+                Current.ButtonText;
 
             button.Font =
                 Current.BodyFont;
