@@ -1,14 +1,15 @@
+using DesktopApp_Project.BUS;
+using DesktopApp_Project.Common;
+using DesktopApp_Project.DTO;
+using DesktopApp_Project.GUI.Shared.Themes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
-using DesktopApp_Project.BUS;
-using DesktopApp_Project.Common;
-using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
@@ -16,10 +17,10 @@ namespace DesktopApp_Project.GUI
     {
         private static readonly Color[] AccentPalette =
         {
-            Color.FromArgb(124, 92, 191),
-            Color.FromArgb(76, 175, 137),
-            Color.FromArgb(232, 168, 56),
-            Color.FromArgb(73, 145, 220)
+            ColorTranslator.FromHtml("#F9B17A"),
+            ColorTranslator.FromHtml("#4CAF50"),
+            ColorTranslator.FromHtml("#29B6F6"),
+            ColorTranslator.FromHtml("#FFB74D")
         };
 
         public static readonly string[] AccentNames =
@@ -41,16 +42,74 @@ namespace DesktopApp_Project.GUI
         public static int AccentIndex { get; private set; }
         public static string Language { get; private set; }
 
-        public static Color BackgroundColor { get { return DarkMode ? Color.FromArgb(30, 30, 46) : Color.FromArgb(245, 247, 250); } }
-        public static Color SurfaceColor { get { return DarkMode ? Color.FromArgb(42, 42, 62) : Color.White; } }
-        public static Color SurfaceAltColor { get { return DarkMode ? Color.FromArgb(36, 36, 54) : Color.FromArgb(232, 236, 244); } }
-        public static Color BorderColor { get { return DarkMode ? Color.FromArgb(58, 58, 82) : Color.FromArgb(205, 213, 225); } }
-        public static Color TextColor { get { return DarkMode ? Color.FromArgb(234, 234, 234) : Color.FromArgb(31, 41, 55); } }
-        public static Color MutedTextColor { get { return DarkMode ? Color.FromArgb(154, 154, 176) : Color.FromArgb(94, 104, 120); } }
-        public static Color AccentColor { get { return AccentPalette[Math.Max(0, Math.Min(AccentIndex, AccentPalette.Length - 1))]; } }
-        public static Color AccentSoftColor { get { return DarkMode ? Color.FromArgb(59, 49, 88) : Color.FromArgb(230, 222, 247); } }
-        public static Color SuccessColor { get { return Color.FromArgb(76, 175, 137); } }
-        public static Color WarningColor { get { return Color.FromArgb(232, 168, 56); } }
+        public static Color BackgroundColor
+        {
+            get
+            {
+                return ThemeManager.Current.BackgroundDark;
+            }
+        }
+        public static Color SurfaceColor
+        {
+            get
+            {
+                return ThemeManager.Current.PanelDark;
+            }
+        }
+        public static Color SurfaceAltColor
+        {
+            get
+            {
+                return DarkMode
+                    ? ColorTranslator.FromHtml("#424769")
+                    : ColorTranslator.FromHtml("#F8FAFC");
+            }
+        }
+        public static Color BorderColor
+        {
+            get
+            {
+                return ThemeManager.Current.BorderColor;
+            }
+        }
+        public static Color TextColor
+        {
+            get
+            {
+                return ThemeManager.Current.PrimaryText;
+            }
+        }
+        public static Color MutedTextColor
+        {
+            get
+            {
+                return ThemeManager.Current.SecondaryText;
+            }
+        }
+        public static Color AccentColor
+        {
+            get
+            {
+                return ThemeManager.Current.Accent;
+            }
+        }
+        public static Color AccentSoftColor
+        {
+            get
+            {
+                return DarkMode
+                    ? ColorTranslator.FromHtml("#FFC28F")
+                    : Color.FromArgb(230, 222, 247);
+            }
+        }
+        public static Color SuccessColor
+        {
+            get { return ColorTranslator.FromHtml("#4CAF50"); }
+        }
+        public static Color WarningColor
+        {
+            get { return ColorTranslator.FromHtml("#FFB74D"); }
+        }
 
         public static void Apply(bool darkMode, int accentIndex, string language)
         {
@@ -150,8 +209,8 @@ namespace DesktopApp_Project.GUI
                 Height = 34,
                 Width = 110,
                 Font = DefaultFont,
-                BackColor = SurfaceColor,
-                ForeColor = TextColor,
+                BackColor = ThemeManager.Current.Accent,
+                ForeColor = ThemeManager.Current.PrimaryText,
                 FlatStyle = FlatStyle.Flat,
                 Margin = new Padding(4),
                 Padding = new Padding(8, 0, 8, 0),
@@ -581,7 +640,7 @@ namespace DesktopApp_Project.GUI
 
             if (!IsInDesignMode)
             {
-                UiHelpers.ApplyDarkTheme(this);
+                //UiHelpers.ApplyDarkTheme(this);
                 Shared.Themes.ThemeManager.ApplyTheme(this);
             }
 

@@ -21,5 +21,10 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         Font TitleFont { get; }
         Font BodyFont { get; }
+        Color GridHeader { get; }
+        Color GridRow { get; }
+        Color GridAlternateRow { get; }
+        Color GridSelectedRow { get; }
+        Color GridSelectedText { get; }
     }
 }

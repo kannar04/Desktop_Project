@@ -1,3 +1,5 @@
+using DesktopApp_Project.GUI.Shared.Themes;
+
 namespace DesktopApp_Project.GUI
 {
     partial class FrmChinh
@@ -55,7 +57,7 @@ namespace DesktopApp_Project.GUI
             // 
             // pnlSideMenu
             // 
-            this.pnlSideMenu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(31)))), ((int)(((byte)(30)))), ((int)(((byte)(68)))));
+            this.pnlSideMenu.BackColor = new AppThemeAdapter().BackgroundDark;
             this.pnlSideMenu.Controls.Add(this.pnlMenuItems);
             this.pnlSideMenu.Controls.Add(this.btnSetting);
             this.pnlSideMenu.Controls.Add(this.pnlLogo);
@@ -65,6 +67,7 @@ namespace DesktopApp_Project.GUI
             this.pnlSideMenu.Name = "pnlSideMenu";
             this.pnlSideMenu.Size = new System.Drawing.Size(240, 896);
             this.pnlSideMenu.TabIndex = 0;
+            this.pnlSideMenu.AutoScroll = false;
             // 
             // pnlMenuItems
             // 

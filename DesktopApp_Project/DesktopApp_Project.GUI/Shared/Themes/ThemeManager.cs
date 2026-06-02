@@ -9,12 +9,10 @@ namespace DesktopApp_Project.GUI.Shared.Themes
     public static class ThemeManager
     {
         private static readonly Dictionary<string, Func<ITheme>> _registry =
-            new Dictionary<string, Func<ITheme>>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "AppTheme", delegate { return new AppThemeAdapter(); } },
-                { "Default", delegate { return new AppThemeAdapter(); } },
-                { "Test1", delegate { return new Test1Theme(); } }
-            };
+    new Dictionary<string, Func<ITheme>>
+        {
+            { "AppTheme", () => new AppThemeAdapter() }
+        };
 
         static ThemeManager()
         {
@@ -98,7 +96,12 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             {
                 control.BackColor = Current.BackgroundDark;
                 control.ForeColor = Current.PrimaryText;
-                control.Font = Current.BodyFont;
+
+                // IMPORTANT: do NOT set form.Font here.
+                // Setting the Form.Font at runtime triggers WinForms AutoScale (AutoScaleMode = Font)
+                // which rescales child controls and causes fonts/sizes to grow on repeated theme changes.
+                // If you want to change fonts for specific controls, set them individually (buttons/labels/inputs).
+                // (control.Font = Current.BodyFont);
             }
 
             var panel = control as Panel;
@@ -122,7 +125,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             var groupBox = control as GroupBox;
             if (groupBox != null)
             {
-                groupBox.BackColor = Current.PanelDark;
+                groupBox.BackColor = ColorTranslator.FromHtml("#353B5C");
                 groupBox.ForeColor = Current.PrimaryText;
                 groupBox.Font = Current.BodyFont;
             }
@@ -233,9 +236,53 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         private static void ApplyLabel(Label label)
         {
-            label.BackColor = Color.Transparent;
-            label.ForeColor = IsSecondaryLabel(label) ? Current.SecondaryText : Current.PrimaryText;
-            label.Font = IsTitleLabel(label) ? Current.TitleFont : Current.BodyFont;
+            if (label == null)
+                return;
+
+            label.BackColor =
+                label.Parent != null
+                    ? label.Parent.BackColor
+                    : Current.PanelDark;
+
+            // Determine label role by name / semantics rather than current font size
+            if (IsTitleLabel(label))
+            {
+                // only override the font if we will not shrink a deliberately larger font
+                if (ShouldOverrideFont(label.Font, Current.TitleFont))
+                {
+                    label.ForeColor = Current.PrimaryText;
+                    label.Font = Current.TitleFont;
+                }
+                else
+                {
+                    // keep larger designer font but ensure color is theme-correct
+                    label.ForeColor = Current.PrimaryText;
+                }
+            }
+            else
+            {
+                // only override body font if it won't reduce a custom large font
+                if (ShouldOverrideFont(label.Font, Current.BodyFont))
+                {
+                    label.ForeColor = Current.SecondaryText;
+                    label.Font = Current.BodyFont;
+                }
+                else
+                {
+                    // preserve the intentionally large font but update color
+                    label.ForeColor = Current.SecondaryText;
+                }
+            }
+        }
+
+        // New helper: return true when it is safe to override (i.e. we won't shrink an intentionally larger font)
+        private static bool ShouldOverrideFont(Font current, Font target)
+        {
+            if (current == null || target == null)
+                return true;
+
+            // preserve larger custom fonts: only override when current font size is <= target font size
+            return current.SizeInPoints <= target.SizeInPoints + 0.001f;
         }
 
         private static bool IsSecondaryLabel(Label label)
@@ -246,13 +293,30 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                    && name.StartsWith("lbl", StringComparison.OrdinalIgnoreCase);
         }
 
+        // Change: do not rely on current label.Font.Size for detection.
+        // Use naming heuristics (designer names) and fall back to font-size only if name is not informative.
         private static bool IsTitleLabel(Label label)
         {
-            var name = (label.Name ?? string.Empty).TrimStart('_');
-            return label.Dock == DockStyle.Top
-                   || label.Height >= 40
-                   || (!string.IsNullOrEmpty(name)
-                       && name.IndexOf("Title", StringComparison.OrdinalIgnoreCase) >= 0);
+            if (label == null)
+                return false;
+
+            var name = (label.Name ?? string.Empty);
+
+            // Prefer explicit name hints (lblTitle, lblHeader, lbl...Title, etc.)
+            if (name.IndexOf("Title", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                name.IndexOf("Header", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                return true;
+            }
+
+            // If control has Tag = "Title" we also treat as title
+            if (label.Tag != null && string.Equals(Convert.ToString(label.Tag), "Title", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            // Fallback: if designer set an explicitly large font (>= 18pt) consider title but do not treat medium sizes (14pt) as authoritative.
+            return label.Font != null && label.Font.SizeInPoints >= 18f;
         }
 
         private static void ApplyTabControl(TabControl tabControl)
@@ -280,28 +344,56 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         private static void ApplyButton(Button button)
         {
-            if (!CanUse(button))
-            {
+            if (button == null)
                 return;
-            }
 
             button.FlatStyle = FlatStyle.Flat;
             button.UseVisualStyleBackColor = false;
-            button.BackColor = Current.Accent;
-            button.ForeColor = GetReadableTextColor(Current.Accent);
-            button.Font = Current.BodyFont;
-            button.FlatAppearance.BorderSize = 0;
-            button.FlatAppearance.MouseOverBackColor = Current.AccentHover;
-            button.FlatAppearance.MouseDownBackColor = Current.AccentPressed;
 
-            button.MouseEnter -= Button_MouseEnter;
-            button.MouseLeave -= Button_MouseLeave;
-            button.MouseDown -= Button_MouseDown;
-            button.MouseUp -= Button_MouseUp;
-            button.MouseEnter += Button_MouseEnter;
-            button.MouseLeave += Button_MouseLeave;
-            button.MouseDown += Button_MouseDown;
-            button.MouseUp += Button_MouseUp;
+            button.FlatAppearance.BorderSize = 0;
+
+            button.BackColor =
+                Current.Accent;
+
+            button.ForeColor =
+                GetReadableTextColor(Current.Accent);
+
+            button.Font =
+                Current.BodyFont;
+
+            button.Cursor =
+                Cursors.Hand;
+
+            button.FlatAppearance.MouseOverBackColor =
+                Current.AccentHover;
+
+            button.FlatAppearance.MouseDownBackColor =
+                Current.AccentPressed;
+        }
+
+        private static void ApplySecondaryButton(Button button)
+        {
+            if (button == null)
+                return;
+
+            button.FlatStyle = FlatStyle.Flat;
+
+            button.FlatAppearance.BorderSize = 1;
+
+            button.FlatAppearance.BorderColor =
+                Current.BorderColor;
+
+            button.BackColor =
+                Current.ControlBackground;
+
+            button.ForeColor =
+                Current.PrimaryText;
+
+            button.Font =
+                Current.BodyFont;
+
+            button.Cursor =
+                Cursors.Hand;
         }
 
         private static void ApplyIconButton(IconButton button)
@@ -313,7 +405,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
             button.FlatStyle = FlatStyle.Flat;
             button.UseVisualStyleBackColor = false;
-            button.BackColor = Color.Transparent;
+            button.BackColor = Current.PanelDark;
             button.ForeColor = Current.PrimaryText;
             button.IconColor = Current.Accent;
             button.Font = Current.BodyFont;
@@ -324,31 +416,96 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         private static void ApplyGrid(DataGridView grid)
         {
-            grid.BackgroundColor = Current.BackgroundDark;
-            grid.GridColor = Current.BorderColor;
+            grid.SuspendLayout();
+
             grid.EnableHeadersVisualStyles = false;
+
+            // Base
+            grid.BackgroundColor = Current.BackgroundDark;
             grid.BorderStyle = BorderStyle.None;
+            grid.GridColor = Current.BorderColor;
+
             grid.Font = Current.BodyFont;
-            grid.RowTemplate.DefaultCellStyle.BackColor = Current.ControlBackground;
-            grid.RowTemplate.DefaultCellStyle.ForeColor = Current.PrimaryText;
-            grid.RowTemplate.DefaultCellStyle.SelectionBackColor = Current.Accent;
-            grid.RowTemplate.DefaultCellStyle.SelectionForeColor = Current.BackgroundDark;
 
-            grid.ColumnHeadersDefaultCellStyle.BackColor = Current.PanelDark;
-            grid.ColumnHeadersDefaultCellStyle.ForeColor = Current.PrimaryText;
-            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = Current.PanelDark;
-            grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = Current.PrimaryText;
-            grid.ColumnHeadersDefaultCellStyle.Font = new Font(Current.BodyFont, FontStyle.Bold);
+            grid.RowHeadersVisible = false;
 
-            grid.DefaultCellStyle.BackColor = Current.ControlBackground;
-            grid.DefaultCellStyle.ForeColor = Current.PrimaryText;
-            grid.DefaultCellStyle.SelectionBackColor = Current.Accent;
-            grid.DefaultCellStyle.SelectionForeColor = GetReadableTextColor(Current.Accent);
+            grid.AllowUserToResizeRows = false;
 
-            grid.AlternatingRowsDefaultCellStyle.BackColor = Current.PanelDark;
-            grid.AlternatingRowsDefaultCellStyle.ForeColor = Current.PrimaryText;
-            grid.AlternatingRowsDefaultCellStyle.SelectionBackColor = Current.Accent;
-            grid.AlternatingRowsDefaultCellStyle.SelectionForeColor = GetReadableTextColor(Current.Accent);
+            grid.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+            grid.MultiSelect = false;
+
+            // Header
+            grid.ColumnHeadersBorderStyle =
+                DataGridViewHeaderBorderStyle.Single;
+
+            grid.ColumnHeadersHeight = 40;
+
+            grid.ColumnHeadersDefaultCellStyle.BackColor =
+                Current.GridHeader;
+
+            grid.ColumnHeadersDefaultCellStyle.ForeColor =
+                Current.PrimaryText;
+
+            grid.ColumnHeadersDefaultCellStyle.SelectionBackColor =
+                Current.GridHeader;
+
+            grid.ColumnHeadersDefaultCellStyle.SelectionForeColor =
+                Current.PrimaryText;
+
+            grid.ColumnHeadersDefaultCellStyle.Font =
+                new Font(Current.BodyFont, FontStyle.Bold);
+
+            grid.ColumnHeadersDefaultCellStyle.Alignment =
+                DataGridViewContentAlignment.MiddleLeft;
+
+            // Rows
+            grid.DefaultCellStyle.BackColor =
+                Current.GridRow;
+
+            grid.DefaultCellStyle.ForeColor =
+                Current.PrimaryText;
+
+            grid.DefaultCellStyle.SelectionBackColor =
+                Current.GridSelectedRow;
+
+            grid.DefaultCellStyle.SelectionForeColor =
+                Current.GridSelectedText;
+
+            grid.DefaultCellStyle.Padding =
+                new Padding(4);
+
+            // Alternate Rows
+            grid.AlternatingRowsDefaultCellStyle.BackColor =
+                Current.GridAlternateRow;
+
+            grid.AlternatingRowsDefaultCellStyle.ForeColor =
+                Current.PrimaryText;
+
+            grid.AlternatingRowsDefaultCellStyle.SelectionBackColor =
+                Current.GridSelectedRow;
+
+            grid.AlternatingRowsDefaultCellStyle.SelectionForeColor =
+                Current.GridSelectedText;
+
+            // Row Style
+            grid.RowTemplate.Height = 36;
+
+            grid.DefaultCellStyle.Alignment =
+                DataGridViewContentAlignment.MiddleLeft;
+
+            // Remove ugly blue focus rectangle
+            grid.DefaultCellStyle.WrapMode =
+                DataGridViewTriState.False;
+
+            // Better visual
+            grid.CellBorderStyle =
+                DataGridViewCellBorderStyle.SingleHorizontal;
+
+            grid.RowHeadersBorderStyle =
+                DataGridViewHeaderBorderStyle.None;
+
+            grid.ResumeLayout();
         }
 
         private static void TabControl_SelectedIndexChanged(object sender, EventArgs e)
@@ -377,7 +534,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
             var selected = e.Index == tabControl.SelectedIndex;
             var bounds = tabControl.GetTabRect(e.Index);
-            var backColor = selected ? Current.Accent : Current.PanelDark;
+            var backColor = selected ? Current.Accent : ColorTranslator.FromHtml("#353B5C");
             var textColor = selected ? GetReadableTextColor(Current.Accent) : Current.PrimaryText;
 
             using (var backBrush = new SolidBrush(backColor))
@@ -445,8 +602,14 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         public static Color GetReadableTextColor(Color background)
         {
-            var luminance = (0.299 * background.R) + (0.587 * background.G) + (0.114 * background.B);
-            return luminance >= 150 ? Color.FromArgb(21, 28, 46) : Color.White;
+            double brightness =
+                (background.R * 0.299) +
+                (background.G * 0.587) +
+                (background.B * 0.114);
+
+            return brightness > 186
+                ? Color.FromArgb(16, 27, 58)
+                : Color.White;
         }
     }
 }
