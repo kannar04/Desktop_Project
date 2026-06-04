@@ -96,7 +96,9 @@
     <Compile Include="FrmDeThi.Designer.cs">
       <DependentUpon>FrmDeThi.cs</DependentUpon>
     </Compile>
-    <Compile Include="FrmFlashcard.cs" />
+    <Compile Include="FrmFlashcard.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="FrmFlashcard.Designer.cs">
       <DependentUpon>FrmFlashcard.cs</DependentUpon>
     </Compile>
