@@ -29,3 +29,5 @@ _rels/
 packages/
 *.html
 *.md
+/docs
+*.pdf
