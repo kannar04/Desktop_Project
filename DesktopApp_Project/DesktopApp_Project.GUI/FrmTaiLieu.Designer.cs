@@ -126,7 +126,7 @@ namespace DesktopApp_Project.GUI
             this._lblTitle.Padding = new System.Windows.Forms.Padding(12, 0, 0, 0);
             this._lblTitle.Size = new System.Drawing.Size(1100, 52);
             this._lblTitle.TabIndex = 0;
-            this._lblTitle.Text = "Cập nhật tài liệu giảng dạy";
+            this._lblTitle.Text = "Quản lý tài liệu giảng dạy";
             this._lblTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // form
