@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -222,11 +223,18 @@ namespace DesktopApp_Project.GUI
             currentBtn.TextImageRelation = TextImageRelation.TextBeforeImage;
             currentBtn.ImageAlign = ContentAlignment.MiddleRight;
 
-            leftBorderBtn.BackColor = color;
-            leftBorderBtn.Height = currentBtn.Height;
-            leftBorderBtn.Location = new Point(0, currentBtn.Top);
-            leftBorderBtn.Visible = true;
-            leftBorderBtn.BringToFront();
+            if (currentBtn.Parent == pnlMenuItems)
+            {
+                leftBorderBtn.BackColor = color;
+                leftBorderBtn.Height = currentBtn.Height;
+                leftBorderBtn.Location = new Point(0, currentBtn.Top);
+                leftBorderBtn.Visible = true;
+                leftBorderBtn.BringToFront();
+            }
+            else
+            {
+                leftBorderBtn.Visible = false;
+            }
 
             lblTitleChildForm.Text = currentBtn.Text;
             lblTitleChildForm.ForeColor = color;
@@ -307,6 +315,98 @@ namespace DesktopApp_Project.GUI
             container.Controls.Add(header);
             pnlDesktop.Controls.Add(container);
             UiHelpers.ApplyDarkTheme(container);
+        }
+
+        private void ShowSettings()
+        {
+            ClearDesktop();
+
+            var container = new Panel
+            {
+                Dock = DockStyle.Fill,
+                BackColor = UiHelpers.AppBackgroundColor,
+                Padding = new Padding(16)
+            };
+
+            var header = new Label
+            {
+                Text = "Cài đặt",
+                Dock = DockStyle.Top,
+                Height = 56,
+                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
+                ForeColor = UiHelpers.TextColor,
+                BackColor = UiHelpers.SurfaceAltColor,
+                Padding = new Padding(16, 0, 0, 0),
+                TextAlign = ContentAlignment.MiddleLeft
+            };
+
+            var settings = new TableLayoutPanel
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ColumnCount = 2,
+                Padding = new Padding(16, 18, 16, 12),
+                BackColor = UiHelpers.SurfaceColor
+            };
+            settings.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 180F));
+            settings.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+
+            AddSettingsRow(settings, "Người dùng", _currentUser == null ? "Chưa đăng nhập" : _currentUser.HoTen);
+            AddSettingsRow(settings, "Vai trò", _currentUser == null ? string.Empty : AppConstants.GetDisplayRole(_currentUser.VaiTro));
+            AddSettingsRow(settings, "Tài khoản", _currentUser == null ? string.Empty : _currentUser.TaiKhoan);
+            AddSettingsRow(settings, "Cơ sở dữ liệu", GetDatabaseSummary());
+            AddSettingsRow(settings, "Phiên bản", Application.ProductVersion);
+
+            container.Controls.Add(settings);
+            container.Controls.Add(header);
+            pnlDesktop.Controls.Add(container);
+            UiHelpers.ApplyDarkTheme(container);
+        }
+
+        private static void AddSettingsRow(TableLayoutPanel panel, string labelText, string valueText)
+        {
+            var row = panel.RowCount++;
+            panel.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+
+            var label = new Label
+            {
+                Text = labelText,
+                AutoSize = true,
+                Margin = new Padding(0, 6, 12, 6),
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                ForeColor = UiHelpers.TextColor
+            };
+
+            var value = new Label
+            {
+                Text = valueText,
+                AutoSize = true,
+                Margin = new Padding(0, 6, 0, 6),
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                ForeColor = UiHelpers.MutedTextColor
+            };
+
+            panel.Controls.Add(label, 0, row);
+            panel.Controls.Add(value, 1, row);
+        }
+
+        private static string GetDatabaseSummary()
+        {
+            var settings = ConfigurationManager.ConnectionStrings["QuanLyIeltsDb"];
+            if (settings == null || string.IsNullOrWhiteSpace(settings.ConnectionString))
+            {
+                return "Chưa cấu hình";
+            }
+
+            try
+            {
+                var builder = new System.Data.SqlClient.SqlConnectionStringBuilder(settings.ConnectionString);
+                return builder.DataSource + " / " + builder.InitialCatalog;
+            }
+            catch
+            {
+                return "Đã cấu hình";
+            }
         }
 
         private void OpenModule(Form childForm)
@@ -415,7 +515,8 @@ namespace DesktopApp_Project.GUI
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
-
+            ActivateButton(sender, RGBColors.color4);
+            ShowSettings();
         }
     }
 }

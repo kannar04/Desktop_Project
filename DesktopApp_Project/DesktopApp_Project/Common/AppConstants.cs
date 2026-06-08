@@ -12,14 +12,6 @@ namespace DesktopApp_Project.Common
         public const string RoleStudent = "HocSinh";
         public const string RoleStaff = "NhanVien";
 
-        public static readonly string[] SupportedRoles =
-        {
-            RoleAdmin,
-            RoleTeacher,
-            RoleStudent,
-            RoleStaff
-        };
-
         public static readonly string[] AdminRoles =
         {
             RoleAdmin,
@@ -40,13 +32,6 @@ namespace DesktopApp_Project.Common
             "Có mặt",
             "Vắng",
             "Đi trễ"
-        };
-
-        public static readonly string[] SubmissionStatuses =
-        {
-            "Chưa nộp",
-            "Đã nộp",
-            "Đã chấm"
         };
 
         public const decimal IeltsMinScore = 0m;

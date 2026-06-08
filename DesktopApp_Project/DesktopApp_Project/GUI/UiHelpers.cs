@@ -161,30 +161,6 @@ namespace DesktopApp_Project.GUI
             combo.DataSource = AppConstants.SkillLabels.ToList();
         }
 
-        public static TableLayoutPanel FormGrid()
-        {
-            var panel = new TableLayoutPanel
-            {
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                ColumnCount = 4,
-                Padding = new Padding(12, 10, 12, 10),
-                Margin = new Padding(0),
-                BackColor = SurfaceColor,
-                GrowStyle = TableLayoutPanelGrowStyle.AddRows
-            };
-            panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            panel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
-            panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            return panel;
-        }
-
-        public static void ApplyPolish(Control root)
-        {
-            ApplyDarkTheme(root);
-        }
-
         public static void ApplyDarkTheme(Control root)
         {
             if (root == null)
@@ -345,17 +321,6 @@ namespace DesktopApp_Project.GUI
 
         protected ModuleFormBase()
         {
-        }
-
-        protected ModuleFormBase(string title)
-        {
-            Text = title;
-        }
-
-        protected ModuleFormBase(ServiceFactory services, NguoiDungDTO currentUser, string title)
-            : this(title)
-        {
-            SetRuntimeContext(services, currentUser);
         }
 
         protected void SetRuntimeContext(ServiceFactory services, NguoiDungDTO currentUser)

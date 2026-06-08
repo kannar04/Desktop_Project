@@ -27,3 +27,8 @@ legacy/
 [Content_Types].xml
 _rels/
 packages/
+*.html
+*.md
+*.pdf
+*.py
+docs/

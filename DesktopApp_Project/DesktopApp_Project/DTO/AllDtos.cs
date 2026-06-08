@@ -24,12 +24,6 @@ namespace DesktopApp_Project.DTO
         public string LichHoc { get; set; }
     }
 
-    public class ChiTietLopHocDTO
-    {
-        public int MaNguoiDung { get; set; }
-        public int MaLopHoc { get; set; }
-    }
-
     public class TaiLieuDTO
     {
         public int MaTaiLieu { get; set; }
@@ -128,13 +122,6 @@ namespace DesktopApp_Project.DTO
         public string TuLoai { get; set; }
         public string PhienAm { get; set; }
         public string Nghia { get; set; }
-    }
-
-    public class FlashcardTienTrinhDTO
-    {
-        public int MaNguoiDung { get; set; }
-        public int MaTuVung { get; set; }
-        public string KetQua { get; set; }
     }
 
     public class ThongBaoDTO

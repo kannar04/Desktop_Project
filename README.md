@@ -28,7 +28,7 @@ Tài khoản mẫu sau khi chạy script:
 
 ### Mẫu chung trong GUI
 
-- Hầu hết form nghiệp vụ kế thừa `ModuleFormBase`: tự thiết lập font, tiêu đề, nền, và hàm `AddContent` để gắn layout chính bên dưới thanh tiêu đề.
+- Hầu hết form nghiệp vụ kế thừa `ModuleFormBase`: tự áp dụng theme tối, giữ context `ServiceFactory`/người dùng hiện tại, và chỉ tải dữ liệu khi chạy runtime.
 - `UiHelpers` cung cấp bộ điều khiển chuẩn (button, textbox, combobox, grid) và cấu hình grid ở chế độ chỉ đọc, chọn từng dòng.
 
 ### `FrmDangNhap`
@@ -41,7 +41,7 @@ Tài khoản mẫu sau khi chạy script:
 
 - Mục tiêu: màn hình shell, điều hướng vào các module nghiệp vụ.
 - Bố cục gồm header hiển thị tên người dùng/vai trò, menu bên trái và panel nội dung ở giữa.
-- `AddMenu` tạo nút và ánh xạ sang form tương ứng; `OpenModule` giải phóng form cũ, nhúng form mới (TopLevel = false, Dock = Fill). Mặc định mở `FrmHocVien`.
+- Các nút menu được khai báo trong designer và ánh xạ sang form tương ứng; `OpenModule` giải phóng form cũ, nhúng form mới (TopLevel = false, Dock = Fill). Mặc định mở màn hình Trang chủ.
 
 ### `FrmHocVien`
 
@@ -114,7 +114,3 @@ Tài khoản mẫu sau khi chạy script:
 - Mục tiêu: quản lý yêu cầu thanh toán học phí.
 - Chọn học viên, nhập số tiền và thông tin ngân hàng; trạng thái thanh toán có các mức chờ/đã thanh toán/quá hạn.
 - Tạo yêu cầu gọi `Services.HocPhi.TaoYeuCau`, cập nhật trạng thái gọi `Services.HocPhi.CapNhatTrangThai` và tải lại danh sách.
-
-### `Form1`
-
-- Form mặc định do template tạo, hiện chưa dùng trong luồng nghiệp vụ.

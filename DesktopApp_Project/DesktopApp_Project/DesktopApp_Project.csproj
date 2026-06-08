@@ -61,12 +61,6 @@
     <Compile Include="DAL\QuanLyIeltsDataContext.cs" />
     <Compile Include="DAL\QuanLyIeltsRepository.cs" />
     <Compile Include="DTO\AllDtos.cs" />
-    <Compile Include="Form1.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
-    </Compile>
     <Compile Include="GUI\FrmChinh.cs">
       <SubType>Form</SubType>
     </Compile>
