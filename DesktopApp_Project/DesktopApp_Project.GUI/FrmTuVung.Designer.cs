@@ -46,8 +46,6 @@ namespace DesktopApp_Project.GUI
 		private System.Windows.Forms.Button _btnAdvancedCloseParenthesis;
 		private System.Windows.Forms.Button _btnAddAdvancedCondition;
 		private System.Windows.Forms.DataGridView _gridAdvancedConditions;
-		private System.Windows.Forms.DataGridViewTextBoxColumn _colAdvancedJoin;
-		private System.Windows.Forms.DataGridViewTextBoxColumn _colAdvancedCondition;
 		private System.Windows.Forms.FlowLayoutPanel _advancedActionRow;
 		private System.Windows.Forms.Button _btnRemoveAdvancedCondition;
 		private System.Windows.Forms.Button _btnClearAdvancedConditions;

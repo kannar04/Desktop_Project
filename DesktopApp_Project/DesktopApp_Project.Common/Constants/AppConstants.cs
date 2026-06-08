@@ -10,14 +10,6 @@ namespace DesktopApp_Project.Common
             public const string RoleStudent = "HocSinh";
             public const string RoleStaff = "NhanVien";
     
-            public static readonly string[] SupportedRoles =
-            {
-                RoleAdmin,
-                RoleTeacher,
-                RoleStudent,
-                RoleStaff
-            };
-    
             public static readonly string[] AdminRoles =
             {
                 RoleAdmin,
@@ -33,15 +25,6 @@ namespace DesktopApp_Project.Common
                 "Speaking"
             };
 
-            public static readonly string[] IeltsQuestionTypes =
-            {
-                "Multiple Choice",
-                "Matching",
-                "True/False/Not Given",
-                "Fill in the Blank",
-                "Short Answer"
-            };
-    
             public const string FilterAll = "Tất cả";
             public const string AttendancePresent = "Có mặt";
             public const string AttendanceAbsent = "Vắng";
@@ -61,13 +44,6 @@ namespace DesktopApp_Project.Common
             public const string EnrollmentPaused = "Tạm nghỉ";
             public const string EnrollmentStopped = "Đã nghỉ";
     
-            public static readonly string[] EnrollmentStatuses =
-            {
-                EnrollmentActive,
-                EnrollmentPaused,
-                EnrollmentStopped
-            };
-
             public static readonly string[] EnrollmentActiveAliases = BuildAliases(EnrollmentActive);
     
             public static readonly string[] StudentStatusFilters =
@@ -129,13 +105,6 @@ namespace DesktopApp_Project.Common
             };
 
             public static readonly string[] PaymentPaidAliases = BuildAliases(PaymentPaid);
-    
-            public static readonly string[] SubmissionStatuses =
-            {
-                "Chưa nộp",
-                "Đã nộp",
-                "Đã chấm"
-            };
     
             public static readonly string[] WordTypes =
             {
