@@ -1,3 +1,5 @@
+// in development, currently not in use, may be deleted in the future
+
 namespace DesktopApp_Project.GUI
 {
     partial class FrmChamBai
