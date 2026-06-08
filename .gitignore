@@ -31,3 +31,4 @@ packages/
 *.md
 docs/
 *.pdf
+*.py
