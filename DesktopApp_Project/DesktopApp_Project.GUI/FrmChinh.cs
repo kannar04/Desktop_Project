@@ -45,16 +45,6 @@ namespace DesktopApp_Project.GUI
         private Panel leftBorderBtn;
         private Form currentChildForm;
 
-        private class RGBColors
-        {
-            public static Color color1 { get { return ThemeManager.Current.Accent; } }
-            public static Color color2 { get { return ThemeManager.Current.Success; } }
-            public static Color color3 { get { return ThemeManager.Current.Warning; } }
-            public static Color color4 { get { return ThemeManager.Current.Accent; } }
-            public static Color color5 { get { return ThemeManager.Current.Success; } }
-            public static Color color6 { get { return ThemeManager.Current.Warning; } }
-        }
-
         public FrmChinh()
         {
             InitializeComponent();
@@ -80,13 +70,13 @@ namespace DesktopApp_Project.GUI
             _runtimeLoaded = true;
             if (_services == null || _currentUser == null)
             {
-                ActivateButton(btnChinh, RGBColors.color1);
+                ActivateButton(btnChinh);
                 ShowHome();
                 return;
             }
 
             Text = "Quản lý lớp IELTS - Xin chào " + _currentUser.HoTen + " (" + AppConstants.GetDisplayRole(_currentUser.VaiTro) + ")";
-            ActivateButton(btnChinh, RGBColors.color1);
+            ActivateButton(btnChinh);
             ShowHome();
         }
 
@@ -354,7 +344,7 @@ namespace DesktopApp_Project.GUI
             WindowState = FormWindowState.Minimized;
         }
 
-        private void ActivateButton(object senderBtn, Color color)
+        private void ActivateButton(object senderBtn)
         {
             if (senderBtn == null)
             {
@@ -415,52 +405,7 @@ namespace DesktopApp_Project.GUI
 
         private void ShowHome()
         {
-            if (pnlDesktop != null)
-            {
-                ShowDashboard();
-                return;
-            }
-
-            ClearDesktop();
-
-            var container = new Panel
-            {
-                Dock = DockStyle.Fill,
-                BackColor = ThemeManager.Current.BackgroundDark,
-                Padding = new Padding(16)
-            };
-
-            var header = new Label
-            {
-                Text = "Trang chủ",
-                Dock = DockStyle.Top,
-                Height = 56,
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                ForeColor = ThemeManager.Current.PrimaryText,
-                BackColor = ThemeManager.Current.PanelDark,
-                Padding = new Padding(16, 0, 0, 0),
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-
-            var greetingText = _currentUser == null
-                ? "Chọn chức năng từ menu bên trái để bắt đầu."
-                : "Xin chào " + _currentUser.HoTen + ", chọn chức năng từ menu bên trái để bắt đầu.";
-
-            var subtitle = new Label
-            {
-                Text = greetingText,
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                Height = 40,
-                Font = new Font("Segoe UI", 11F, FontStyle.Regular),
-                ForeColor = ThemeManager.Current.SecondaryText,
-                Padding = new Padding(18, 12, 0, 0)
-            };
-
-            container.Controls.Add(subtitle);
-            container.Controls.Add(header);
-            pnlDesktop.Controls.Add(container);
-            ThemeManager.ApplyTheme(container);
+            ShowDashboard();
         }
 
         private void ShowDashboard()
@@ -477,7 +422,9 @@ namespace DesktopApp_Project.GUI
 
             var title = new Label
             {
-                Text = "Xin chào Admin",
+                Text = _currentUser == null
+                    ? "Trang chủ"
+                    : "Xin chào " + _currentUser.HoTen + " (" + AppConstants.GetDisplayRole(_currentUser.VaiTro) + ")",
                 Dock = DockStyle.Top,
                 AutoSize = true,
                 Height = 44,
@@ -485,19 +432,6 @@ namespace DesktopApp_Project.GUI
                 ForeColor = ThemeManager.Current.PrimaryText,
                 BackColor = ThemeManager.Current.BackgroundDark,
                 Padding = new Padding(10, 0, 0, 0),
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-
-            var subtitle = new Label
-            {
-                Text = "Xin chào, Admin !!!",
-                Dock = DockStyle.Top,
-                AutoSize = true,
-                Height = 34,
-                Font = new Font("Segoe UI", 10F),
-                ForeColor = ThemeManager.Current.SecondaryText,
-                BackColor = ThemeManager.Current.BackgroundDark,
-                Padding = new Padding(12, 0, 0, 8),
                 TextAlign = ContentAlignment.MiddleLeft
             };
 
@@ -680,19 +614,19 @@ namespace DesktopApp_Project.GUI
 
         private void btnChinh_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color1);
+            ActivateButton(sender);
             ShowHome();
         }
 
         private void btnBaiTap_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color2);
+            ActivateButton(sender);
             OpenModule(new FrmBaiTap(_services, _currentUser));
         }
 
         private void btnBaoCao_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color3);
+            ActivateButton(sender);
             OpenModule(new FrmBaoCao(_services, _currentUser));
         }
 
@@ -703,73 +637,73 @@ namespace DesktopApp_Project.GUI
 
         private void btnDeThi_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color5);
+            ActivateButton(sender);
             OpenModule(new FrmDeThi(_services, _currentUser));
         }
 
         private void btnDiemDanh_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color6);
+            ActivateButton(sender);
             OpenModule(new FrmDiemDanh(_services, _currentUser));
         }
 
         private void btnDiemSo_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color1);
+            ActivateButton(sender);
             OpenModule(new FrmDiemSo(_services, _currentUser));
         }
 
         private void btnHocPhi_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color2);
+            ActivateButton(sender);
             OpenModule(new FrmHocPhi(_services, _currentUser));
         }
 
         private void btnHocVien_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color3);
+            ActivateButton(sender);
             OpenModule(new FrmHocVien(_services, _currentUser));
         }
 
         private void btnLopHoc_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color4);
+            ActivateButton(sender);
             OpenModule(new FrmLopHoc(_services, _currentUser));
         }
 
         private void btnTaiLieu_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color5);
+            ActivateButton(sender);
             OpenModule(new FrmTaiLieu(_services, _currentUser));
         }
 
         private void btnTuVung_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color5);
+            ActivateButton(sender);
             OpenModule(new FrmTuVung(_services, _currentUser));
         }
 
         private void btnFlashcard_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color5);
+            ActivateButton(sender);
             OpenModule(new FrmFlashcard(_services, _currentUser));
         }
 
         private void btnThongBao_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, RGBColors.color6);
+            ActivateButton(sender);
             OpenModule(new FrmThongBao(_services, _currentUser));
         }
 
         private void lblLogo_Click(object sender, EventArgs e)
         {
-            ActivateButton(btnChinh, RGBColors.color1);
+            ActivateButton(btnChinh);
             ShowHome();
         }
 
         private void btnSetting_Click(object sender, EventArgs e)
         {
-            ActivateButton(sender, ThemeManager.Current.Accent);
+            ActivateButton(sender);
             ShowSettings();
         }
 

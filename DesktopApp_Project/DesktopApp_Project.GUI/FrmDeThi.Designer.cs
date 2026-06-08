@@ -377,7 +377,7 @@
 			this.btnXoa.Name = "btnXoa";
 			this.btnXoa.Size = new System.Drawing.Size(92, 34);
 			this.btnXoa.TabIndex = 2;
-			this.btnXoa.Text = "Lứu";
+			this.btnXoa.Text = "Xóa";
 			// 
 			// btnChonFile
 			// 
