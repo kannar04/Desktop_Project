@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý màn hình chính
+// Chức năng:
+// - Hiển thị và nhập dữ liệu màn hình chính
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,6 +18,7 @@ using FontAwesome.Sharp;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị màn hình chính và gọi tầng nghiệp vụ khi người dùng thao tác.
     public partial class FrmChinh : Form
     {
         protected override CreateParams CreateParams
@@ -58,6 +65,7 @@ namespace DesktopApp_Project.GUI
             _currentUser = currentUser;
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -80,6 +88,7 @@ namespace DesktopApp_Project.GUI
             ShowHome();
         }
 
+        // Cấu hình khung màn hình chính gồm menu trái, thanh tiêu đề và vùng nội dung.
         private void ConfigureShell()
         {
             SetStyle(ControlStyles.ResizeRedraw | ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
@@ -108,6 +117,7 @@ namespace DesktopApp_Project.GUI
             pnlMenuItems.Controls.Add(leftBorderBtn);
         }
 
+        // Áp dụng màu nền và phông chữ cho khung màn hình chính.
         private void ApplyShellTheme()
         {
             var theme = ThemeManager.Current;
@@ -129,6 +139,7 @@ namespace DesktopApp_Project.GUI
             ApplySidebarTheme();
         }
 
+        // Áp dụng màu sắc cho menu bên trái và các nút điều hướng.
         private void ApplySidebarTheme()
         {
             var buttons = new[]
@@ -169,6 +180,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Định dạng nút menu theo chủ đề giao diện hiện tại.
         private void StyleMenuButton(IconButton button, bool active)
         {
             var theme = ThemeManager.Current;
@@ -190,6 +202,7 @@ namespace DesktopApp_Project.GUI
             button.MouseLeave += SidebarButton_MouseLeave;
         }
 
+        // Xử lý sidebar khi rê chuột vào nút.
         private void SidebarButton_MouseEnter(object sender, EventArgs e)
         {
             var button = sender as IconButton;
@@ -203,6 +216,7 @@ namespace DesktopApp_Project.GUI
             button.IconColor = ThemeManager.Current.Accent;
         }
 
+        // Xử lý sidebar khi rời chuột khỏi nút.
         private void SidebarButton_MouseLeave(object sender, EventArgs e)
         {
             var button = sender as IconButton;
@@ -216,6 +230,7 @@ namespace DesktopApp_Project.GUI
             button.IconColor = ThemeManager.Current.Accent;
         }
 
+        // Định dạng các nút thu nhỏ, phóng to và đóng cửa sổ.
         private void StyleShellWindowButton(Button button)
         {
             button.BackColor = Color.Transparent;
@@ -225,6 +240,7 @@ namespace DesktopApp_Project.GUI
             button.UseVisualStyleBackColor = false;
         }
 
+        // Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
         private void ThemeManager_ThemeChanged(object sender, EventArgs e)
         {
             ThemeManager.ApplyTheme(this);
@@ -236,6 +252,7 @@ namespace DesktopApp_Project.GUI
             pnlDesktop.Invalidate(true);
         }
 
+        // Dọn tham chiếu khi biểu mẫu con đã đóng.
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             ThemeManager.ThemeChanged -= ThemeManager_ThemeChanged;
@@ -243,11 +260,14 @@ namespace DesktopApp_Project.GUI
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        // Xử lý nhả bắt chuột khi kéo cửa sổ.
         private static extern void ReleaseCapture();
 
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        // Xử lý gửi thông điệp kéo cửa sổ.
         private static extern void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
 
+        // Xử lý kéo cửa sổ từ thanh tiêu đề tùy biến.
         private void pnlMovingForm_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -257,6 +277,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý xử lý thông điệp cửa sổ.
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
@@ -314,6 +335,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Đóng.
         private void btnClose_Click(object sender, EventArgs e)
         {
             if (!ConfirmExit())
@@ -325,6 +347,7 @@ namespace DesktopApp_Project.GUI
             Application.Exit();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút phóng to hoặc khôi phục cửa sổ.
         private void button1_Click(object sender, EventArgs e)
         {
             if (WindowState == FormWindowState.Normal)
@@ -339,11 +362,13 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Thu nhỏ.
         private void btnMinimize_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Minimized;
         }
 
+        // Xử lý activate nút.
         private void ActivateButton(object senderBtn)
         {
             if (senderBtn == null)
@@ -372,6 +397,7 @@ namespace DesktopApp_Project.GUI
             icoTittle.IconColor = ThemeManager.Current.Accent;
         }
 
+        // Xử lý disable nút.
         private void DisableButton()
         {
             if (currentBtn == null)
@@ -388,6 +414,7 @@ namespace DesktopApp_Project.GUI
             leftBorderBtn.Visible = false;
         }
 
+        // Xóa dữ liệu nhập và đưa biểu mẫu về trạng thái thao tác mới.
         private void ClearDesktop()
         {
             if (currentChildForm != null)
@@ -403,11 +430,13 @@ namespace DesktopApp_Project.GUI
             pnlDesktop.Controls.Clear();
         }
 
+        // Hiển thị home.
         private void ShowHome()
         {
             ShowDashboard();
         }
 
+        // Hiển thị màn hình tổng quan.
         private void ShowDashboard()
         {
             ClearDesktop();
@@ -485,6 +514,7 @@ namespace DesktopApp_Project.GUI
             ApplyShellTheme();
         }
 
+        // Tạo metric card.
         private Control CreateMetricCard(string label, string value, Color accent)
         {
             var panel = new Panel
@@ -515,6 +545,7 @@ namespace DesktopApp_Project.GUI
             return panel;
         }
 
+        // Xử lý metric card paint.
         private void MetricCard_Paint(object sender, PaintEventArgs e)
         {
             var panel = sender as Panel;
@@ -529,6 +560,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Tạo doanh thu chart.
         private Control CreateRevenueChart(List<MonthlyRevenueDTO> rows)
         {
             var panel = new Panel
@@ -542,6 +574,7 @@ namespace DesktopApp_Project.GUI
             return panel;
         }
 
+        // Vẽ biểu đồ doanh thu theo tháng trên màn hình tổng quan.
         private void PaintRevenueChart(Panel panel, Graphics graphics, List<MonthlyRevenueDTO> rows)
         {
             graphics.Clear(ThemeManager.Current.BackgroundDark);
@@ -572,11 +605,13 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Tạo schedule bảng.
         private Control CreateScheduleGrid(List<WeeklyScheduleDTO> rows)
         {
             var grid = UiHelpers.Grid();
             grid.Margin = new Padding(6);
             grid.ReadOnly = true;
+            // Xóa dữ liệu đang hiển thị trên bảng khi chưa đủ điều kiện tải.
             grid.DataSource = rows.Select(x => new
             {
                 Ngày = x.NgayHoc.ToString("dd/MM/yyyy"),
@@ -587,11 +622,13 @@ namespace DesktopApp_Project.GUI
             return grid;
         }
 
+        // Định dạng tiền tệ.
         private static string FormatMoney(decimal value)
         {
             return value.ToString("N0") + " đ";
         }
 
+        // Xử lý tiện ích giao diện và thao tác tệp an toàn cho người dùng.
         private void OpenModule(Form childForm)
         {
             if (_services == null || _currentUser == null)
@@ -612,18 +649,21 @@ namespace DesktopApp_Project.GUI
             childForm.Show();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Trang chính.
         private void btnChinh_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             ShowHome();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Bài tập.
         private void btnBaiTap_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmBaiTap(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Báo cáo.
         private void btnBaoCao_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
@@ -635,78 +675,91 @@ namespace DesktopApp_Project.GUI
             // Cham Bai module disabled by request. Keep handler as no-op for designer compatibility.
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Đề thi.
         private void btnDeThi_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmDeThi(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Điểm danh.
         private void btnDiemDanh_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmDiemDanh(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Điểm số.
         private void btnDiemSo_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmDiemSo(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Học phí.
         private void btnHocPhi_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmHocPhi(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Học viên.
         private void btnHocVien_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmHocVien(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Lớp học.
         private void btnLopHoc_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmLopHoc(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Tài liệu.
         private void btnTaiLieu_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmTaiLieu(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Từ vựng.
         private void btnTuVung_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmTuVung(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Flashcard.
         private void btnFlashcard_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmFlashcard(_services, _currentUser));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Thông báo.
         private void btnThongBao_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             OpenModule(new FrmThongBao(_services, _currentUser));
         }
 
+        // Xử lý thao tác bấm trên điều khiển giao diện để cập nhật trạng thái biểu mẫu.
         private void lblLogo_Click(object sender, EventArgs e)
         {
             ActivateButton(btnChinh);
             ShowHome();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Cài đặt.
         private void btnSetting_Click(object sender, EventArgs e)
         {
             ActivateButton(sender);
             ShowSettings();
         }
 
+        // Hiển thị settings.
         private void ShowSettings()
         {
             ClearDesktop();
@@ -768,6 +821,7 @@ namespace DesktopApp_Project.GUI
 
         }
 
+        // Xử lý khi đóng màn hình đăng nhập.
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!_allowClose && e.CloseReason == CloseReason.UserClosing && !ConfirmExit())
@@ -779,6 +833,7 @@ namespace DesktopApp_Project.GUI
             base.OnFormClosing(e);
         }
 
+        // Xử lý xác nhận thoát ứng dụng.
         private bool ConfirmExit()
         {
             return MessageBox.Show(

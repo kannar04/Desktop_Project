@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý tài liệu học tập
+// Chức năng:
+// - Hiển thị và nhập dữ liệu tài liệu học tập
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.Drawing;
 using System.IO;
@@ -8,6 +14,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị tài liệu học tập và gọi tầng nghiệp vụ khi người dùng thao tác.
     public partial class FrmTaiLieu : ModuleFormBase
     {
         private int _selectedId;
@@ -27,6 +34,7 @@ namespace DesktopApp_Project.GUI
             SetRuntimeContext(services, currentUser);
         }
 
+        // Đăng ký các hàm xử lý sự kiện cho điều khiển trên biểu mẫu.
         private void WireEvents()
         {
             WireClick(btnMoi, BtnMoi_Click);
@@ -42,6 +50,7 @@ namespace DesktopApp_Project.GUI
             WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected override void OnRuntimeLoad()
         {
             UiHelpers.BindLopHoc(_cboLop, Services);
@@ -49,13 +58,16 @@ namespace DesktopApp_Project.GUI
             LoadData();
         }
 
+        // tải dữ liệu.
         private void LoadData()
         {
             var maLop = UiHelpers.SelectedId(_cboLop);
+            // Nạp danh sách vào bảng hiển thị.
             _grid.DataSource = SafeLoad<object>(() => Services.TaiLieu.LayDanhSach(maLop == 0 ? (int?)null : maLop), null);
             ResetGridSelection();
         }
 
+        // Đưa dữ liệu từ dòng đang chọn trên lưới lên các ô nhập liệu.
         private void FillFromGrid()
         {
             var item = UiHelpers.SelectedItem<TaiLieuDTO>(_grid);
@@ -87,6 +99,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xóa dữ liệu nhập và đưa biểu mẫu về trạng thái thao tác mới.
         private void ClearForm()
         {
             _selectedId = 0;
@@ -102,17 +115,20 @@ namespace DesktopApp_Project.GUI
             ClearPreview();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Mới.
         private void BtnMoi_Click(object sender, EventArgs e)
         {
             _selectedId = 0;
             SaveCurrentDocument();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Lưu.
         private void BtnLuu_Click(object sender, EventArgs e)
         {
             SaveCurrentDocument();
         }
 
+        // Lưu tài liệu hiện tại.
         private void SaveCurrentDocument()
         {
             var localPath = !string.IsNullOrWhiteSpace(_txtDuongDanLocal.Text) ? _txtDuongDanLocal.Text.Trim() : _txtFile.Text.Trim();
@@ -129,6 +145,7 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
+            // Gọi tầng nghiệp vụ để lưu dữ liệu đang nhập.
             var result = Services.TaiLieu.Luu(new TaiLieuDTO
             {
                 MaTaiLieu = _selectedId,
@@ -143,6 +160,7 @@ namespace DesktopApp_Project.GUI
                 TenFileGoc = _txtTenFileGoc.Text.Trim(),
                 DuongDanLocal = localPath,
                 DuongDanCloud = _txtCloudUrl.Text.Trim(),
+                // Gọi tầng nghiệp vụ để xử lý tệp hình ảnh.
                 ThumbnailPath = Services.Media.IsImage(localPath) ? localPath : string.Empty
             });
 
@@ -154,19 +172,23 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Xóa.
         private void BtnXoa_Click(object sender, EventArgs e)
         {
+            // Kiểm tra đã chọn bản ghi trên lưới trước khi cập nhật hoặc xóa.
             if (_selectedId == 0)
             {
                 UiHelpers.WarnSelect("tai lieu");
                 return;
             }
 
+            // Xác nhận với người dùng trước khi xóa dữ liệu.
             if (!UiHelpers.ConfirmDelete("tai lieu"))
             {
                 return;
             }
 
+            // Gọi tầng nghiệp vụ để xóa bản ghi đang chọn.
             var result = Services.TaiLieu.Xoa(_selectedId);
             UiHelpers.ShowResult(result);
             if (result.Success)
@@ -176,12 +198,14 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Chọn tệp.
         private void BtnFile_Click(object sender, EventArgs e)
         {
             using (var dialog = new OpenFileDialog { Filter = "Tai lieu va media|*.pdf;*.doc;*.docx;*.ppt;*.pptx;*.xls;*.xlsx;*.txt;*.jpg;*.jpeg;*.png;*.gif;*.bmp;*.mp3;*.wav;*.m4a;*.aac;*.flac;*.mp4;*.mov;*.avi;*.mkv|Tat ca|*.*" })
             {
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
+                    // Gọi tầng nghiệp vụ để xử lý tệp vào thư mục tải lên.
                     var result = Services.Media.CopyFileToUploadFolder(dialog.FileName, "TaiLieu");
                     UiHelpers.ShowResult(result);
                     if (!result.Success)
@@ -202,6 +226,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút chọn âm thanh.
         private void BtnAudio_Click(object sender, EventArgs e)
         {
             using (var dialog = new OpenFileDialog { Filter = "Audio|*.mp3;*.wav;*.m4a;*.aac;*.flac|Tat ca|*.*" })
@@ -217,6 +242,7 @@ namespace DesktopApp_Project.GUI
                     return;
                 }
 
+                // Gọi tầng nghiệp vụ để xử lý tệp vào thư mục tải lên.
                 var result = Services.Media.CopyFileToUploadFolder(dialog.FileName, "TaiLieu");
                 UiHelpers.ShowResult(result);
                 if (result.Success)
@@ -226,20 +252,26 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Mở tệp.
         private void BtnMoFile_Click(object sender, EventArgs e)
         {
             var path = !string.IsNullOrWhiteSpace(_txtDuongDanLocal.Text) ? _txtDuongDanLocal.Text : _txtFile.Text;
+            // Gọi tầng nghiệp vụ để hiển thị tệp.
             UiHelpers.ShowResult(Services.Media.OpenFile(path));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Mở âm thanh.
         private void BtnMoAudio_Click(object sender, EventArgs e)
         {
+            // Gọi tầng nghiệp vụ để hiển thị tệp.
             UiHelpers.ShowResult(Services.Media.OpenFile(_txtAudio.Text));
         }
 
+        // Xử lý sự kiện người dùng nhấn nút tải lên đám mây.
         private void BtnUploadCloud_Click(object sender, EventArgs e)
         {
             var path = !string.IsNullOrWhiteSpace(_txtDuongDanLocal.Text) ? _txtDuongDanLocal.Text : _txtFile.Text;
+            // Gọi tầng nghiệp vụ để xử lý tệp lên kho đám mây giả lập.
             var result = Services.Media.UploadToFakeCloud(path, "TaiLieu");
             UiHelpers.ShowResult(result);
             if (result.Success)
@@ -248,6 +280,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Chọn lại dòng vừa lưu trên bảng.
         private void SelectSavedRow(string localPath, string topic)
         {
             foreach (DataGridViewRow row in _grid.Rows)
@@ -276,6 +309,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Kiểm tra âm thanh đường dẫn.
         private bool ValidateAudioPath(string audioPath)
         {
             if (string.IsNullOrWhiteSpace(audioPath))
@@ -289,6 +323,7 @@ namespace DesktopApp_Project.GUI
                 return false;
             }
 
+            // Gọi tầng nghiệp vụ để xử lý đường dẫn tệp thực tế.
             var resolved = Services.Media.ResolvePath(audioPath);
             if (!File.Exists(resolved))
             {
@@ -299,6 +334,7 @@ namespace DesktopApp_Project.GUI
             return true;
         }
 
+        // Xử lý định dạng âm thanh được hỗ trợ đường dẫn.
         private static bool IsSupportedAudioPath(string path)
         {
             var extension = Path.GetExtension(path);
@@ -313,6 +349,7 @@ namespace DesktopApp_Project.GUI
             return false;
         }
 
+        // Cập nhật phần hiển thị xem trước dựa trên dữ liệu đang chọn.
         private void UpdatePreview(string localPath)
         {
             ClearPreview();
@@ -327,6 +364,7 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
+            // Gọi tầng nghiệp vụ để xử lý đường dẫn tệp thực tế.
             var resolved = Services.Media.ResolvePath(localPath);
             if (!File.Exists(resolved))
             {
@@ -334,9 +372,11 @@ namespace DesktopApp_Project.GUI
                 return;
             }
 
+            // Gọi tầng nghiệp vụ để xử lý tệp hình ảnh.
             if (!Services.Media.IsImage(localPath))
             {
                 var fileName = Path.GetFileName(resolved);
+                // Gọi tầng nghiệp vụ để lấy loại tệp.
                 var fileType = Services.Media.GetFileType(localPath);
                 SetPreviewMessage(fileType + ": " + fileName, "File nay khong phai anh nen khong co preview hinh.");
                 return;
@@ -355,6 +395,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xóa dữ liệu nhập và đưa biểu mẫu về trạng thái thao tác mới.
         private void ClearPreview()
         {
             if (_picPreview == null)
@@ -370,6 +411,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Cập nhật phần hiển thị xem trước dựa trên dữ liệu đang chọn.
         private void SetPreviewMessage(string title, string detail)
         {
             if (_picPreview == null)
@@ -398,6 +440,7 @@ namespace DesktopApp_Project.GUI
             _picPreview.Image = bitmap;
         }
 
+        // Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
         private void Grid_SelectionChanged(object sender, EventArgs e)
         {
             if (!_allowGridFill)
@@ -408,6 +451,7 @@ namespace DesktopApp_Project.GUI
             FillFromGrid();
         }
 
+        // Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
         private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0)
@@ -419,6 +463,7 @@ namespace DesktopApp_Project.GUI
             FillFromGrid();
         }
 
+        // Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
         private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (_isFilling)
@@ -430,6 +475,7 @@ namespace DesktopApp_Project.GUI
             LoadData();
         }
 
+        // Xóa trạng thái chọn dòng trên bảng.
         private void ResetGridSelection()
         {
             _allowGridFill = false;

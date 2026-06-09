@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý điểm danh
+// Chức năng:
+// - Hiển thị và nhập dữ liệu điểm danh
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -8,6 +14,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị điểm danh và gọi tầng nghiệp vụ khi người dùng thao tác.
     public partial class FrmDiemDanh : ModuleFormBase
     {
         private BindingList<DiemDanhDTO> _rows = new BindingList<DiemDanhDTO>();
@@ -24,12 +31,14 @@ namespace DesktopApp_Project.GUI
             SetRuntimeContext(services, currentUser);
         }
 
+        // Đăng ký các hàm xử lý sự kiện cho điều khiển trên biểu mẫu.
         private void WireEvents()
         {
             WireClick(btnTai, BtnTai_Click);
             WireClick(btnLuu, BtnLuu_Click);
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected override void OnRuntimeLoad()
         {
             ConfigureGrid();
@@ -38,6 +47,7 @@ namespace DesktopApp_Project.GUI
             LoadData();
         }
 
+        // Xử lý các nút thao tác.
         private void ConfigureActions()
         {
             bottom.Controls.Clear();
@@ -46,6 +56,7 @@ namespace DesktopApp_Project.GUI
             bottom.Controls.Add(btnLuu);
         }
 
+        // Xử lý cấu hình cột điểm danh.
         private void ConfigureGrid()
         {
             _grid.AutoGenerateColumns = false;
@@ -91,8 +102,10 @@ namespace DesktopApp_Project.GUI
             });
         }
 
+        // tải dữ liệu.
         private void LoadData()
         {
+            // Gọi tầng nghiệp vụ để lấy bảng điểm danh của lớp và ngày học.
             var result = SafeLoad(() => Services.DiemDanh.LayBangDiemDanh(UiHelpers.SelectedId(_cboLop), _dtNgay.Value), null);
             if (result == null)
             {
@@ -102,6 +115,7 @@ namespace DesktopApp_Project.GUI
             if (result.Success)
             {
                 _rows = new BindingList<DiemDanhDTO>(result.Data);
+                // Xóa dữ liệu đang hiển thị trên bảng khi chưa đủ điều kiện tải.
                 _grid.DataSource = _rows;
             }
             else
@@ -110,11 +124,13 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Tải.
         private void BtnTai_Click(object sender, EventArgs e)
         {
             LoadData();
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Lưu.
         private void BtnLuu_Click(object sender, EventArgs e)
         {
             _grid.EndEdit();
@@ -123,6 +139,7 @@ namespace DesktopApp_Project.GUI
                 row.CoMat = row.TrangThai == AppConstants.AttendancePresent || row.TrangThai == AppConstants.AttendanceLate;
             }
 
+            // Gọi tầng nghiệp vụ để lưu toàn bộ danh sách điểm danh.
             var result = Services.DiemDanh.LuuTatCa(_rows.ToList());
             UiHelpers.ShowResult(result);
             if (result.Success) LoadData();

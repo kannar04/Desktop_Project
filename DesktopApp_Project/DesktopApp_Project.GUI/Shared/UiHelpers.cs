@@ -1,3 +1,9 @@
+// Tiện ích dùng chung cho các biểu mẫu Windows Forms
+// Chức năng:
+// - Tạo điều khiển theo chuẩn giao diện
+// - Hiển thị thông báo kết quả từ tầng nghiệp vụ
+// - Sao chép, mở và chuẩn hóa đường dẫn tệp đa phương tiện
+
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.Common;
 using DesktopApp_Project.DTO;
@@ -13,6 +19,7 @@ using System.Windows.Forms;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp lưu cấu hình màu sắc và phông chữ đang được áp dụng cho giao diện.
     public static class AppTheme
     {
         private static readonly Color[] AccentPalette =
@@ -110,6 +117,7 @@ namespace DesktopApp_Project.GUI
         {
             get { return ColorTranslator.FromHtml("#FFB74D"); }
         }
+        // Áp dụng chủ đề màu.
         public static void Apply(bool darkMode, int accentIndex, string language)
         {
             DarkMode = darkMode;
@@ -118,6 +126,7 @@ namespace DesktopApp_Project.GUI
             Save();
         }
 
+        // Lấy cấu hình từ tệp.
         public static void Load()
         {
             Language = "Vietnamese";
@@ -156,6 +165,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Lưu cấu hình xuống tệp.
         private static void Save()
         {
             var dir = Path.GetDirectoryName(SettingsPath);
@@ -184,6 +194,7 @@ namespace DesktopApp_Project.GUI
         }
     }
 
+    // Lớp hỗ trợ giao diện lưu dữ liệu tiện ích giao diện Windows Forms cho biểu mẫu sử dụng nội bộ.
     public static class UiHelpers
     {
         public static readonly Font DefaultFont = new Font("Segoe UI", 9F, FontStyle.Regular);
@@ -199,6 +210,7 @@ namespace DesktopApp_Project.GUI
         public static Color SuccessColor { get { return AppTheme.SuccessColor; } }
         public static Color WarningColor { get { return AppTheme.WarningColor; } }
 
+        // Xử lý nút.
         public static Button Button(string text)
         {
             var button = new Button
@@ -220,6 +232,7 @@ namespace DesktopApp_Project.GUI
             return button;
         }
 
+        // Áp dụng màu nền, chữ và trạng thái hover cho nút thường.
         public static void ApplyButtonStyle(Button button)
         {
             button.FlatAppearance.BorderColor = BorderColor;
@@ -227,6 +240,7 @@ namespace DesktopApp_Project.GUI
             button.FlatAppearance.MouseDownBackColor = AccentColor;
         }
 
+        // Xử lý nhãn.
         public static Label Label(string text)
         {
             return new Label
@@ -239,6 +253,7 @@ namespace DesktopApp_Project.GUI
             };
         }
 
+        // Xử lý ô nhập.
         public static TextBox TextBox()
         {
             return new TextBox
@@ -254,6 +269,7 @@ namespace DesktopApp_Project.GUI
             };
         }
 
+        // Xử lý ô chọn.
         public static ComboBox ComboBox()
         {
             return new ComboBox
@@ -270,6 +286,7 @@ namespace DesktopApp_Project.GUI
             };
         }
 
+        // Xử lý bảng.
         public static DataGridView Grid()
         {
             return new DataGridView
@@ -295,6 +312,7 @@ namespace DesktopApp_Project.GUI
             };
         }
 
+        // Xử lý mã đang chọn trong ô chọn.
         public static int SelectedId(ComboBox combo)
         {
             if (combo.SelectedValue == null)
@@ -306,6 +324,7 @@ namespace DesktopApp_Project.GUI
             return int.TryParse(combo.SelectedValue.ToString(), out id) ? id : 0;
         }
 
+        // Lấy dòng dữ liệu hiện tại trên bảng và ép về kiểu DTO cần dùng.
         public static T SelectedItem<T>(DataGridView grid) where T : class
         {
             if (grid.CurrentRow == null)
@@ -316,6 +335,7 @@ namespace DesktopApp_Project.GUI
             return grid.CurrentRow.DataBoundItem as T;
         }
 
+        // Hiển thị thông báo kết quả xử lý.
         public static void ShowResult(ServiceResult result)
         {
             MessageBox.Show(result.Message, result.Success ? "Thông báo" : "Lỗi",
@@ -323,6 +343,7 @@ namespace DesktopApp_Project.GUI
                 result.Success ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
         }
 
+        // Xử lý cảnh báo khi chưa chọn dữ liệu.
         public static void WarnSelect(string itemName)
         {
             MessageBox.Show("Vui lòng chọn " + itemName + ".", "Thông báo",
@@ -330,6 +351,7 @@ namespace DesktopApp_Project.GUI
                 MessageBoxIcon.Information);
         }
 
+        // Xử lý hộp xác nhận xóa.
         public static bool ConfirmDelete(string itemName)
         {
             return MessageBox.Show("Bạn có chắc muốn xóa " + itemName + " này?", "Xác nhận",
@@ -337,21 +359,25 @@ namespace DesktopApp_Project.GUI
                 MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
+        // Lấy danh sách lớp học vào ô chọn.
         public static void BindLopHoc(ComboBox combo, ServiceFactory services)
         {
             combo.BeginUpdate();
             combo.DataSource = null;
             combo.DisplayMember = "TenLop";
             combo.ValueMember = "MaLopHoc";
+            // Gọi tầng nghiệp vụ để lấy danh sách hiển thị.
             combo.DataSource = services.LopHoc.LayDanhSach();
             combo.EndUpdate();
         }
 
+        // Lấy danh sách kỹ năng vào ô chọn.
         public static void BindKyNang(ComboBox combo)
         {
             combo.DataSource = AppConstants.SkillLabels.ToList();
         }
 
+        // Xử lý bảng dữ liệu chuẩn của biểu mẫu.
         public static TableLayoutPanel FormGrid()
         {
             var panel = new TableLayoutPanel
@@ -371,11 +397,13 @@ namespace DesktopApp_Project.GUI
             return panel;
         }
 
+        // Áp dụng giao diện hoàn thiện cho biểu mẫu.
         public static void ApplyPolish(Control root)
         {
             ApplyDarkTheme(root);
         }
 
+        // Áp dụng chủ đề tối.
         public static void ApplyDarkTheme(Control root)
         {
             if (root == null)
@@ -389,6 +417,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Áp dụng chủ đề cho từng điều khiển.
         private static void ApplyControlTheme(Control control)
         {
             if (control is Form)
@@ -484,6 +513,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Áp dụng kiểu hiển thị bảng.
         private static void ApplyGridStyle(DataGridView grid)
         {
             grid.BackgroundColor = AppBackgroundColor;
@@ -500,6 +530,7 @@ namespace DesktopApp_Project.GUI
             grid.AlternatingRowsDefaultCellStyle.BackColor = SurfaceAltColor;
         }
 
+        // Xử lý toàn bộ cây điều khiển con.
         private static IEnumerable<Control> EnumerateControls(Control root)
         {
             yield return root;
@@ -513,6 +544,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý chế độ vẽ đệm để giảm nhấp nháy.
         public static void EnableDoubleBuffering(Control control)
         {
             if (control == null)
@@ -528,11 +560,13 @@ namespace DesktopApp_Project.GUI
         }
     }
 
+    // Lớp hỗ trợ lưu tệp tải lên vào thư mục nội bộ của ứng dụng.
     public static class ManagedFileStorage
     {
         private const string AppFolderName = "QuanLyLopIELTS";
         private const string UploadsFolderName = "Uploads";
 
+        // Xử lý tiện ích giao diện và thao tác tệp an toàn cho người dùng.
         public static string CopyToManagedFolder(string sourcePath, string category)
         {
             if (string.IsNullOrWhiteSpace(sourcePath))
@@ -557,6 +591,7 @@ namespace DesktopApp_Project.GUI
             return UploadsFolderName + "/" + safeCategory + "/" + storedName;
         }
 
+        // Xử lý đường dẫn tệp thực tế.
         public static string ResolvePath(string storedPath)
         {
             if (string.IsNullOrWhiteSpace(storedPath))
@@ -583,6 +618,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý đoạn đường dẫn an toàn.
         private static string SanitizePathSegment(string value)
         {
             value = string.IsNullOrWhiteSpace(value) ? "General" : value.Trim();
@@ -594,6 +630,7 @@ namespace DesktopApp_Project.GUI
             return value;
         }
 
+        // Xử lý tên tệp an toàn.
         private static string SanitizeFileName(string value)
         {
             value = string.IsNullOrWhiteSpace(value) ? "upload" : value.Trim();
@@ -606,33 +643,39 @@ namespace DesktopApp_Project.GUI
         }
     }
 
+    // Lớp nền cho các biểu mẫu chức năng, giữ bộ khởi tạo dịch vụ và xử lý lỗi lúc chạy thống nhất.
     public class ModuleFormBase : Form
     {
         protected ServiceFactory Services;
         protected NguoiDungDTO CurrentUser;
         private bool _runtimeLoaded;
 
+        // Khởi tạo biểu mẫu cơ sở phục vụ luồng xử lý nội bộ.
         protected ModuleFormBase()
         {
         }
 
+        // Khởi tạo biểu mẫu cơ sở với tiêu đề hiển thị.
         protected ModuleFormBase(string title)
         {
             Text = title;
         }
 
+        // Khởi tạo biểu mẫu cơ sở với dịch vụ, người dùng hiện tại và tiêu đề.
         protected ModuleFormBase(ServiceFactory services, NguoiDungDTO currentUser, string title)
             : this(title)
         {
             SetRuntimeContext(services, currentUser);
         }
 
+        // Xử lý dịch vụ và người dùng hiện tại.
         protected void SetRuntimeContext(ServiceFactory services, NguoiDungDTO currentUser)
         {
             Services = services;
             CurrentUser = currentUser;
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -651,6 +694,7 @@ namespace DesktopApp_Project.GUI
             SafeRun(OnRuntimeLoad);
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected virtual void OnRuntimeLoad()
         {
         }
@@ -670,6 +714,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý tiện ích giao diện và thao tác tệp an toàn cho người dùng.
         protected bool SafeRun(Action action)
         {
             try
@@ -688,6 +733,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý tiện ích giao diện và thao tác tệp an toàn cho người dùng.
         protected T SafeLoad<T>(Func<T> action, T fallback)
         {
             try
@@ -701,6 +747,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý người dùng hiện tại đã sẵn sàng.
         protected bool HasCurrentUser()
         {
             if (CurrentUser != null)
@@ -712,6 +759,7 @@ namespace DesktopApp_Project.GUI
             return false;
         }
 
+        // Xử lý sự kiện nhấn nút an toàn.
         protected void WireClick(Control control, EventHandler handler)
         {
             if (control == null || handler == null)
@@ -723,6 +771,7 @@ namespace DesktopApp_Project.GUI
             control.Click += (sender, e) => SafeRun(() => handler(sender, e));
         }
 
+        // Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
         protected void WireSelectedIndexChanged(ComboBox combo, EventHandler handler)
         {
             if (combo == null || handler == null)
@@ -734,6 +783,7 @@ namespace DesktopApp_Project.GUI
             combo.SelectedIndexChanged += (sender, e) => SafeRun(() => handler(sender, e));
         }
 
+        // Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
         protected void WireSelectionChanged(DataGridView grid, EventHandler handler)
         {
             if (grid == null || handler == null)
@@ -745,6 +795,7 @@ namespace DesktopApp_Project.GUI
             grid.SelectionChanged += (sender, e) => SafeRun(() => handler(sender, e));
         }
 
+        // Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
         protected void WireCellClick(DataGridView grid, DataGridViewCellEventHandler handler)
         {
             if (grid == null || handler == null)
@@ -756,11 +807,13 @@ namespace DesktopApp_Project.GUI
             grid.CellClick += (sender, e) => SafeRun(() => handler(sender, e));
         }
 
+        // Xử lý thông báo thông tin.
         protected void Info(string message)
         {
             MessageBox.Show(message, "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        // Hiển thị lỗi lúc chạy.
         private void ShowRuntimeError(Exception ex)
         {
             var message = ex == null ? "Lỗi không xác định." : ex.Message;

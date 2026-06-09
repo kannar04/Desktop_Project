@@ -1,3 +1,9 @@
+// Dịch vụ xử lý nghiệp vụ đường dẫn thanh toán VNPay
+// Chức năng:
+// - Nhận dữ liệu từ giao diện dưới dạng đối tượng truyền dữ liệu hoặc tham số lọc
+// - Kiểm tra nghiệp vụ trước khi gọi tầng dữ liệu
+// - Trả kết quả xử lý hoặc danh sách đối tượng truyền dữ liệu cho giao diện
+
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -9,8 +15,10 @@ using System.Text.RegularExpressions;
 
 namespace DesktopApp_Project.BUS
 {
+    // Lớp xử lý nghiệp vụ đường dẫn thanh toán VNPay, kiểm tra dữ liệu trước khi gọi kho dữ liệu/tầng dữ liệu.
     public class VnpayUrlService
     {
+        // Tạo đường dẫn thanh toán VNPay từ thông tin giao dịch.
         public string BuildPaymentUrl(string txnRef, decimal amount, string orderInfo, string ipAddr)
         {
             if (string.IsNullOrWhiteSpace(txnRef))
@@ -56,6 +64,7 @@ namespace DesktopApp_Project.BUS
             return payUrl + separator + query + "&vnp_SecureHash=" + secureHash;
         }
 
+        // Kiểm tra cấu hình VNPay bắt buộc.
         private static string RequireVnpayConfig(string key)
         {
             var value = ConfigurationManager.AppSettings[key];
@@ -67,6 +76,7 @@ namespace DesktopApp_Project.BUS
             return value.Trim();
         }
 
+        // Chuẩn hóa nội dung đơn hàng trước khi gửi sang VNPay.
         private static string SanitizeOrderInfo(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -98,6 +108,7 @@ namespace DesktopApp_Project.BUS
             return string.IsNullOrWhiteSpace(sanitized) ? "Thanh toan hoc phi" : sanitized;
         }
 
+        // Xử lý sign.
         private static string Sign(string rawHash, string hashSecret)
         {
             var keyBytes = Encoding.UTF8.GetBytes(hashSecret);
@@ -109,6 +120,7 @@ namespace DesktopApp_Project.BUS
             }
         }
 
+        // Xử lý đường dẫn encode.
         private static string UrlEncode(string value)
         {
             return Uri.EscapeDataString(value ?? string.Empty);

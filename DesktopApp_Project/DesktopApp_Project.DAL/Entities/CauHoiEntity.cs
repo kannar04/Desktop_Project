@@ -1,9 +1,15 @@
 ﻿using System;
+// Thực thể dữ liệu ánh xạ bảng câu hỏi trong cơ sở dữ liệu
+// Chức năng:
+// - Khai báo các cột LINQ sang SQL
+// - Được kho dữ liệu dùng để đọc và ghi dữ liệu cơ sở dữ liệu
+
 using System.Data.Linq.Mapping;
 
 namespace DesktopApp_Project.DAL
 {
     [Table(Name = "dbo.CauHoi")]
+    // Lớp thực thể dữ liệu ánh xạ dữ liệu câu hỏi từ bảng cơ sở dữ liệu sang đối tượng C#.
     public class CauHoiEntity
         {
             [Column(IsPrimaryKey = true, IsDbGenerated = true, AutoSync = AutoSync.OnInsert)]

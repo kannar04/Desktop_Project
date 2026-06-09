@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý hóa đơn học phí
+// Chức năng:
+// - Hiển thị và nhập dữ liệu hóa đơn học phí
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -6,6 +12,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị hóa đơn học phí và gọi tầng nghiệp vụ khi người dùng thao tác.
     public partial class FrmHoaDonHocPhi : ModuleFormBase
     {
         private readonly int _maThanhToan;
@@ -23,6 +30,7 @@ namespace DesktopApp_Project.GUI
             SetRuntimeContext(services, currentUser);
         }
 
+        // Đăng ký các hàm xử lý sự kiện cho điều khiển trên biểu mẫu.
         private void WireEvents()
         {
             WireClick(btnXuatHtml, BtnXuatHtml_Click);
@@ -30,8 +38,10 @@ namespace DesktopApp_Project.GUI
             WireClick(btnDong, (s, e) => Close());
         }
 
+        // Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
         protected override void OnRuntimeLoad()
         {
+            // Gọi tầng nghiệp vụ để tạo hóa đơn học phí dạng HTML.
             var result = Services.BaoCao.TaoHoaDonHocPhiHtml(_maThanhToan);
             if (!result.Success)
             {
@@ -43,6 +53,7 @@ namespace DesktopApp_Project.GUI
             txtFallback.Text = result.Data;
         }
 
+        // Xử lý sự kiện người dùng nhấn nút xuất tệp HTML.
         private void BtnXuatHtml_Click(object sender, EventArgs e)
         {
             using (var dialog = new FolderBrowserDialog())
@@ -52,6 +63,7 @@ namespace DesktopApp_Project.GUI
                     return;
                 }
 
+                // Gọi tầng nghiệp vụ để xuất hóa đơn học phí dạng HTML.
                 var result = Services.BaoCao.XuatHoaDonHocPhiHtml(_maThanhToan, dialog.SelectedPath);
                 UiHelpers.ShowResult(result);
                 if (result.Success)
@@ -61,6 +73,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút In.
         private void BtnIn_Click(object sender, EventArgs e)
         {
             if (browser.Document != null)

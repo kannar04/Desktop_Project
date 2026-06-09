@@ -1,7 +1,13 @@
+// Bộ chuyển đổi thực thể dữ liệu sang đối tượng truyền dữ liệu
+// Chức năng:
+// - Nhận thực thể dữ liệu từ tầng dữ liệu
+// - Tạo đối tượng truyền dữ liệu để tầng nghiệp vụ và giao diện sử dụng mà không lộ lớp ánh xạ cơ sở dữ liệu
+
 using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.DAL
 {
+    // Lớp chuyển đổi thực thể dữ liệu sang đối tượng truyền dữ liệu cho các tầng phía trên.
     internal static class DtoMapper
     {
         public static NguoiDungDTO ToDto(NguoiDungEntity entity)

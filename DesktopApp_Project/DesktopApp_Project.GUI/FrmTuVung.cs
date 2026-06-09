@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý từ vựng và flashcard
+// Chức năng:
+// - Hiển thị và nhập dữ liệu từ vựng và flashcard
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,6 +16,7 @@ using DesktopApp_Project.GUI.Shared.Themes;
 
 namespace DesktopApp_Project.GUI
 {
+	// Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị từ vựng và flashcard và gọi tầng nghiệp vụ khi người dùng thao tác.
 	public partial class FrmTuVung : ModuleFormBase
 	{
 		private int _selectedId;
@@ -31,6 +38,7 @@ namespace DesktopApp_Project.GUI
 			SetRuntimeContext(services, currentUser);
 		}
 
+		// Đăng ký các hàm xử lý sự kiện cho điều khiển trên biểu mẫu.
 		private void WireEvents()
 		{
 			WireClick(btnMoi, BtnMoi_Click);
@@ -41,6 +49,7 @@ namespace DesktopApp_Project.GUI
 			WireSelectedIndexChanged(_cboLop, CboLop_SelectedIndexChanged);
 		}
 
+		// Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
 		protected override void OnRuntimeLoad()
 		{
 			UiHelpers.BindLopHoc(_cboLop, Services);
@@ -49,25 +58,34 @@ namespace DesktopApp_Project.GUI
 			LoadData();
 		}
 
+		// Xử lý bộ lọc tìm kiếm.
 		private void ConfigureFilters()
 		{
+			// Cập nhật dữ liệu hiển thị trên ô chọn bộ lọc loại báo cáo.
 			_cboLoaiFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.WordTypes).ToList();
+			// Xóa dữ liệu đang hiển thị trên ô chọn cấp độ khi chưa đủ điều kiện tải.
 			_cboCapDoFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.CefrLevels).ToList();
+			// Xóa dữ liệu đang hiển thị trên ô chọn chủ đề khi chưa đủ điều kiện tải.
 			_cboChuDeFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.VocabularyTopics).ToList();
+			// Xóa dữ liệu đang hiển thị trên ô chọn chữ cái đầu khi chưa đủ điều kiện tải.
 			_cboChuCaiFilter.DataSource = new[] { AppConstants.FilterAll }.Concat(Enumerable.Range('A', 26).Select(x => ((char)x).ToString())).ToList();
 
 			btnLoc.Click += (sender, e) => SafeRun(() => BtnLoc_Click(sender, e));
 			_btnToggleAdvancedSearch.Click += (sender, e) => SafeRun(() => ToggleAdvancedSearch());
 		}
 
+		// Xử lý cấu hình tìm kiếm nâng cao.
 		private void ConfigureAdvancedSearch()
 		{
+			// Xóa dữ liệu đang hiển thị trên ô chọn toán tử nối nâng cao khi chưa đủ điều kiện tải.
 			_cboAdvancedJoin.DataSource = GetAdvancedJoinOptions();
 			_btnAdvancedOpenParenthesis.Click += (sender, e) => SafeRun(() => IncrementPendingParenthesis(true));
+			// Xóa dữ liệu đang hiển thị trên ô chọn trường tìm kiếm nâng cao khi chưa đủ điều kiện tải.
 			_cboAdvancedField.DataSource = GetAdvancedFieldOptions();
 			_btnAdvancedCloseParenthesis.Click += (sender, e) => SafeRun(() => IncrementPendingParenthesis(false));
 			_btnAddAdvancedCondition.Click += (sender, e) => SafeRun(() => AddAdvancedCondition());
 
+			// Xóa dữ liệu đang hiển thị trên bảng điều kiện tìm kiếm nâng cao khi chưa đủ điều kiện tải.
 			_gridAdvancedConditions.DataSource = _advancedConditions;
 			ThemeManager.ApplyTheme(_gridAdvancedConditions);
 
@@ -80,14 +98,17 @@ namespace DesktopApp_Project.GUI
 			UpdateAdvancedJoinInput();
 		}
 
+		// Chuyển đổi bật/tắt tìm kiếm nâng cao.
 		private void ToggleAdvancedSearch()
 		{
 			_advancedSearchPanel.Visible = !_advancedSearchPanel.Visible;
 			_btnToggleAdvancedSearch.Text = _advancedSearchPanel.Visible ? "Ẩn tìm kiếm nâng cao" : "Tìm kiếm nâng cao";
 		}
 
+		// tải dữ liệu.
 		private void LoadData()
 		{
+			// Nạp kết quả tìm kiếm vào bảng.
 			_grid.DataSource = SafeLoad<object>(() => Services.TuVung.TimKiem(new TuVungSearchCriteriaDTO
 			{
 				MaLopHoc = UiHelpers.SelectedId(_cboLop),
@@ -100,6 +121,7 @@ namespace DesktopApp_Project.GUI
 			ResetGridSelection();
 		}
 
+		// Lấy danh sách trường tìm kiếm nâng cao.
 		private static List<SearchOption> GetAdvancedFieldOptions()
 		{
 			return new List<SearchOption>
@@ -112,6 +134,7 @@ namespace DesktopApp_Project.GUI
 			};
 		}
 
+		// Lấy toán tử nối điều kiện nâng cao.
 		private static List<SearchOption> GetAdvancedJoinOptions()
 		{
 			return new List<SearchOption>
@@ -121,6 +144,7 @@ namespace DesktopApp_Project.GUI
 			};
 		}
 
+		// Cập nhật ô nhập toán tử nối nâng cao.
 		private void UpdateAdvancedJoinInput()
 		{
 			if (_cboAdvancedJoin == null)
@@ -135,6 +159,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Chuẩn hóa toán tử nối giữa các điều kiện nâng cao.
 		private void NormalizeAdvancedConditionJoins()
 		{
 			for (var i = 0; i < _advancedConditions.Count; i++)
@@ -156,6 +181,7 @@ namespace DesktopApp_Project.GUI
 			UpdateAdvancedJoinInput();
 		}
 
+		// Xóa dữ liệu nhập và đưa biểu mẫu về trạng thái thao tác mới.
 		private void ClearAdvancedConditions()
 		{
 			_advancedConditions.Clear();
@@ -163,6 +189,7 @@ namespace DesktopApp_Project.GUI
 			ResetPendingParentheses();
 		}
 
+		// Xử lý tự đóng ngoặc trong điều kiện nâng cao.
 		private bool AutoCloseAdvancedParentheses()
 		{
 			var balance = 0;
@@ -186,6 +213,7 @@ namespace DesktopApp_Project.GUI
 			return true;
 		}
 
+		// Cập nhật ô nhập giá trị tìm kiếm nâng cao.
 		private void UpdateAdvancedValueInput()
 		{
 			var field = SelectedOptionValue(_cboAdvancedField);
@@ -196,15 +224,18 @@ namespace DesktopApp_Project.GUI
 			_cboAdvancedValue.Visible = useCombo;
 			if (useCombo)
 			{
+				// Xóa dữ liệu đang hiển thị trên ô chọn giá trị tìm kiếm nâng cao khi chưa đủ điều kiện tải.
 				_cboAdvancedValue.DataSource = values;
 			}
 			else
 			{
 				_txtAdvancedValue.Clear();
+				// Xóa dữ liệu đang hiển thị trên ô chọn giá trị tìm kiếm nâng cao khi chưa đủ điều kiện tải.
 				_cboAdvancedValue.DataSource = null;
 			}
 		}
 
+		// Lấy giá trị gợi ý cho tìm kiếm nâng cao.
 		private static List<string> GetAdvancedValues(string field)
 		{
 			if (field == "ChuDe")
@@ -230,6 +261,7 @@ namespace DesktopApp_Project.GUI
 			return new List<string>();
 		}
 
+		// Thêm điều kiện tìm kiếm nâng cao.
 		private void AddAdvancedCondition()
 		{
 			var field = SelectedOptionValue(_cboAdvancedField);
@@ -270,6 +302,7 @@ namespace DesktopApp_Project.GUI
 			ResetPendingParentheses();
 		}
 
+		// Xóa điều kiện tìm kiếm nâng cao.
 		private void RemoveAdvancedCondition()
 		{
 			var row = UiHelpers.SelectedItem<SearchConditionRow>(_gridAdvancedConditions);
@@ -283,6 +316,7 @@ namespace DesktopApp_Project.GUI
 			NormalizeAdvancedConditionJoins();
 		}
 
+		// Xử lý chạy tìm kiếm nâng cao.
 		private void RunAdvancedSearch()
 		{
 			if (!AutoCloseAdvancedParentheses())
@@ -290,6 +324,7 @@ namespace DesktopApp_Project.GUI
 				return;
 			}
 
+			// Gọi tầng nghiệp vụ để tìm kiếm nâng cao.
 			var result = Services.TuVung.TimKiemNangCao(
 				UiHelpers.SelectedId(_cboLop),
 				_advancedConditions.Select(x => x.ToDto()).ToList());
@@ -297,28 +332,33 @@ namespace DesktopApp_Project.GUI
 			UiHelpers.ShowResult(result);
 			if (result.Success)
 			{
+				// Xóa dữ liệu đang hiển thị trên bảng khi chưa đủ điều kiện tải.
 				_grid.DataSource = result.Data;
 				ResetGridSelection();
 			}
 		}
 
+		// Xử lý giá trị của lựa chọn hiện tại.
 		private static string SelectedOptionValue(ComboBox combo)
 		{
 			var option = combo == null ? null : combo.SelectedItem as SearchOption;
 			return option == null ? string.Empty : option.Value;
 		}
 
+		// Xử lý nhãn của lựa chọn hiện tại.
 		private static string SelectedOptionLabel(ComboBox combo)
 		{
 			var option = combo == null ? null : combo.SelectedItem as SearchOption;
 			return option == null ? string.Empty : option.Label;
 		}
 
+		// Xử lý toán tử nối đang chọn.
 		private static SearchJoinOperator SelectedJoinOperator(ComboBox combo)
 		{
 			return SelectedOptionValue(combo) == "Or" ? SearchJoinOperator.Or : SearchJoinOperator.And;
 		}
 
+		// Xử lý tăng số ngoặc chờ đóng.
 		private void IncrementPendingParenthesis(bool open)
 		{
 			if (open)
@@ -333,6 +373,7 @@ namespace DesktopApp_Project.GUI
 			RefreshPendingParenthesisButtons();
 		}
 
+		// Xóa trạng thái các ngoặc đang chờ đóng.
 		private void ResetPendingParentheses()
 		{
 			_pendingOpenParentheses = 0;
@@ -340,6 +381,7 @@ namespace DesktopApp_Project.GUI
 			RefreshPendingParenthesisButtons();
 		}
 
+		// Xử lý trạng thái nút đóng ngoặc.
 		private void RefreshPendingParenthesisButtons()
 		{
 			if (_btnAdvancedOpenParenthesis != null)
@@ -357,6 +399,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Đưa dữ liệu từ dòng đang chọn trên lưới lên các ô nhập liệu.
 		private void Fill()
 		{
 			var item = UiHelpers.SelectedItem<TuVungDTO>(_grid);
@@ -383,6 +426,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xóa dữ liệu nhập và đưa biểu mẫu về trạng thái thao tác mới.
 		private void ClearForm()
 		{
 			_selectedId = 0;
@@ -392,8 +436,10 @@ namespace DesktopApp_Project.GUI
 			_txtNghia.Clear();
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Mới.
 		private void BtnMoi_Click(object sender, EventArgs e)
 		{
+			// Gọi tầng nghiệp vụ để lưu dữ liệu đang nhập.
 			var result = Services.TuVung.Luu(BuildDto(0));
 			UiHelpers.ShowResult(result);
 			if (result.Success)
@@ -405,14 +451,17 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Lưu.
 		private void BtnLuu_Click(object sender, EventArgs e)
 		{
+			// Kiểm tra đã chọn bản ghi trên lưới trước khi cập nhật hoặc xóa.
 			if (_selectedId == 0)
 			{
 				UiHelpers.WarnSelect("tu vung");
 				return;
 			}
 
+			// Gọi tầng nghiệp vụ để lưu dữ liệu đang nhập.
 			var result = Services.TuVung.Luu(BuildDto(_selectedId));
 
 			UiHelpers.ShowResult(result);
@@ -423,8 +472,10 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Tạo đối tượng truyền dữ liệu từ dữ liệu người dùng nhập trên biểu mẫu để gửi xuống tầng nghiệp vụ.
 		private TuVungDTO BuildDto(int maTuVung)
 		{
+			// Đóng gói dữ liệu trên biểu mẫu vào đối tượng truyền dữ liệu trước khi chuyển xuống tầng nghiệp vụ.
 			return new TuVungDTO
 			{
 				MaTuVung = maTuVung,
@@ -438,19 +489,23 @@ namespace DesktopApp_Project.GUI
 			};
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Xóa.
 		private void BtnXoa_Click(object sender, EventArgs e)
 		{
+			// Kiểm tra đã chọn bản ghi trên lưới trước khi cập nhật hoặc xóa.
 			if (_selectedId == 0)
 			{
 				UiHelpers.WarnSelect("từ vựng");
 				return;
 			}
 
+			// Xác nhận với người dùng trước khi xóa dữ liệu.
 			if (!UiHelpers.ConfirmDelete("từ vựng"))
 			{
 				return;
 			}
 
+			// Gọi tầng nghiệp vụ để xóa bản ghi đang chọn.
 			var result = Services.TuVung.Xoa(_selectedId);
 			UiHelpers.ShowResult(result);
 			if (result.Success)
@@ -460,6 +515,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
 		private void Grid_SelectionChanged(object sender, EventArgs e)
 		{
 			if (!_allowGridFill)
@@ -470,6 +526,7 @@ namespace DesktopApp_Project.GUI
 			Fill();
 		}
 
+		// Xử lý khi người dùng chọn dữ liệu trên bảng dữ liệu.
 		private void Grid_CellClick(object sender, DataGridViewCellEventArgs e)
 		{
 			if (e.RowIndex < 0)
@@ -481,17 +538,20 @@ namespace DesktopApp_Project.GUI
 			Fill();
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Lọc.
 		private void BtnLoc_Click(object sender, EventArgs e)
 		{
 			LoadData();
 		}
 
+		// Xử lý giá trị đang chọn hoặc mặc định.
 		private string SelectedOrDefault(ComboBox combo, string defaultValue)
 		{
 			var value = combo == null ? null : Convert.ToString(combo.SelectedItem);
 			return string.IsNullOrWhiteSpace(value) || value == AppConstants.FilterAll ? defaultValue : value;
 		}
 
+		// Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
 		private void CboLop_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (_isFilling)
@@ -504,6 +564,7 @@ namespace DesktopApp_Project.GUI
 			LoadData();
 		}
 
+		// Xóa trạng thái bộ lọc tìm kiếm.
 		private void ResetSearchFilters()
 		{
 			if (_txtTuKhoa != null)
@@ -521,6 +582,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xóa trạng thái ô chọn về Tất cả.
 		private static void ResetComboToAll(ComboBox combo)
 		{
 			if (combo != null && combo.Items.Count > 0)
@@ -529,6 +591,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xóa trạng thái chọn dòng trên bảng.
 		private void ResetGridSelection()
 		{
 			_selectedId = 0;
@@ -537,8 +600,10 @@ namespace DesktopApp_Project.GUI
 			_grid.CurrentCell = null;
 		}
 
+		// Lớp hỗ trợ giao diện lưu dữ liệu lựa chọn tìm kiếm cho biểu mẫu sử dụng nội bộ.
 		private class SearchOption
 		{
+			// Khởi tạo đối tượng lựa chọn tìm kiếm phục vụ luồng xử lý nội bộ.
 			public SearchOption(string value, string label)
 			{
 				Value = value;
@@ -549,6 +614,7 @@ namespace DesktopApp_Project.GUI
 			public string Label { get; private set; }
 		}
 
+		// Lớp hỗ trợ giao diện lưu dữ liệu dòng điều kiện tìm kiếm cho biểu mẫu sử dụng nội bộ.
 		private class SearchConditionRow
 		{
 			public SearchJoinOperator? JoinOperator { get; set; }
@@ -569,8 +635,10 @@ namespace DesktopApp_Project.GUI
 				}
 			}
 
+			// Tạo đối tượng truyền dữ liệu từ dữ liệu người dùng nhập trên biểu mẫu để gửi xuống tầng nghiệp vụ.
 			public SearchConditionDTO ToDto()
 			{
+				// Đóng gói dữ liệu trên biểu mẫu vào đối tượng truyền dữ liệu trước khi chuyển xuống tầng nghiệp vụ.
 				return new SearchConditionDTO
 				{
 					Field = Field,

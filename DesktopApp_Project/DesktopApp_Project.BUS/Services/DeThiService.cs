@@ -1,3 +1,9 @@
+// Dịch vụ xử lý nghiệp vụ đề thi IELTS
+// Chức năng:
+// - Nhận dữ liệu từ giao diện dưới dạng đối tượng truyền dữ liệu hoặc tham số lọc
+// - Kiểm tra nghiệp vụ trước khi gọi tầng dữ liệu
+// - Trả kết quả xử lý hoặc danh sách đối tượng truyền dữ liệu cho giao diện
+
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,15 +18,19 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.BUS
 {
+	// Lớp xử lý nghiệp vụ đề thi IELTS, kiểm tra dữ liệu trước khi gọi kho dữ liệu/tầng dữ liệu.
 	public class DeThiService : ServiceBase
 	{
 		public DeThiService(IQuanLyIeltsRepository repository) : base(repository) { }
 
+		// Lấy đề thi.
 		public List<DeThiDTO> LayDeThi()
 		{
+			// Lấy danh sách đề thi qua tầng dữ liệu.
 			return Repository.GetDeThi();
 		}
 
+		// Kiểm tra nghiệp vụ rồi gọi tầng dữ liệu để lưu dữ liệu đề thi IELTS.
 		public ServiceResult Luu(DeThiDTO dto)
 		{
 			return Try(() =>
@@ -28,16 +38,19 @@ namespace DesktopApp_Project.BUS
 				dto = dto ?? new DeThiDTO();
 				dto.KyNang = NormalizeSkill(dto.KyNang);
 
+				// Ràng buộc dữ liệu: Vui lòng nhập tên đề thi.
 				if (ValidationHelper.IsBlank(dto.TenDeThi))
 				{
 					return ServiceResult.Fail("Vui long nhap ten de thi.");
 				}
 
+				// Ràng buộc dữ liệu: Kỹ năng phải là Listening, Reading, Writing hoặc Speaking.
 				if (!ValidationHelper.IsValidSkill(dto.KyNang))
 				{
 					return ServiceResult.Fail("Ky nang phai la Listening, Reading, Writing hoac Speaking.");
 				}
 
+				// Ràng buộc dữ liệu: Band phải nằm trong khoảng 0 đến 9 và theo bước 0.5.
 				if (!ValidationHelper.IsValidIeltsScore(dto.BandLevel)
 					|| !ValidationHelper.IsValidIeltsScore(dto.BandTu)
 					|| !ValidationHelper.IsValidIeltsScore(dto.BandDen))
@@ -65,6 +78,7 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult.Fail("Anh chi ho tro .jpg, .jpeg hoac .png.");
 				}
 
+				// Ràng buộc dữ liệu: Đề Listening bắt buộc phải có âm thanh.
 				if (dto.KyNang == "Listening" && string.IsNullOrWhiteSpace(dto.AudioPath))
 				{
 					return ServiceResult.Fail("De Listening bat buoc phai co audio.");
@@ -73,34 +87,42 @@ namespace DesktopApp_Project.BUS
 				dto.TrangThai = string.IsNullOrWhiteSpace(dto.TrangThai) ? "DangTao" : dto.TrangThai.Trim();
 				if (dto.MaDeThi == 0)
 				{
+					// Thêm đề thi mới qua tầng dữ liệu.
 					Repository.InsertDeThi(dto);
 					return ServiceResult.Ok("Them de thi thanh cong.");
 				}
 
+				// Cập nhật thông tin đề thi qua tầng dữ liệu.
 				Repository.UpdateDeThi(dto);
 				return ServiceResult.Ok("Cap nhat de thi thanh cong.");
 			});
 		}
 
+		// Gọi tầng dữ liệu để xóa dữ liệu đề thi IELTS sau khi giao diện xác nhận.
 		public ServiceResult Xoa(int maDeThi)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Vui lòng chọn đề thi.
 				if (maDeThi <= 0)
 				{
 					return ServiceResult.Fail("Vui long chon de thi.");
 				}
 
+				// Xóa đề thi đã chọn qua tầng dữ liệu.
 				Repository.DeleteDeThi(maDeThi);
 				return ServiceResult.Ok("Xoa de thi thanh cong.");
 			});
 		}
 
+		// Lấy câu hỏi.
 		public List<CauHoiDTO> LayCauHoi(string keyword)
 		{
+			// Lấy danh sách câu hỏi qua tầng dữ liệu.
 			return Repository.GetCauHoi(keyword);
 		}
 
+		// Lấy câu hỏi.
 		public ServiceResult<List<CauHoiDTO>> LayCauHoi(CauHoiSearchCriteriaDTO criteria)
 		{
 			return Try(() =>
@@ -111,10 +133,12 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult<List<CauHoiDTO>>.Fail(message);
 				}
 
+				// Tìm kiếm câu hỏi theo bộ lọc nâng cao qua tầng dữ liệu.
 				return ServiceResult<List<CauHoiDTO>>.Ok(Repository.SearchCauHoi(criteria), "Tai cau hoi thanh cong.");
 			});
 		}
 
+		// Lấy các đoạn Reading theo khoảng band điểm.
 		public ServiceResult<List<ReadingPassageDTO>> LayReadingPassages(decimal? bandTu, decimal? bandDen)
 		{
 			return Try(() =>
@@ -124,10 +148,12 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult<List<ReadingPassageDTO>>.Fail(message);
 				}
 
+				// Lấy các đoạn Reading theo khoảng band qua tầng dữ liệu.
 				return ServiceResult<List<ReadingPassageDTO>>.Ok(Repository.GetReadingPassages(bandTu, bandDen), "OK");
 			});
 		}
 
+		// Lấy phần phần Listening.
 		public ServiceResult<List<ListeningSectionDTO>> LayListeningSections(decimal? bandTu, decimal? bandDen)
 		{
 			return Try(() =>
@@ -137,23 +163,28 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult<List<ListeningSectionDTO>>.Fail(message);
 				}
 
+				// Lấy các phần Listening theo khoảng band qua tầng dữ liệu.
 				return ServiceResult<List<ListeningSectionDTO>>.Ok(Repository.GetListeningSections(bandTu, bandDen), "OK");
 			});
 		}
 
+		// Lấy nội dung đề thi.
 		public ServiceResult<List<IeltsExamItemDTO>> LayNoiDungDeThi(int maDeThi)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Vui lòng chọn đề thi.
 				if (maDeThi <= 0)
 				{
 					return ServiceResult<List<IeltsExamItemDTO>>.Fail("Vui long chon de thi.");
 				}
 
+				// Lấy nội dung đề thi qua tầng dữ liệu.
 				return ServiceResult<List<IeltsExamItemDTO>>.Ok(Repository.GetNoiDungDeThi(maDeThi), "OK");
 			});
 		}
 
+		// Lấy ngân hàng câu hỏi IELTS.
 		public ServiceResult<List<BankRowDTO>> LayBankIELTS(string kyNang, float bandTu, float bandDen)
 		{
 			return Try(() =>
@@ -172,9 +203,11 @@ namespace DesktopApp_Project.BUS
 				}
 
 				var rows = new List<BankRowDTO>();
+				// Tìm kiếm câu hỏi theo bộ lọc nâng cao qua tầng dữ liệu.
 				var questions = Repository.SearchCauHoi(new CauHoiSearchCriteriaDTO { NhanKyNang = skill, BandTu = from, BandDen = to });
 				if (skill == "Reading")
 				{
+					// Lấy các đoạn Reading theo khoảng band qua tầng dữ liệu.
 					rows.AddRange(Repository.GetReadingPassages(from, to).Select(x => new BankRowDTO
 					{
 						Kind = "Passage",
@@ -189,6 +222,7 @@ namespace DesktopApp_Project.BUS
 				}
 				else
 				{
+					// Lấy các phần Listening theo khoảng band qua tầng dữ liệu.
 					rows.AddRange(Repository.GetListeningSections(from, to).Select(x => new BankRowDTO
 					{
 						Kind = "Section",
@@ -219,6 +253,7 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Lấy bản xem trước câu hỏi trong ngân hàng.
 		public ServiceResult<string> LayPreviewBankItem(BankRowDTO row)
 		{
 			return Try(() =>
@@ -230,6 +265,7 @@ namespace DesktopApp_Project.BUS
 
 				if (row.Kind == "Passage")
 				{
+					// Lấy đoạn Reading theo mã qua tầng dữ liệu.
 					var passage = Repository.GetReadingPassageById(row.Id);
 					if (passage == null) return ServiceResult<string>.Fail("Khong tim thay passage.");
 					return ServiceResult<string>.Ok(passage.Title + Environment.NewLine + Environment.NewLine + passage.Content + Environment.NewLine + Environment.NewLine + passage.ImagePath, passage.ImagePath);
@@ -237,11 +273,13 @@ namespace DesktopApp_Project.BUS
 
 				if (row.Kind == "Section")
 				{
+					// Lấy phần Listening theo mã qua tầng dữ liệu.
 					var section = Repository.GetListeningSectionById(row.Id);
 					if (section == null) return ServiceResult<string>.Fail("Khong tim thay section.");
 					return ServiceResult<string>.Ok(section.Title + Environment.NewLine + Environment.NewLine + section.Transcript + Environment.NewLine + Environment.NewLine + section.AudioPath, section.AudioPath);
 				}
 
+				// Lấy danh sách câu hỏi qua tầng dữ liệu.
 				var question = Repository.GetCauHoi(null).FirstOrDefault(x => x.MaCauHoi == row.Id);
 				if (question == null) return ServiceResult<string>.Fail("Khong tim thay cau hoi.");
 				var preview = question.NoiDung + Environment.NewLine
@@ -256,12 +294,14 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Tạo đề thi.
 		public ServiceResult<int> TaoDeThi(DeThiDTO dto)
 		{
 			return Try(() =>
 			{
 				dto = dto ?? new DeThiDTO();
 				dto.KyNang = NormalizeSkill(dto.KyNang);
+				// Ràng buộc dữ liệu: Vui lòng nhập tên đề thi.
 				if (ValidationHelper.IsBlank(dto.TenDeThi))
 				{
 					return ServiceResult<int>.Fail("Vui long nhap ten de thi.");
@@ -277,11 +317,13 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult<int>.Fail(bandMessage);
 				}
 
+				// Thêm đề thi mới qua tầng dữ liệu.
 				var id = Repository.InsertDeThi(dto);
 				return ServiceResult<int>.Ok(id, "Tao de thi thanh cong.");
 			});
 		}
 
+		// Tạo đề thi IELTS tự động.
 		public ServiceResult<int> TaoDeThiIELTSTuDong(string kyNang, float bandTu, float bandDen)
 		{
 			return Try(() =>
@@ -301,6 +343,7 @@ namespace DesktopApp_Project.BUS
 
 				if (skill == "Reading")
 				{
+					// Lấy các đoạn Reading theo khoảng band qua tầng dữ liệu.
 					var passages = Repository.GetReadingPassages(from, to)
 						.Where(x => x.SoCauHoi > 0)
 						.OrderBy(x => Guid.NewGuid())
@@ -312,6 +355,7 @@ namespace DesktopApp_Project.BUS
 					}
 
 					var groupedQuestions = passages
+						// Lấy câu hỏi thuộc đoạn Reading qua tầng dữ liệu.
 						.Select(x => new { Passage = x, Questions = Repository.GetCauHoiByPassageId(x.PassageId).Where(q => IsInBand(q.BandLevel, from, to)).OrderBy(q => q.MaCauHoi).ToList() })
 						.ToList();
 					if (groupedQuestions.Sum(x => x.Questions.Count) < 40)
@@ -326,6 +370,7 @@ namespace DesktopApp_Project.BUS
 						foreach (var question in group.Questions)
 						{
 							if (order > 40) break;
+							// Thêm câu hỏi vào đề thi qua tầng dữ liệu.
 							Repository.ThemCauHoiVaoDeThi(examId, question.MaCauHoi, "Reading", group.Passage.PassageId, order++);
 						}
 					}
@@ -333,6 +378,7 @@ namespace DesktopApp_Project.BUS
 				}
 				else
 				{
+					// Lấy các phần Listening theo khoảng band qua tầng dữ liệu.
 					var sections = Repository.GetListeningSections(from, to)
 						.Where(x => x.SoCauHoi > 0)
 						.GroupBy(x => x.PartNo > 0 ? x.PartNo : x.SectionNumber)
@@ -346,6 +392,7 @@ namespace DesktopApp_Project.BUS
 					}
 
 					var groupedQuestions = sections
+						// Lấy câu hỏi thuộc phần Listening qua tầng dữ liệu.
 						.Select(x => new { Section = x, Questions = Repository.GetCauHoiBySectionId(x.SectionId).Where(q => IsInBand(q.BandLevel, from, to)).OrderBy(q => q.MaCauHoi).ToList() })
 						.ToList();
 					if (groupedQuestions.Sum(x => x.Questions.Count) < 40)
@@ -360,6 +407,7 @@ namespace DesktopApp_Project.BUS
 						foreach (var question in group.Questions)
 						{
 							if (order > 40) break;
+							// Thêm câu hỏi vào đề thi qua tầng dữ liệu.
 							Repository.ThemCauHoiVaoDeThi(examId, question.MaCauHoi, "Listening", group.Section.SectionId, order++);
 						}
 					}
@@ -368,15 +416,18 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Kiểm tra nghiệp vụ rồi gọi tầng dữ liệu để lưu dữ liệu đề thi IELTS.
 		public ServiceResult LuuCauHoi(CauHoiDTO dto)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Nội dung câu hỏi và kỹ năng không hợp lệ.
 				if (ValidationHelper.IsBlank(dto.NoiDung) || !ValidationHelper.IsValidSkill(dto.NhanKyNang))
 				{
 					return ServiceResult.Fail("Noi dung cau hoi va ky nang khong hop le.");
 				}
 
+				// Ràng buộc dữ liệu: Band câu hỏi phải nằm trong khoảng 0 đến 9 và theo bước 0.5.
 				if (!ValidationHelper.IsValidIeltsScore(dto.BandLevel))
 				{
 					return ServiceResult.Fail("Band cau hoi phai nam trong khoang 0 den 9 va theo buoc 0.5.");
@@ -391,48 +442,58 @@ namespace DesktopApp_Project.BUS
 				dto.DapAn = string.IsNullOrWhiteSpace(dto.DapAn) ? dto.AnswerKey : dto.DapAn;
 				if (dto.MaCauHoi == 0)
 				{
+					// Thêm câu hỏi mới qua tầng dữ liệu.
 					Repository.InsertCauHoi(dto);
 					return ServiceResult.Ok("Them cau hoi thanh cong.");
 				}
 
+				// Cập nhật thông tin câu hỏi qua tầng dữ liệu.
 				Repository.UpdateCauHoi(dto);
 				return ServiceResult.Ok("Cap nhat cau hoi thanh cong.");
 			});
 		}
 
+		// Gọi tầng dữ liệu để xóa dữ liệu đề thi IELTS sau khi giao diện xác nhận.
 		public ServiceResult XoaCauHoi(int maCauHoi)
 		{
 			return Try(() =>
 			{
+				// Xóa câu hỏi đã chọn qua tầng dữ liệu.
 				Repository.DeleteCauHoi(maCauHoi);
 				return ServiceResult.Ok("Xoa cau hoi thanh cong.");
 			});
 		}
 
+		// Thêm câu hỏi vào đề thi.
 		public ServiceResult ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi)
 		{
 			return ThemCauHoiVaoDeThi(maDeThi, maCauHoi, null, null, null);
 		}
 
+		// Thêm câu hỏi vào đề thi.
 		public ServiceResult ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi, string groupType, int? groupId, int? thuTu)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Vui lòng chọn đề thi và câu hỏi.
 				if (maDeThi <= 0 || maCauHoi <= 0)
 				{
 					return ServiceResult.Fail("Vui long chon de thi va cau hoi.");
 				}
 
+				// Kiểm tra câu hỏi đã nằm trong đề thi qua tầng dữ liệu.
 				if (Repository.ExistsQuestionInExam(maDeThi, maCauHoi))
 				{
 					return ServiceResult.Fail("Cau hoi da ton tai trong de, khong them trung.");
 				}
 
+				// Thêm câu hỏi vào đề thi qua tầng dữ liệu.
 				Repository.ThemCauHoiVaoDeThi(maDeThi, maCauHoi, groupType, groupId, thuTu ?? Repository.GetNextThuTu(maDeThi));
 				return ServiceResult.Ok("Da them cau hoi vao de thi.");
 			});
 		}
 
+		// Xử lý gom câu hỏi theo nguồn Reading/Listening.
 		public ServiceResult<List<CauHoiDTO>> ResolveQuestions(BankRowDTO row)
 		{
 			return Try(() =>
@@ -444,45 +505,55 @@ namespace DesktopApp_Project.BUS
 
 				if (row.Kind == "Passage")
 				{
+					// Lấy câu hỏi thuộc đoạn Reading qua tầng dữ liệu.
 					return ServiceResult<List<CauHoiDTO>>.Ok(Repository.GetCauHoiByPassageId(row.Id), "OK");
 				}
 
 				if (row.Kind == "Section")
 				{
+					// Lấy câu hỏi thuộc phần Listening qua tầng dữ liệu.
 					return ServiceResult<List<CauHoiDTO>>.Ok(Repository.GetCauHoiBySectionId(row.Id), "OK");
 				}
 
+				// Lấy danh sách câu hỏi qua tầng dữ liệu.
 				var question = Repository.GetCauHoi(null).FirstOrDefault(x => x.MaCauHoi == row.Id);
 				return ServiceResult<List<CauHoiDTO>>.Ok(question == null ? new List<CauHoiDTO>() : new List<CauHoiDTO> { question }, "OK");
 			});
 		}
 
+		// Gọi tầng dữ liệu để xóa dữ liệu đề thi IELTS sau khi giao diện xác nhận.
 		public ServiceResult XoaCauHoiKhoiDeThi(int maDeThi, int maCauHoi)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Vui lòng chọn câu hỏi trong đề thi.
 				if (maDeThi <= 0 || maCauHoi <= 0)
 				{
 					return ServiceResult.Fail("Vui long chon cau hoi trong de thi.");
 				}
 
+				// Xóa câu hỏi khỏi đề thi qua tầng dữ liệu.
 				Repository.XoaCauHoiKhoiDeThi(maDeThi, maCauHoi);
 				return ServiceResult.Ok("Da xoa cau hoi khoi de thi.");
 			});
 		}
 
+		// Xử lý tải đường dẫn âm thanh lên kho lưu trữ.
 		public ServiceResult<string> UploadAudioPath(string sourcePath)
 		{
 			return CopyFileToUploadFolder(sourcePath, "DeThi/Audio", new[] { ".mp3", ".wav" });
 		}
 
+		// Xử lý tải đường dẫn hình ảnh lên kho lưu trữ.
 		public ServiceResult<string> UploadImagePath(string sourcePath)
 		{
 			return CopyFileToUploadFolder(sourcePath, "DeThi/Image", new[] { ".jpg", ".jpeg", ".png" });
 		}
 
+		// Xử lý tải âm thanh cho phần Listening.
 		public ServiceResult<string> UploadAudioForSection(int maSection, string sourceFilePath)
 		{
+			// Ràng buộc dữ liệu: Phần Listening không hợp lệ.
 			if (maSection <= 0)
 			{
 				return ServiceResult<string>.Fail("Section khong hop le.");
@@ -491,8 +562,10 @@ namespace DesktopApp_Project.BUS
 			return UploadAudioPath(sourceFilePath);
 		}
 
+		// Xử lý tải hình ảnh cho đoạn Reading.
 		public ServiceResult<string> UploadImageForPassage(int maPassage, string sourceFilePath)
 		{
+			// Ràng buộc dữ liệu: Đoạn Reading không hợp lệ.
 			if (maPassage <= 0)
 			{
 				return ServiceResult<string>.Fail("Passage khong hop le.");
@@ -501,11 +574,13 @@ namespace DesktopApp_Project.BUS
 			return UploadImagePath(sourceFilePath);
 		}
 
+		// Đọc dữ liệu đề thi IELTS từ tệp Excel hoặc CSV.
 		public ServiceResult<IeltsImportResultDTO> ImportIeltsExcel(string filePath)
 		{
 			return Try(() =>
 			{
 				var result = new IeltsImportResultDTO();
+				// Ràng buộc dữ liệu: Tệp dữ liệu nhập không tồn tại.
 				if (string.IsNullOrWhiteSpace(filePath) || !File.Exists(filePath))
 				{
 					return ServiceResult<IeltsImportResultDTO>.Fail("File import khong ton tai.");
@@ -539,6 +614,7 @@ namespace DesktopApp_Project.BUS
 					}
 				}
 
+				// Nhập dữ liệu IELTS từ tệp nhập qua tầng dữ liệu.
 				var count = Repository.ImportIeltsRows(validRows);
 				result.QuestionCount = count;
 				result.PassageCount = validRows.Where(x => x.Skill == "Reading").Select(x => x.ParentCode).Distinct().Count();
@@ -553,8 +629,10 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Tạo đề thi tự động.
 		private int CreateAutoExam(string skill, decimal from, decimal to)
 		{
+			// Thêm đề thi mới qua tầng dữ liệu.
 			return Repository.InsertDeThi(new DeThiDTO
 			{
 				TenDeThi = skill + " IELTS " + DateTime.Now.ToString("yyyyMMdd HHmm"),
@@ -565,6 +643,7 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Kiểm tra khoảng band điểm.
 		private static bool ValidateBandRange(decimal? bandTu, decimal? bandDen, out string message)
 		{
 			if (bandTu.HasValue && !ValidationHelper.IsValidIeltsScore(bandTu))
@@ -589,15 +668,18 @@ namespace DesktopApp_Project.BUS
 			return true;
 		}
 
+		// Xử lý tệp vào thư mục tải lên.
 		private ServiceResult<string> CopyFileToUploadFolder(string sourcePath, string folderName, string[] allowedExtensions)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Tệp nguồn không tồn tại.
 				if (string.IsNullOrWhiteSpace(sourcePath) || !File.Exists(sourcePath))
 				{
 					return ServiceResult<string>.Fail("File nguon khong ton tai.");
 				}
 
+				// Ràng buộc dữ liệu: Định dạng tệp không được hỗ trợ.
 				if (!ValidationHelper.IsSupportedFile(sourcePath, allowedExtensions))
 				{
 					return ServiceResult<string>.Fail("Dinh dang file khong duoc ho tro.");
@@ -622,11 +704,13 @@ namespace DesktopApp_Project.BUS
 			get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "QuanLyLopIELTS"); }
 		}
 
+		// Xử lý kỹ năng đề thi được hỗ trợ.
 		private static bool IsSupportedExamSkill(string skill)
 		{
 			return skill == "Reading" || skill == "Listening";
 		}
 
+		// Chuẩn hóa skill.
 		private static string NormalizeSkill(string skill)
 		{
 			if (string.Equals(skill, "Reading", StringComparison.OrdinalIgnoreCase)) return "Reading";
@@ -634,26 +718,31 @@ namespace DesktopApp_Project.BUS
 			return (skill ?? string.Empty).Trim();
 		}
 
+		// Xử lý điểm nằm trong khoảng band.
 		private static bool IsInBand(decimal? bandLevel, decimal bandTu, decimal bandDen)
 		{
 			return !bandLevel.HasValue || (bandLevel.Value >= bandTu && bandLevel.Value <= bandDen);
 		}
 
+		// Xử lý định dạng tài liệu được hỗ trợ.
 		private static bool IsSupportedDocument(string path)
 		{
 			return IsBlankOrExtension(path, ".pdf", ".doc", ".docx", ".xlsx");
 		}
 
+		// Xử lý định dạng âm thanh được hỗ trợ.
 		private static bool IsSupportedAudio(string path)
 		{
 			return IsBlankOrExtension(path, ".mp3", ".wav");
 		}
 
+		// Xử lý định dạng hình ảnh được hỗ trợ.
 		private static bool IsSupportedImage(string path)
 		{
 			return IsBlankOrExtension(path, ".jpg", ".jpeg", ".png");
 		}
 
+		// Xử lý đường dẫn rỗng hoặc phần mở rộng tệp.
 		private static bool IsBlankOrExtension(string path, params string[] extensions)
 		{
 			if (string.IsNullOrWhiteSpace(path))
@@ -665,6 +754,7 @@ namespace DesktopApp_Project.BUS
 			return extensions.Contains(extension);
 		}
 
+		// Kiểm tra dòng dữ liệu nhập.
 		private static bool ValidateImportRow(IeltsImportRowDTO row, List<string> errors)
 		{
 			if (row == null)
@@ -692,6 +782,7 @@ namespace DesktopApp_Project.BUS
 			return true;
 		}
 
+		// Đọc các dòng dữ liệu nhập từ tệp.
 		private static List<IeltsImportRowDTO> ReadImportRows(string filePath)
 		{
 			var extension = Path.GetExtension(filePath).ToLowerInvariant();
@@ -703,6 +794,7 @@ namespace DesktopApp_Project.BUS
 			return ReadExcelRows(filePath);
 		}
 
+		// Xử lý đọc các dòng CSV.
 		private static List<IeltsImportRowDTO> ReadCsvRows(string filePath)
 		{
 			var result = new List<IeltsImportRowDTO>();
@@ -727,6 +819,7 @@ namespace DesktopApp_Project.BUS
 			return result;
 		}
 
+		// Xử lý đọc các dòng Excel.
 		private static List<IeltsImportRowDTO> ReadExcelRows(string filePath)
 		{
 			var connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + filePath + ";Extended Properties=\"Excel 12.0 Xml;HDR=YES;IMEX=1\";";
@@ -781,6 +874,7 @@ namespace DesktopApp_Project.BUS
 			}
 		}
 
+		// Xử lý đọc sheet Excel.
 		private static DataTable ReadSheet(OleDbConnection connection, string sheetName)
 		{
 			using (var adapter = new OleDbDataAdapter("SELECT * FROM [" + sheetName + "]", connection))
@@ -791,6 +885,7 @@ namespace DesktopApp_Project.BUS
 			}
 		}
 
+		// Chuyển đổi dòng dữ liệu nhập.
 		private static IeltsImportRowDTO ToImportRow(string[] headers, string[] values, int rowNumber)
 		{
 			Func<string, string> get = name =>
@@ -828,6 +923,7 @@ namespace DesktopApp_Project.BUS
 			};
 		}
 
+		// Chuyển đổi dòng dữ liệu nhập thành câu hỏi.
 		private static IeltsImportRowDTO ToQuestionImportRow(DataRow row, int rowNumber, string skill, string parentCode)
 		{
 			decimal band;
@@ -848,11 +944,13 @@ namespace DesktopApp_Project.BUS
 			};
 		}
 
+		// Lấy cell.
 		private static string GetCell(DataRow row, string columnName)
 		{
 			return row.Table.Columns.Contains(columnName) ? Convert.ToString(row[columnName]).Trim() : string.Empty;
 		}
 
+		// Xử lý chuyển chuỗi sang số nguyên.
 		private static int? TryParseInt(string value)
 		{
 			int number;

@@ -1,7 +1,13 @@
+// Thành phần chủ đề giao diện cho giao diện Windows Forms
+// Chức năng:
+// - Khai báo hoặc áp dụng màu sắc, phông chữ và trạng thái giao diện
+// - Hỗ trợ các biểu mẫu dùng chung một phong cách hiển thị
+
 using System.Drawing;
 
 namespace DesktopApp_Project.GUI.Shared.Themes
 {
+    // Lớp chuyển cấu hình AppTheme cũ sang hợp đồng chủ đề dùng chung cho giao diện.
     public sealed class AppThemeAdapter : ITheme
     {
         public string Name
@@ -122,7 +128,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
         }
 
         // =========================
-        // STATUS COLORS
+        // MÀU TRẠNG THÁI
         // =========================
 
         public Color Success
@@ -141,7 +147,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
         }
 
         // =========================
-        // FONTS
+        // PHÔNG CHỮ
         // =========================
 
         public Font TitleFont
@@ -167,7 +173,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
         }
 
         // =========================
-        // DATAGRIDVIEW
+        // bảng dữ liệu
         // =========================
 
         public Color GridHeader

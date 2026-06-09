@@ -1,3 +1,9 @@
+// Dịch vụ xử lý nghiệp vụ từ vựng và flashcard
+// Chức năng:
+// - Nhận dữ liệu từ giao diện dưới dạng đối tượng truyền dữ liệu hoặc tham số lọc
+// - Kiểm tra nghiệp vụ trước khi gọi tầng dữ liệu
+// - Trả kết quả xử lý hoặc danh sách đối tượng truyền dữ liệu cho giao diện
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,20 +13,26 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.BUS
 {
+	// Lớp xử lý nghiệp vụ từ vựng và flashcard, kiểm tra dữ liệu trước khi gọi kho dữ liệu/tầng dữ liệu.
 	public class TuVungService : ServiceBase
 	{
 		public TuVungService(IQuanLyIeltsRepository repository) : base(repository) { }
 
+		// Lấy danh sách.
 		public List<TuVungDTO> LayDanhSach(int? maLopHoc)
 		{
+			// Lấy danh sách từ vựng theo lớp qua tầng dữ liệu.
 			return Repository.GetTuVung(maLopHoc);
 		}
 
+		// Tìm kiếm từ vựng và flashcard theo tiêu chí nhận từ giao diện.
 		public List<TuVungDTO> TimKiem(TuVungSearchCriteriaDTO criteria)
 		{
+			// Tìm kiếm từ vựng theo tiêu chí tìm kiếm qua tầng dữ liệu.
 			return Repository.SearchTuVung(criteria);
 		}
 
+		// Tìm kiếm từ vựng và flashcard theo tiêu chí nhận từ giao diện.
 		public ServiceResult<List<TuVungDTO>> TimKiemNangCao(
 			int? maLopHoc,
 			List<SearchConditionDTO> conditions,
@@ -28,6 +40,7 @@ namespace DesktopApp_Project.BUS
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: chọn lớp.
 				if (!maLopHoc.HasValue || maLopHoc.Value <= 0)
 				{
 					return ServiceResult<List<TuVungDTO>>.Fail("Vui lòng chọn lớp.");
@@ -48,6 +61,7 @@ namespace DesktopApp_Project.BUS
 					}
 				}
 
+				// Lấy danh sách từ vựng theo lớp qua tầng dữ liệu.
 				var rows = Repository.GetTuVung(maLopHoc.Value);
 				var result = joinOperator == SearchJoinOperator.Or
 					? rows.Where(row => normalized.Any(condition => MatchesCondition(row, condition))).ToList()
@@ -57,12 +71,14 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Tìm kiếm từ vựng và flashcard theo tiêu chí nhận từ giao diện.
 		public ServiceResult<List<TuVungDTO>> TimKiemNangCao(
 			int? maLopHoc,
 			List<SearchConditionDTO> conditions)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: chọn lớp.
 				if (!maLopHoc.HasValue || maLopHoc.Value <= 0)
 				{
 					return ServiceResult<List<TuVungDTO>>.Fail("Vui lòng chọn lớp.");
@@ -89,6 +105,7 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult<List<TuVungDTO>>.Fail(parenthesesValidation);
 				}
 
+				// Lấy danh sách từ vựng theo lớp qua tầng dữ liệu.
 				var rows = Repository.GetTuVung(maLopHoc.Value);
 				var result = rows
 					.Where(row => MatchesConditionExpression(row, normalized))
@@ -99,29 +116,35 @@ namespace DesktopApp_Project.BUS
 			});
 		}
 
+		// Lấy danh sách flashcard.
 		public ServiceResult<List<TuVungDTO>> LayDanhSachFlashcard(TuVungSearchCriteriaDTO criteria)
 		{
 			return Try(() =>
 			{
+				// Tìm kiếm từ vựng theo tiêu chí tìm kiếm qua tầng dữ liệu.
 				var rows = Repository.SearchTuVung(criteria ?? new TuVungSearchCriteriaDTO());
 				return ServiceResult<List<TuVungDTO>>.Ok(rows, "Tai danh sach flashcard thanh cong.");
 			});
 		}
 
+		// Ghi nhận flashcard đã học.
 		public ServiceResult GhiNhanFlashcardDaHoc(int maNguoiDung, int maTuVung)
 		{
 			return Try(() =>
 			{
+				// Ràng buộc dữ liệu: Không có thông tin người dùng hoặc từ vựng.
 				if (maNguoiDung <= 0 || maTuVung <= 0)
 				{
 					return ServiceResult.Fail("Khong co thong tin nguoi dung hoac tu vung.");
 				}
 
+				// Lưu tiến trình học flashcard qua tầng dữ liệu.
 				Repository.UpsertTienTrinhFlashcard(maNguoiDung, maTuVung, "Đã học");
 				return ServiceResult.Ok("Da cap nhat tien trinh flashcard.");
 			});
 		}
 
+		// Kiểm tra nghiệp vụ rồi gọi tầng dữ liệu để lưu dữ liệu từ vựng và flashcard.
 		public ServiceResult Luu(TuVungDTO dto)
 		{
 			return Try(() =>
@@ -131,11 +154,13 @@ namespace DesktopApp_Project.BUS
 					dto.CapDo = "B1";
 				}
 
+				// Ràng buộc dữ liệu: nhập đầy đủ thông tin từ vựng.
 				if (ValidationHelper.IsBlank(dto.ChuDe))
 				{
 					dto.ChuDe = "Academic/IELTS General";
 				}
 
+				// Ràng buộc dữ liệu: nhập đầy đủ thông tin từ vựng.
 				if (dto.MaLopHoc <= 0 || ValidationHelper.IsBlank(dto.TuTiengAnh) ||
 					ValidationHelper.IsBlank(dto.TuLoai) || ValidationHelper.IsBlank(dto.PhienAm) ||
 					ValidationHelper.IsBlank(dto.Nghia))
@@ -148,6 +173,7 @@ namespace DesktopApp_Project.BUS
 					return ServiceResult.Fail("Cấp độ CEFR không hợp lệ.");
 				}
 
+				// Kiểm tra từ vựng bị trùng trong lớp qua tầng dữ liệu.
 				if (Repository.ExistsTuVungTrongLop(dto.TuTiengAnh.Trim(), dto.MaLopHoc, dto.MaTuVung))
 				{
 					return ServiceResult.Fail("Từ vựng đã tồn tại trong lớp này.");
@@ -155,25 +181,31 @@ namespace DesktopApp_Project.BUS
 
 				if (dto.MaTuVung == 0)
 				{
+					// Thêm từ vựng mới qua tầng dữ liệu.
 					var maTuVung = Repository.InsertTuVung(dto);
+					// Đồng bộ flashcard của lớp theo từ vựng qua tầng dữ liệu.
 					Repository.DongBoFlashcardChoLop(maTuVung, dto.MaLopHoc);
 					return ServiceResult.Ok("Thêm từ vựng thành công và đã đồng bộ Flashcard.");
 				}
 
+				// Cập nhật thông tin từ vựng qua tầng dữ liệu.
 				Repository.UpdateTuVung(dto);
 				return ServiceResult.Ok("Cập nhật từ vựng thành công.");
 			});
 		}
 
+		// Gọi tầng dữ liệu để xóa dữ liệu từ vựng và flashcard sau khi giao diện xác nhận.
 		public ServiceResult Xoa(int maTuVung)
 		{
 			return Try(() =>
 			{
+				// Xóa từ vựng đã chọn qua tầng dữ liệu.
 				Repository.DeleteTuVung(maTuVung);
 				return ServiceResult.Ok("Xóa từ vựng thành công.");
 			});
 		}
 
+		// Chuẩn hóa điều kiện tìm kiếm nâng caos.
 		private static List<SearchConditionDTO> NormalizeAdvancedConditions(IEnumerable<SearchConditionDTO> conditions)
 		{
 			return (conditions ?? Enumerable.Empty<SearchConditionDTO>())
@@ -191,6 +223,7 @@ namespace DesktopApp_Project.BUS
 				.ToList();
 		}
 
+		// Kiểm tra điều kiện tìm kiếm nâng cao.
 		private static string ValidateAdvancedCondition(SearchConditionDTO condition)
 		{
 			if (string.IsNullOrWhiteSpace(condition.Field))
@@ -211,6 +244,7 @@ namespace DesktopApp_Project.BUS
 			return string.Empty;
 		}
 
+		// Xử lý định dạng tệp được hỗ trợ field.
 		private static bool IsSupportedField(string field)
 		{
 			return field == "Keyword"
@@ -220,6 +254,7 @@ namespace DesktopApp_Project.BUS
 				|| field == "TuLoai";
 		}
 
+		// Tự bổ sung ngoặc đóng còn thiếu trong biểu thức tìm kiếm nâng cao.
 		private static string AutoCloseParentheses(List<SearchConditionDTO> conditions)
 		{
 			var balance = 0;
@@ -241,11 +276,13 @@ namespace DesktopApp_Project.BUS
 			return string.Empty;
 		}
 
+		// Xử lý matches condition expression.
 		private static bool MatchesConditionExpression(TuVungDTO row, List<SearchConditionDTO> conditions)
 		{
 			return new SearchExpressionParser(BuildExpressionTokens(row, conditions)).Evaluate();
 		}
 
+		// Tạo expression tokens.
 		private static List<SearchExpressionToken> BuildExpressionTokens(TuVungDTO row, List<SearchConditionDTO> conditions)
 		{
 			var tokens = new List<SearchExpressionToken>();
@@ -276,20 +313,26 @@ namespace DesktopApp_Project.BUS
 			return tokens;
 		}
 
+		// Xử lý matches tất cả condition groups.
 		private static bool MatchesAllConditionGroups(TuVungDTO row, List<SearchConditionDTO> conditions)
 		{
+			// Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
 			var keywordConditions = conditions.Where(x => x.Field == "Keyword").ToList();
+			// Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
 			if (keywordConditions.Any(condition => !MatchesCondition(row, condition)))
 			{
 				return false;
 			}
 
 			return conditions
+				// Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
 				.Where(x => x.Field != "Keyword")
+				// Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
 				.GroupBy(x => x.Field)
 				.All(group => group.Any(condition => MatchesCondition(row, condition)));
 		}
 
+		// Xử lý matches condition.
 		private static bool MatchesCondition(TuVungDTO row, SearchConditionDTO condition)
 		{
 			var value = Convert.ToString(condition.Value);
@@ -322,6 +365,7 @@ namespace DesktopApp_Project.BUS
 			return false;
 		}
 
+		// Xử lý contains.
 		private static bool Contains(string source, string value)
 		{
 			return !string.IsNullOrWhiteSpace(source)
@@ -329,6 +373,7 @@ namespace DesktopApp_Project.BUS
 				&& source.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0;
 		}
 
+		// Kiểm tra chuỗi bắt đầu bằng giá trị cần so khớp.
 		private static bool StartsWith(string source, string value)
 		{
 			return !string.IsNullOrWhiteSpace(source)
@@ -336,16 +381,19 @@ namespace DesktopApp_Project.BUS
 				&& source.Trim().StartsWith(value.Trim(), StringComparison.OrdinalIgnoreCase);
 		}
 
+		// Xử lý equals text.
 		private static bool EqualsText(string source, string value)
 		{
 			return string.Equals(SafeText(source), SafeText(value), StringComparison.OrdinalIgnoreCase);
 		}
 
+		// Xử lý safe text.
 		private static string SafeText(string value)
 		{
 			return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
 		}
 
+		// Kiểu liệt kê biểu diễn loại phần tử biểu thức tìm kiếm dùng trong luồng xử lý nghiệp vụ.
 		private enum SearchExpressionTokenType
 		{
 			Condition,
@@ -355,13 +403,16 @@ namespace DesktopApp_Project.BUS
 			CloseParenthesis
 		}
 
+		// Lớp hỗ trợ lưu trạng thái phần tử biểu thức tìm kiếm trong quá trình xử lý nghiệp vụ.
 		private class SearchExpressionToken
 		{
+			// Khởi tạo đối tượng phần tử biểu thức tìm kiếm phục vụ luồng xử lý nội bộ.
 			public SearchExpressionToken(SearchExpressionTokenType type)
 			{
 				Type = type;
 			}
 
+			// Khởi tạo đối tượng phần tử biểu thức tìm kiếm phục vụ luồng xử lý nội bộ.
 			public SearchExpressionToken(bool value)
 			{
 				Type = SearchExpressionTokenType.Condition;
@@ -372,16 +423,19 @@ namespace DesktopApp_Project.BUS
 			public bool Value { get; private set; }
 		}
 
+		// Lớp hỗ trợ lưu trạng thái bộ phân tích biểu thức tìm kiếm trong quá trình xử lý nghiệp vụ.
 		private class SearchExpressionParser
 		{
 			private readonly List<SearchExpressionToken> _tokens;
 			private int _index;
 
+			// Khởi tạo đối tượng bộ phân tích biểu thức tìm kiếm phục vụ luồng xử lý nội bộ.
 			public SearchExpressionParser(List<SearchExpressionToken> tokens)
 			{
 				_tokens = tokens ?? new List<SearchExpressionToken>();
 			}
 
+			// Xử lý evaluate.
 			public bool Evaluate()
 			{
 				if (_tokens.Count == 0)
@@ -392,6 +446,7 @@ namespace DesktopApp_Project.BUS
 				return ParseOr();
 			}
 
+			// Phân tích biểu thức điều kiện với toán tử OR.
 			private bool ParseOr()
 			{
 				var result = ParseAnd();
@@ -404,6 +459,7 @@ namespace DesktopApp_Project.BUS
 				return result;
 			}
 
+			// Phân tích biểu thức điều kiện với toán tử AND.
 			private bool ParseAnd()
 			{
 				var result = ParsePrimary();
@@ -416,6 +472,7 @@ namespace DesktopApp_Project.BUS
 				return result;
 			}
 
+			// Phân tích điều kiện đơn hoặc nhóm điều kiện trong ngoặc.
 			private bool ParsePrimary()
 			{
 				if (Match(SearchExpressionTokenType.OpenParenthesis))
@@ -433,6 +490,7 @@ namespace DesktopApp_Project.BUS
 				return false;
 			}
 
+			// Xử lý match.
 			private bool Match(SearchExpressionTokenType type)
 			{
 				if (_index >= _tokens.Count || _tokens[_index].Type != type)

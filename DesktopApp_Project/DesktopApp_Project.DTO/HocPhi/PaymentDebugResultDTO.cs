@@ -1,7 +1,13 @@
+// Đối tượng truyền thông tin kiểm thử thanh toán
+// Chức năng:
+// - Truyền dữ liệu giữa giao diện, tầng nghiệp vụ và tầng dữ liệu
+// - Chứa các thuộc tính phục vụ hiển thị hoặc xử lý nghiệp vụ
+
 using System;
 
 namespace DesktopApp_Project.DTO
 {
+    // Lớp đối tượng truyền dữ liệu dùng để truyền thông tin kiểm thử thanh toán giữa các tầng giao diện, tầng nghiệp vụ và tầng dữ liệu.
     public class PaymentDebugResultDTO
     {
         public int TransactionId { get; set; }

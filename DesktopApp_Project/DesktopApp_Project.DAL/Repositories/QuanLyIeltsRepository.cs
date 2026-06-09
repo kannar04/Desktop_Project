@@ -1,3 +1,9 @@
+// kho dữ liệu truy cập dữ liệu cơ sở dữ liệu SQL Server cho hệ thống quản lý IELTS
+// Chức năng:
+// - Thực hiện truy vấn LINQ sang SQL
+// - Thêm, sửa, xóa và tổng hợp dữ liệu
+// - Chuyển thực thể dữ liệu thành đối tượng truyền dữ liệu trước khi trả cho tầng nghiệp vụ
+
 using System;
 using System.Collections.Generic;
 using System.Data.Linq;
@@ -7,15 +13,18 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.DAL
 {
+    // Lớp kho dữ liệu cài đặt toàn bộ truy vấn và cập nhật dữ liệu cơ sở dữ liệu SQL Server cho tầng nghiệp vụ.
     public class QuanLyIeltsRepository : IQuanLyIeltsRepository
     {
         private readonly IDataContextFactory _factory;
 
+        // Khởi tạo đối tượng tầng dữ liệu với cấu hình kết nối hoặc factory dữ liệu.
         public QuanLyIeltsRepository(IDataContextFactory factory)
         {
             _factory = factory;
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         private static T RequireEntity<T>(T entity, string message) where T : class
         {
             if (entity == null)
@@ -26,6 +35,7 @@ namespace DesktopApp_Project.DAL
             return entity;
         }
 
+        // Kiểm tra kết nối cơ sở dữ liệu trong cơ sở dữ liệu.
         public bool KiemTraKetNoi(out string error)
         {
             try
@@ -46,6 +56,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy thông tin người dùng theo tài khoản.
         public NguoiDungDTO GetNguoiDungByTaiKhoan(string taiKhoan)
         {
             using (var db = _factory.Create())
@@ -55,6 +66,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy thông tin người dùng theo mã.
         public NguoiDungDTO GetNguoiDungById(int maNguoiDung)
         {
             using (var db = _factory.Create())
@@ -63,11 +75,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách người dùng theo vai trò.
         public List<NguoiDungDTO> GetNguoiDungByVaiTro(string vaiTro)
         {
             using (var db = _factory.Create())
             {
                 return db.NguoiDungs
+                    // Lọc người dùng theo vai trò được yêu cầu.
                     .Where(x => x.VaiTro == vaiTro)
                     .OrderBy(x => x.HoTen)
                     .AsEnumerable()
@@ -76,13 +90,16 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tìm kiếm danh sách học viên theo tiêu chí tìm kiếm.
         public List<NguoiDungDTO> SearchHocVien(string keyword)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn người dùng trước khi áp dụng bộ lọc.
                 var query = db.NguoiDungs.Where(x => x.VaiTro == AppConstants.RoleStudent);
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
+                    // Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
                     query = query.Where(x => x.HoTen.Contains(keyword) || x.TaiKhoan.Contains(keyword) || x.Email.Contains(keyword));
                 }
 
@@ -90,28 +107,33 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tìm kiếm danh sách học viên theo tiêu chí tìm kiếm.
         public List<NguoiDungDTO> SearchHocVien(HocVienSearchCriteriaDTO criteria)
         {
             using (var db = _factory.Create())
             {
                 criteria = criteria ?? new HocVienSearchCriteriaDTO();
+                // Khởi tạo truy vấn người dùng trước khi áp dụng bộ lọc.
                 var query = db.NguoiDungs.Where(x => x.VaiTro == AppConstants.RoleStudent);
 
                 if (!string.IsNullOrWhiteSpace(criteria.HoTen))
                 {
                     var keyword = criteria.HoTen.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí họ tên.
                     query = query.Where(x => x.HoTen.Contains(keyword));
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteria.LienHe))
                 {
                     var lienHe = criteria.LienHe.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí liên hệ.
                     query = query.Where(x => x.SDT.Contains(lienHe) || x.Email.Contains(lienHe));
                 }
 
                 if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
                 {
                     var maLopHoc = criteria.MaLopHoc.Value;
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí lớp học.
                     query = query.Where(x => db.ChiTietLopHocs.Any(ct => ct.MaNguoiDung == x.MaNguoiDung && ct.MaLopHoc == maLopHoc));
                 }
 
@@ -121,6 +143,7 @@ namespace DesktopApp_Project.DAL
                     if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
                     {
                         var maLopHoc = criteria.MaLopHoc.Value;
+                        // Chỉ thêm điều kiện lọc khi có tiêu chí lớp học.
                         query = query.Where(x => db.ChiTietLopHocs.Any(ct =>
                             ct.MaNguoiDung == x.MaNguoiDung
                             && ct.MaLopHoc == maLopHoc
@@ -138,6 +161,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm người dùng mới.
         public int InsertNguoiDung(NguoiDungDTO dto)
         {
             using (var db = _factory.Create())
@@ -159,6 +183,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin người dùng.
         public void UpdateNguoiDung(NguoiDungDTO dto)
         {
             using (var db = _factory.Create())
@@ -178,6 +203,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa người dùng đã chọn.
         public void DeleteNguoiDung(int maNguoiDung)
         {
             using (var db = _factory.Create())
@@ -190,6 +216,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra tài khoản bị trùng trong cơ sở dữ liệu.
         public bool ExistsTaiKhoan(string taiKhoan, int exceptId)
         {
             using (var db = _factory.Create())
@@ -198,6 +225,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra thư điện tử bị trùng trong cơ sở dữ liệu.
         public bool ExistsEmail(string email, int exceptId)
         {
             using (var db = _factory.Create())
@@ -206,6 +234,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách lớp học.
         public List<LopHocDTO> GetLopHoc()
         {
             using (var db = _factory.Create())
@@ -214,6 +243,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm lớp học mới.
         public int InsertLopHoc(LopHocDTO dto)
         {
             using (var db = _factory.Create())
@@ -231,6 +261,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin lớp học.
         public void UpdateLopHoc(LopHocDTO dto)
         {
             using (var db = _factory.Create())
@@ -246,6 +277,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa lớp học đã chọn.
         public void DeleteLopHoc(int maLopHoc)
         {
             using (var db = _factory.Create())
@@ -258,6 +290,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra tên lớp bị trùng trong cơ sở dữ liệu.
         public bool ExistsTenLop(string tenLop, int exceptId)
         {
             using (var db = _factory.Create())
@@ -266,6 +299,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra lịch học bị trùng trong cơ sở dữ liệu.
         public bool ExistsLichHoc(string lichHoc, int exceptId)
         {
             if (string.IsNullOrWhiteSpace(lichHoc))
@@ -279,11 +313,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách học viên trong lớp.
         public List<NguoiDungDTO> GetHocVienTrongLop(int maLopHoc)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết lớp học trước khi áp dụng bộ lọc.
                     from ct in db.ChiTietLopHocs
                     join nd in db.NguoiDungs on ct.MaNguoiDung equals nd.MaNguoiDung
                     where ct.MaLopHoc == maLopHoc
@@ -297,11 +333,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách học viên kèm trạng thái lớp.
         public List<HocVienLopDTO> GetHocVienLop(int maLopHoc, bool onlyActive)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết lớp học trước khi áp dụng bộ lọc.
                     from ct in db.ChiTietLopHocs
                     join nd in db.NguoiDungs on ct.MaNguoiDung equals nd.MaNguoiDung
                     where ct.MaLopHoc == maLopHoc && nd.VaiTro == AppConstants.RoleStudent
@@ -313,6 +351,7 @@ namespace DesktopApp_Project.DAL
 
                 if (onlyActive)
                 {
+                    // Lọc theo trạng thái đã chọn trên màn hình.
                     query = query.Where(x => AppConstants.EnrollmentActiveAliases.Contains(x.ct.TrangThai) && x.ct.NgayNghiHoc == null);
                 }
 
@@ -331,6 +370,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy lớp hiện tại của học viên.
         public int? GetLopHocDangHocCuaHocVien(int maNguoiDung)
         {
             using (var db = _factory.Create())
@@ -345,6 +385,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public int SaveHocVienVaChuyenLop(NguoiDungDTO dto, int maLopHoc)
         {
             using (var db = _factory.Create())
@@ -371,6 +412,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public void ChuyenHocVienSangLop(int maNguoiDung, int maLopHoc)
         {
             using (var db = _factory.Create())
@@ -380,6 +422,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static void ApplyNguoiDungValues(NguoiDungEntity entity, NguoiDungDTO dto)
         {
             entity.VaiTro = dto.VaiTro;
@@ -392,6 +435,7 @@ namespace DesktopApp_Project.DAL
             entity.MatKhau = dto.MatKhau;
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static void MoveActiveEnrollment(QuanLyIeltsDataContext db, int maNguoiDung, int maLopHoc)
         {
             var today = DateTime.Today;
@@ -401,6 +445,7 @@ namespace DesktopApp_Project.DAL
                             && x.NgayNghiHoc == null)
                 .ToList();
 
+            // Giới hạn dữ liệu trong lớp học đang chọn.
             foreach (var row in activeRows.Where(x => x.MaLopHoc != maLopHoc))
             {
                 row.TrangThai = AppConstants.EnrollmentStopped;
@@ -430,13 +475,16 @@ namespace DesktopApp_Project.DAL
             selected.NgayNghiHoc = null;
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách tài liệu theo lớp.
         public List<TaiLieuDTO> GetTaiLieu(int? maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn tài liệu trước khi áp dụng bộ lọc.
                 var query = db.TaiLieus.AsQueryable();
                 if (maLopHoc.HasValue)
                 {
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     query = query.Where(x => x.MaLopHoc == maLopHoc.Value);
                 }
 
@@ -444,6 +492,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm tài liệu mới.
         public int InsertTaiLieu(TaiLieuDTO dto)
         {
             using (var db = _factory.Create())
@@ -470,6 +519,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin tài liệu.
         public void UpdateTaiLieu(TaiLieuDTO dto)
         {
             using (var db = _factory.Create())
@@ -494,6 +544,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa tài liệu đã chọn.
         public void DeleteTaiLieu(int maTaiLieu)
         {
             using (var db = _factory.Create())
@@ -506,13 +557,16 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách bài tập theo lớp.
         public List<BaiTapDTO> GetBaiTap(int? maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn bài tập trước khi áp dụng bộ lọc.
                 var query = db.BaiTaps.AsQueryable();
                 if (maLopHoc.HasValue)
                 {
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     query = query.Where(x => x.MaLopHoc == maLopHoc.Value);
                 }
 
@@ -520,6 +574,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm bài tập mới.
         public int InsertBaiTap(BaiTapDTO dto)
         {
             using (var db = _factory.Create())
@@ -539,6 +594,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin bài tập.
         public void UpdateBaiTap(BaiTapDTO dto)
         {
             using (var db = _factory.Create())
@@ -555,6 +611,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa bài tập đã chọn.
         public void DeleteBaiTap(int maBaiTap)
         {
             using (var db = _factory.Create())
@@ -567,10 +624,12 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tạo dòng nộp bài cho từng học viên trong lớp.
         public void TaoChiTietNopBaiChoLop(int maBaiTap, int maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var hocVienIds = db.ChiTietLopHocs.Where(x => x.MaLopHoc == maLopHoc).Select(x => x.MaNguoiDung).ToList();
                 foreach (var maNguoiDung in hocVienIds)
                 {
@@ -589,11 +648,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách bài nộp của bài tập.
         public List<NopBaiDTO> GetNopBaiTheoBaiTap(int maBaiTap)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết bài nộp trước khi áp dụng bộ lọc.
                     from nb in db.ChiTietNopBais
                     join nd in db.NguoiDungs on nb.MaNguoiDung equals nd.MaNguoiDung
                     where nb.MaBaiTap == maBaiTap
@@ -628,10 +689,12 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách buổi học của lớp.
         public List<BuoiHocDTO> GetBuoiHoc(int maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 return db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc)
                     .OrderByDescending(x => x.NgayHoc)
                     .AsEnumerable()
@@ -640,6 +703,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy buổi học theo ngày, tạo mới nếu chưa có.
         public int GetOrCreateBuoiHoc(int maLopHoc, DateTime ngayHoc)
         {
             using (var db = _factory.Create())
@@ -658,11 +722,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách điểm danh của buổi học.
         public List<DiemDanhDTO> GetDiemDanh(int maBuoiHoc)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết điểm danh trước khi áp dụng bộ lọc.
                     from dd in db.ChiTietDiemDanhs
                     join nd in db.NguoiDungs on dd.MaNguoiDung equals nd.MaNguoiDung
                     where dd.MaBuoiHoc == maBuoiHoc
@@ -681,6 +747,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lưu dữ liệu điểm danh.
         public void LuuDiemDanh(DiemDanhDTO dto)
         {
             using (var db = _factory.Create())
@@ -698,6 +765,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lưu dữ liệu điểm danh.
         public void LuuDiemDanh(IEnumerable<DiemDanhDTO> danhSach)
         {
             using (var db = _factory.Create())
@@ -723,11 +791,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public decimal TinhTiLeChuyenCan(int maNguoiDung, int maLopHoc, int? thang = null, int? nam = null)
         {
             using (var db = _factory.Create())
             {
                 var chiTietLop = db.ChiTietLopHocs
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     .Where(x => x.MaNguoiDung == maNguoiDung && x.MaLopHoc == maLopHoc)
                     .OrderByDescending(x => x.NgayVaoLop)
                     .FirstOrDefault();
@@ -737,6 +807,7 @@ namespace DesktopApp_Project.DAL
                 }
 
                 var ngayVaoLop = chiTietLop.NgayVaoLop.Date;
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var buoiQuery = db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc && x.NgayHoc >= ngayVaoLop);
                 if (thang.HasValue)
                 {
@@ -772,6 +843,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách đề thi.
         public List<DeThiDTO> GetDeThi()
         {
             using (var db = _factory.Create())
@@ -780,6 +852,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm đề thi mới.
         public int InsertDeThi(DeThiDTO dto)
         {
             using (var db = _factory.Create())
@@ -804,6 +877,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin đề thi.
         public void UpdateDeThi(DeThiDTO dto)
         {
             using (var db = _factory.Create())
@@ -825,6 +899,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa đề thi đã chọn.
         public void DeleteDeThi(int maDeThi)
         {
             using (var db = _factory.Create())
@@ -844,23 +919,28 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy các đoạn Reading theo khoảng band.
         public List<ReadingPassageDTO> GetReadingPassages(decimal? bandTu, decimal? bandDen)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn đoạn Reading trước khi áp dụng bộ lọc.
                 var query = db.ReadingPassages.AsQueryable();
                 if (bandTu.HasValue)
                 {
+                    // Lọc nội dung IELTS theo khoảng band điểm.
                     query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value >= bandTu.Value);
                 }
 
                 if (bandDen.HasValue)
                 {
+                    // Lọc nội dung IELTS theo khoảng band điểm.
                     query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value <= bandDen.Value);
                 }
 
                 var questionCounts = db.CauHois
                     .Where(x => x.PassageId.HasValue)
+                    // Gom nhóm dữ liệu để tính toán báo cáo hoặc thống kê.
                     .GroupBy(x => x.PassageId.Value)
                     .ToDictionary(x => x.Key, x => x.Count());
 
@@ -877,6 +957,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy đoạn Reading theo mã.
         public ReadingPassageDTO GetReadingPassageById(int maPassage)
         {
             using (var db = _factory.Create())
@@ -885,23 +966,28 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy các phần Listening theo khoảng band.
         public List<ListeningSectionDTO> GetListeningSections(decimal? bandTu, decimal? bandDen)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn phần Listening trước khi áp dụng bộ lọc.
                 var query = db.ListeningSections.AsQueryable();
                 if (bandTu.HasValue)
                 {
+                    // Lọc nội dung IELTS theo khoảng band điểm.
                     query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value >= bandTu.Value);
                 }
 
                 if (bandDen.HasValue)
                 {
+                    // Lọc nội dung IELTS theo khoảng band điểm.
                     query = query.Where(x => !x.BandLevel.HasValue || x.BandLevel.Value <= bandDen.Value);
                 }
 
                 var questionCounts = db.CauHois
                     .Where(x => x.SectionId.HasValue)
+                    // Gom nhóm dữ liệu để tính toán báo cáo hoặc thống kê.
                     .GroupBy(x => x.SectionId.Value)
                     .ToDictionary(x => x.Key, x => x.Count());
 
@@ -919,6 +1005,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy phần Listening theo mã.
         public ListeningSectionDTO GetListeningSectionById(int maSection)
         {
             using (var db = _factory.Create())
@@ -927,6 +1014,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm đoạn Reading mới.
         public int InsertReadingPassage(ReadingPassageDTO dto)
         {
             using (var db = _factory.Create())
@@ -948,6 +1036,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm nhiều đoạn Reading.
         public void InsertReadingPassageBulk(IEnumerable<ReadingPassageDTO> danhSach)
         {
             using (var db = _factory.Create())
@@ -967,6 +1056,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm phần Listening mới.
         public int InsertListeningSection(ListeningSectionDTO dto)
         {
             using (var db = _factory.Create())
@@ -990,6 +1080,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm nhiều phần Listening.
         public void InsertListeningSectionBulk(IEnumerable<ListeningSectionDTO> danhSach)
         {
             using (var db = _factory.Create())
@@ -1011,13 +1102,16 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách câu hỏi.
         public List<CauHoiDTO> GetCauHoi(string keyword)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn câu hỏi trước khi áp dụng bộ lọc.
                 var query = db.CauHois.AsQueryable();
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
+                    // Lọc học viên theo từ khóa họ tên, tài khoản hoặc thư điện tử.
                     query = query.Where(x => x.NoiDung.Contains(keyword) || x.NhanKyNang.Contains(keyword) || x.QuestionType.Contains(keyword));
                 }
 
@@ -1025,32 +1119,38 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tìm kiếm câu hỏi theo bộ lọc nâng cao.
         public List<CauHoiDTO> SearchCauHoi(CauHoiSearchCriteriaDTO criteria)
         {
             using (var db = _factory.Create())
             {
                 criteria = criteria ?? new CauHoiSearchCriteriaDTO();
+                // Khởi tạo truy vấn câu hỏi trước khi áp dụng bộ lọc.
                 var query = db.CauHois.AsQueryable();
 
                 if (!string.IsNullOrWhiteSpace(criteria.NhanKyNang) && criteria.NhanKyNang != AppConstants.FilterAll)
                 {
                     var skill = criteria.NhanKyNang.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí nhãn kỹ năng.
                     query = query.Where(x => x.NhanKyNang == skill);
                 }
 
                 if (criteria.BandTu.HasValue)
                 {
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí band từ.
                     query = query.Where(x => x.BandLevel.HasValue && x.BandLevel.Value >= criteria.BandTu.Value);
                 }
 
                 if (criteria.BandDen.HasValue)
                 {
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí band đến.
                     query = query.Where(x => x.BandLevel.HasValue && x.BandLevel.Value <= criteria.BandDen.Value);
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteria.Keyword))
                 {
                     var keyword = criteria.Keyword.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí từ khóa.
                     query = query.Where(x => x.NoiDung.Contains(keyword) || x.DapAn.Contains(keyword) || x.QuestionType.Contains(keyword) || x.AnswerKey.Contains(keyword));
                 }
 
@@ -1062,6 +1162,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm câu hỏi mới.
         public int InsertCauHoi(CauHoiDTO dto)
         {
             using (var db = _factory.Create())
@@ -1073,6 +1174,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy câu hỏi thuộc đoạn Reading.
         public List<CauHoiDTO> GetCauHoiByPassageId(int maPassage)
         {
             using (var db = _factory.Create())
@@ -1086,6 +1188,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy câu hỏi thuộc phần Listening.
         public List<CauHoiDTO> GetCauHoiBySectionId(int maSection)
         {
             using (var db = _factory.Create())
@@ -1099,6 +1202,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm nhiều câu hỏi.
         public void InsertCauHoiBulk(IEnumerable<CauHoiDTO> danhSach)
         {
             using (var db = _factory.Create())
@@ -1108,6 +1212,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin câu hỏi.
         public void UpdateCauHoi(CauHoiDTO dto)
         {
             using (var db = _factory.Create())
@@ -1132,6 +1237,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa câu hỏi đã chọn.
         public void DeleteCauHoi(int maCauHoi)
         {
             using (var db = _factory.Create())
@@ -1146,11 +1252,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm câu hỏi vào đề thi.
         public void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi)
         {
             ThemCauHoiVaoDeThi(maDeThi, maCauHoi, null, null, null);
         }
 
+        // Tầng dữ liệu thực hiện lấy thứ tự tiếp theo trong đề thi.
         public int GetNextThuTu(int maDeThi)
         {
             using (var db = _factory.Create())
@@ -1164,6 +1272,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra câu hỏi đã nằm trong đề thi trong cơ sở dữ liệu.
         public bool ExistsQuestionInExam(int maDeThi, int maCauHoi)
         {
             using (var db = _factory.Create())
@@ -1172,6 +1281,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm câu hỏi vào đề thi.
         public void ThemCauHoiVaoDeThi(int maDeThi, int maCauHoi, string groupType, int? groupId, int? thuTu)
         {
             using (var db = _factory.Create())
@@ -1194,11 +1304,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy nội dung đề thi.
         public List<IeltsExamItemDTO> GetNoiDungDeThi(int maDeThi)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết đề thi trước khi áp dụng bộ lọc.
                     from ct in db.ChiTietDeThis
                     join q in db.CauHois on ct.MaCauHoi equals q.MaCauHoi
                     where ct.MaDeThi == maDeThi
@@ -1225,6 +1337,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa câu hỏi khỏi đề thi.
         public void XoaCauHoiKhoiDeThi(int maDeThi, int maCauHoi)
         {
             using (var db = _factory.Create())
@@ -1238,6 +1351,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public int ImportIeltsRows(IEnumerable<IeltsImportRowDTO> rows)
         {
             using (var db = _factory.Create())
@@ -1325,6 +1439,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Chuyển đối tượng truyền dữ liệu sang thực thể dữ liệu trước khi lưu xuống cơ sở dữ liệu.
         private static CauHoiEntity ToCauHoiEntity(CauHoiDTO dto)
         {
             return new CauHoiEntity
@@ -1345,6 +1460,7 @@ namespace DesktopApp_Project.DAL
             };
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static CauHoiDTO FillQuestionGroupTitle(CauHoiDTO dto, QuanLyIeltsDataContext db)
         {
             if (dto == null)
@@ -1366,6 +1482,7 @@ namespace DesktopApp_Project.DAL
             return dto;
         }
 
+        // Xây dựng truy vấn hoặc diễn giải dữ liệu phục vụ tầng dữ liệu.
         private static string ResolveGroupTitle(QuanLyIeltsDataContext db, string groupType, int? groupId)
         {
             if (!groupId.HasValue)
@@ -1388,10 +1505,12 @@ namespace DesktopApp_Project.DAL
             return string.Empty;
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách đợt kiểm tra của lớp.
         public List<DotKiemTraDTO> GetDotKiemTra(int maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 return db.DotKiemTras.Where(x => x.MaLopHoc == maLopHoc)
                     .OrderByDescending(x => x.NgayKiemTra)
                     .AsEnumerable()
@@ -1400,6 +1519,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm đợt kiểm tra mới.
         public int InsertDotKiemTra(DotKiemTraDTO dto)
         {
             using (var db = _factory.Create())
@@ -1417,11 +1537,13 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách điểm số của đợt kiểm tra.
         public List<DiemSoDTO> GetDiemSo(int maDotKiemTra)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết điểm số trước khi áp dụng bộ lọc.
                     from ds in db.ChiTietDiemSos
                     join nd in db.NguoiDungs on ds.MaNguoiDung equals nd.MaNguoiDung
                     where ds.MaDotKiemTra == maDotKiemTra
@@ -1443,6 +1565,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra điểm số đã có của học viên trong đợt kiểm tra trong cơ sở dữ liệu.
         public bool ExistsDiemSo(int maNguoiDung, int maDotKiemTra)
         {
             using (var db = _factory.Create())
@@ -1451,6 +1574,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm điểm số mới cho học viên.
         public void InsertDiemSo(DiemSoDTO dto)
         {
             using (var db = _factory.Create())
@@ -1470,13 +1594,16 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách từ vựng theo lớp.
         public List<TuVungDTO> GetTuVung(int? maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Khởi tạo truy vấn từ vựng trước khi áp dụng bộ lọc.
                 var query = db.TuVungs.AsQueryable();
                 if (maLopHoc.HasValue)
                 {
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     query = query.Where(x => x.MaLopHoc == maLopHoc.Value);
                 }
 
@@ -1484,21 +1611,25 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tìm kiếm từ vựng theo tiêu chí tìm kiếm.
         public List<TuVungDTO> SearchTuVung(TuVungSearchCriteriaDTO criteria)
         {
             using (var db = _factory.Create())
             {
                 criteria = criteria ?? new TuVungSearchCriteriaDTO();
+                // Khởi tạo truy vấn từ vựng trước khi áp dụng bộ lọc.
                 var query = db.TuVungs.AsQueryable();
 
                 if (criteria.MaLopHoc.HasValue && criteria.MaLopHoc.Value > 0)
                 {
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí lớp học.
                     query = query.Where(x => x.MaLopHoc == criteria.MaLopHoc.Value);
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteria.Keyword))
                 {
                     var keyword = criteria.Keyword.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí từ khóa.
                     query = query.Where(x => x.TuTiengAnh.Contains(keyword) || x.Nghia.Contains(keyword));
                 }
 
@@ -1511,18 +1642,21 @@ namespace DesktopApp_Project.DAL
                 if (!string.IsNullOrWhiteSpace(criteria.CapDo) && criteria.CapDo != AppConstants.FilterAll)
                 {
                     var capDo = criteria.CapDo.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí cấp độ.
                     query = query.Where(x => x.CapDo == capDo);
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteria.ChuDe) && criteria.ChuDe != AppConstants.FilterAll)
                 {
                     var chuDe = criteria.ChuDe.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí chủ đề.
                     query = query.Where(x => x.ChuDe == chuDe);
                 }
 
                 if (!string.IsNullOrWhiteSpace(criteria.ChuCaiDau) && criteria.ChuCaiDau != AppConstants.FilterAll)
                 {
                     var chuCaiDau = criteria.ChuCaiDau.Trim();
+                    // Chỉ thêm điều kiện lọc khi có tiêu chí chữ cái đầu.
                     query = query.Where(x => x.TuTiengAnh.StartsWith(chuCaiDau));
                 }
 
@@ -1530,6 +1664,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Kiểm tra từ vựng bị trùng trong lớp trong cơ sở dữ liệu.
         public bool ExistsTuVungTrongLop(string tuTiengAnh, int maLopHoc, int exceptId)
         {
             using (var db = _factory.Create())
@@ -1538,6 +1673,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm từ vựng mới.
         public int InsertTuVung(TuVungDTO dto)
         {
             using (var db = _factory.Create())
@@ -1558,6 +1694,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật thông tin từ vựng.
         public void UpdateTuVung(TuVungDTO dto)
         {
             using (var db = _factory.Create())
@@ -1576,6 +1713,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện xóa từ vựng đã chọn.
         public void DeleteTuVung(int maTuVung)
         {
             using (var db = _factory.Create())
@@ -1590,10 +1728,12 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public void DongBoFlashcardChoLop(int maTuVung, int maLopHoc)
         {
             using (var db = _factory.Create())
             {
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var hocVienIds = db.ChiTietLopHocs.Where(x => x.MaLopHoc == maLopHoc).Select(x => x.MaNguoiDung).ToList();
                 foreach (var maNguoiDung in hocVienIds)
                 {
@@ -1612,6 +1752,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lưu tiến trình học flashcard.
         public void UpsertTienTrinhFlashcard(int maNguoiDung, int maTuVung, string ketQua)
         {
             using (var db = _factory.Create())
@@ -1636,6 +1777,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách thông báo.
         public List<ThongBaoDTO> GetThongBao()
         {
             using (var db = _factory.Create())
@@ -1644,6 +1786,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm thông báo mới.
         public int InsertThongBao(ThongBaoDTO dto)
         {
             using (var db = _factory.Create())
@@ -1662,6 +1805,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tạo danh sách người nhận thông báo.
         public void TaoNguoiNhanThongBao(int maThongBao, IEnumerable<int> maNguoiNhan)
         {
             using (var db = _factory.Create())
@@ -1683,16 +1827,19 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách học phí.
         public List<ThanhToanHocPhiDTO> GetHocPhi()
         {
             return GetHocPhi(null, null, null);
         }
 
+        // Tầng dữ liệu thực hiện lấy danh sách học phí.
         public List<ThanhToanHocPhiDTO> GetHocPhi(int? maLopHoc, DateTime? tuNgay, DateTime? denNgay)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn thanh toán học phí trước khi áp dụng bộ lọc.
                     from hp in db.ThanhToanHocPhis
                     join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
                     join lop in db.LopHocs on hp.MaLopHoc equals (int?)lop.MaLopHoc into lopJoin
@@ -1720,17 +1867,20 @@ namespace DesktopApp_Project.DAL
 
                 if (maLopHoc.HasValue && maLopHoc.Value > 0)
                 {
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     query = query.Where(x => x.MaLopHoc == maLopHoc.Value);
                 }
 
                 if (tuNgay.HasValue)
                 {
+                    // Lọc dữ liệu trong khoảng ngày được chọn.
                     query = query.Where(x => x.NgayTao >= tuNgay.Value.Date);
                 }
 
                 if (denNgay.HasValue)
                 {
                     var den = denNgay.Value.Date.AddDays(1);
+                    // Lọc dữ liệu trong khoảng ngày được chọn.
                     query = query.Where(x => x.NgayTao < den);
                 }
 
@@ -1738,6 +1888,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm phiếu học phí mới.
         public int InsertHocPhi(ThanhToanHocPhiDTO dto)
         {
             using (var db = _factory.Create())
@@ -1765,6 +1916,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện thêm nhiều phiếu học phí.
         public void InsertHocPhiBulk(IEnumerable<ThanhToanHocPhiDTO> danhSach)
         {
             using (var db = _factory.Create())
@@ -1794,6 +1946,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật trạng thái học phí.
         public void UpdateTrangThaiHocPhi(int maThanhToan, string trangThai)
         {
             using (var db = _factory.Create())
@@ -1806,6 +1959,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện tạo nhật ký giao dịch thanh toán.
         public PaymentResultDTO TaoNhatKyThanhToan(PaymentRequestDTO request, string maGiaoDichNgoai, string paymentUrl, string qrContent)
         {
             using (var db = _factory.Create())
@@ -1833,6 +1987,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy giao dịch thanh toán theo mã.
         public PaymentResultDTO LayGiaoDichThanhToan(int maGiaoDich)
         {
             using (var db = _factory.Create())
@@ -1842,6 +1997,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy các giao dịch của khoản học phí.
         public List<PaymentResultDTO> LayGiaoDichTheoThanhToan(int maThanhToan)
         {
             using (var db = _factory.Create())
@@ -1856,6 +2012,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy chi tiết giao dịch để kiểm thử.
         public PaymentDebugResultDTO LayChiTietGiaoDichDebug(int maGiaoDich)
         {
             using (var db = _factory.Create())
@@ -1865,6 +2022,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật trạng thái gửi thư yêu cầu thanh toán.
         public void CapNhatEmailThanhToan(int maGiaoDich, bool sent, DateTime? sentAt, string error)
         {
             using (var db = _factory.Create())
@@ -1881,6 +2039,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật trạng thái gửi thư thông báo giao dịch.
         public void CapNhatEmailTrangThai(int maGiaoDich, bool sent, DateTime? sentAt, string error)
         {
             using (var db = _factory.Create())
@@ -1898,6 +2057,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật trạng thái giao dịch.
         public void CapNhatTrangThaiGiaoDich(int maGiaoDich, string trangThai)
         {
             using (var db = _factory.Create())
@@ -1913,6 +2073,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật trạng thái và phương thức thanh toán học phí.
         public void CapNhatTrangThaiHocPhi(int maThanhToan, string trangThai, string phuongThuc, DateTime? ngayThanhToan)
         {
             using (var db = _factory.Create())
@@ -1927,6 +2088,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy hóa đơn học phí theo mã thanh toán.
         public HoaDonHocPhiDTO LayHoaDonHocPhi(int maThanhToan)
         {
             using (var db = _factory.Create())
@@ -1935,6 +2097,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy hóa đơn học phí theo khoảng ngày.
         public List<HoaDonHocPhiDTO> LayHoaDonHocPhiTheoKhoangNgay(DateTime tuNgay, DateTime denNgay)
         {
             using (var db = _factory.Create())
@@ -1949,6 +2112,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy báo cáo doanh thu theo khoảng ngày.
         public List<BaoCaoDoanhThuDTO> LayBaoCaoDoanhThu(DateTime tuNgay, DateTime denNgay)
         {
             using (var db = _factory.Create())
@@ -1958,6 +2122,7 @@ namespace DesktopApp_Project.DAL
                 return BuildHoaDonQuery(db)
                     .Where(x => x.NgayTao >= start && x.NgayTao < end)
                     .AsEnumerable()
+                    // Gom nhóm dữ liệu để tính toán báo cáo hoặc thống kê.
                     .GroupBy(x => new { Ngay = x.NgayTao.Date, x.MaLopHoc, x.TenLop })
                     .Select(g => new BaoCaoDoanhThuDTO
                     {
@@ -1967,6 +2132,7 @@ namespace DesktopApp_Project.DAL
                         SoPhieu = g.Count(),
                         SoPhieuDaThanhToan = g.Count(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai)),
                         TongTienDaThanhToan = g
+                            // Lọc theo trạng thái đã chọn trên màn hình.
                             .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai))
                             .Sum(x => x.SoTienCuoi.HasValue ? x.SoTienCuoi.Value : x.SoTien)
                     })
@@ -1976,6 +2142,7 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Tầng dữ liệu thực hiện cập nhật mã hóa đơn học phí.
         public void CapNhatThongTinHoaDon(int maThanhToan, string maHoaDon)
         {
             using (var db = _factory.Create())
@@ -1988,9 +2155,11 @@ namespace DesktopApp_Project.DAL
             }
         }
 
+        // Xây dựng truy vấn hoặc diễn giải dữ liệu phục vụ tầng dữ liệu.
         private static IQueryable<PaymentDebugResultDTO> BuildPaymentDebugQuery(QuanLyIeltsDataContext db)
         {
             return
+                // Khởi tạo truy vấn nhật ký thanh toán trước khi áp dụng bộ lọc.
                 from tx in db.NhatKyThanhToans
                 join hp in db.ThanhToanHocPhis on tx.MaThanhToan equals hp.MaThanhToan
                 join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
@@ -2022,6 +2191,7 @@ namespace DesktopApp_Project.DAL
                 };
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static string TrimForColumn(string value, int maxLength)
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -2033,8 +2203,10 @@ namespace DesktopApp_Project.DAL
             return value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static void EnsurePaymentDebugColumns(QuanLyIeltsDataContext db)
         {
+            // Thực thi SQL trực tiếp để bổ sung cột kiểm thử thanh toán khi cần.
             db.ExecuteCommand(@"
 IF OBJECT_ID(N'dbo.NhatKyThanhToan', N'U') IS NOT NULL AND COL_LENGTH(N'dbo.NhatKyThanhToan', N'ReceiverEmail') IS NULL
 BEGIN
@@ -2086,9 +2258,11 @@ BEGIN
 END");
         }
 
+        // Xây dựng truy vấn hoặc diễn giải dữ liệu phục vụ tầng dữ liệu.
         private static IQueryable<HoaDonHocPhiDTO> BuildHoaDonQuery(QuanLyIeltsDataContext db)
         {
             return
+                // Khởi tạo truy vấn thanh toán học phí trước khi áp dụng bộ lọc.
                 from hp in db.ThanhToanHocPhis
                 join nd in db.NguoiDungs on hp.MaNguoiDung equals nd.MaNguoiDung
                 join lop in db.LopHocs on hp.MaLopHoc equals (int?)lop.MaLopHoc into lopJoin
@@ -2115,6 +2289,7 @@ END");
                 };
         }
 
+        // Tầng dữ liệu thực hiện lấy số liệu tổng quan màn hình tổng quan.
         public DashboardSummaryDTO GetDashboardSummary(DateTime today)
         {
             using (var db = _factory.Create())
@@ -2122,6 +2297,7 @@ END");
                 var start = new DateTime(today.Year, today.Month, 1);
                 var end = start.AddMonths(1);
                 var paidThisMonth = db.ThanhToanHocPhis
+                    // Lọc theo trạng thái đã chọn trên màn hình.
                     .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai) && x.NgayTao >= start && x.NgayTao < end)
                     .AsEnumerable()
                     .Sum(x => x.SoTienCuoi.HasValue ? x.SoTienCuoi.Value : x.SoTien);
@@ -2130,6 +2306,7 @@ END");
                 {
                     TongHocVien = db.NguoiDungs.Count(x => x.VaiTro == AppConstants.RoleStudent),
                     HocVienDangHoc = db.ChiTietLopHocs
+                        // Lọc theo trạng thái đã chọn trên màn hình.
                         .Where(x => AppConstants.EnrollmentActiveAliases.Contains(x.TrangThai) && x.NgayNghiHoc == null)
                         .Select(x => x.MaNguoiDung)
                         .Distinct()
@@ -2140,6 +2317,7 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy doanh thu theo tháng.
         public List<MonthlyRevenueDTO> GetRevenueByMonth(int months, DateTime today)
         {
             using (var db = _factory.Create())
@@ -2147,8 +2325,10 @@ END");
                 months = Math.Max(1, months);
                 var firstMonth = new DateTime(today.Year, today.Month, 1).AddMonths(-(months - 1));
                 var paid = db.ThanhToanHocPhis
+                    // Lọc theo trạng thái đã chọn trên màn hình.
                     .Where(x => AppConstants.PaymentPaidAliases.Contains(x.TrangThai) && x.NgayTao >= firstMonth)
                     .AsEnumerable()
+                    // Gom nhóm dữ liệu để tính toán báo cáo hoặc thống kê.
                     .GroupBy(x => new { x.NgayTao.Year, x.NgayTao.Month })
                     .ToDictionary(
                         x => x.Key.Year + "-" + x.Key.Month,
@@ -2174,6 +2354,7 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy lịch học trong tuần.
         public List<WeeklyScheduleDTO> GetWeeklySchedule(DateTime weekStart)
         {
             using (var db = _factory.Create())
@@ -2189,11 +2370,13 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy dữ liệu báo cáo điểm.
         public List<BaoCaoDiemDTO> GetBaoCaoDiem(int? maLopHoc)
         {
             using (var db = _factory.Create())
             {
                 var query =
+                    // Khởi tạo truy vấn chi tiết điểm số trước khi áp dụng bộ lọc.
                     from ds in db.ChiTietDiemSos
                     join dot in db.DotKiemTras on ds.MaDotKiemTra equals dot.MaDotKiemTra
                     join lop in db.LopHocs on dot.MaLopHoc equals lop.MaLopHoc
@@ -2211,6 +2394,7 @@ END");
                 {
                     var lopId = maLopHoc.Value;
                     query =
+                        // Khởi tạo truy vấn chi tiết điểm số trước khi áp dụng bộ lọc.
                         from ds in db.ChiTietDiemSos
                         join dot in db.DotKiemTras on ds.MaDotKiemTra equals dot.MaDotKiemTra
                         join lop in db.LopHocs on dot.MaLopHoc equals lop.MaLopHoc
@@ -2230,6 +2414,7 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy dữ liệu báo cáo bài tập.
         public List<BaoCaoBaiTapDTO> GetBaoCaoBaiTap(int? maLopHoc)
         {
             using (var db = _factory.Create())
@@ -2242,6 +2427,7 @@ END");
                 foreach (var lopId in lopIds)
                 {
                     var hocVien = GetHocVienLop(lopId, true);
+                    // Giới hạn dữ liệu trong lớp học đang chọn.
                     var baiTap = db.BaiTaps.Where(x => x.MaLopHoc == lopId).ToList();
                     var baiTapIds = baiTap.Select(x => x.MaBaiTap).ToList();
                     var nopBai = db.ChiTietNopBais.Where(x => baiTapIds.Contains(x.MaBaiTap)).ToList();
@@ -2266,12 +2452,15 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy dữ liệu báo cáo chuyên cần.
         public List<BaoCaoChuyenCanDTO> GetBaoCaoChuyenCan(int maLopHoc)
         {
             using (var db = _factory.Create())
             {
                 var hocVien = GetHocVienLop(maLopHoc, true);
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var buoiIds = db.BuoiHocs.Where(x => x.MaLopHoc == maLopHoc).Select(x => x.MaBuoiHoc).ToList();
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var diemDanh = db.ChiTietDiemDanhs.Where(x => buoiIds.Contains(x.MaBuoiHoc)).ToList();
                 var result = new List<BaoCaoChuyenCanDTO>();
 
@@ -2294,11 +2483,13 @@ END");
             }
         }
 
+        // Tầng dữ liệu thực hiện lấy dữ liệu báo cáo cuối kỳ.
         public List<BaoCaoCuoiKyDTO> GetBaoCaoCuoiKy(int maLopHoc)
         {
             using (var db = _factory.Create())
             {
                 var hocVien = GetHocVienLop(maLopHoc, true);
+                // Giới hạn dữ liệu trong lớp học đang chọn.
                 var dot = db.DotKiemTras.Where(x => x.MaLopHoc == maLopHoc).OrderBy(x => x.NgayKiemTra).ToList();
                 var dotIds = dot.Select(x => x.MaDotKiemTra).ToList();
                 var diem = db.ChiTietDiemSos.Where(x => dotIds.Contains(x.MaDotKiemTra)).ToList();
@@ -2326,6 +2517,7 @@ END");
             }
         }
 
+        // Trả về thực thể bắt buộc hoặc ném lỗi rõ ràng khi không tìm thấy dữ liệu.
         public void GhiNhatKyBaoCao(int maNguoiDung, string loaiBaoCao, string tieuChi)
         {
             using (var db = _factory.Create())
@@ -2341,6 +2533,7 @@ END");
             }
         }
 
+        // Xử lý dữ liệu phụ trợ trước khi kho dữ liệu đọc hoặc ghi cơ sở dữ liệu.
         private static void AddScheduleRows(List<WeeklyScheduleDTO> result, LopHocEntity lop, DateTime monday)
         {
             var labels = new[] { "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật" };

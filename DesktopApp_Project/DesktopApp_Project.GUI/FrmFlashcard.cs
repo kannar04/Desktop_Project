@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý flashcard từ vựng
+// Chức năng:
+// - Hiển thị và nhập dữ liệu flashcard từ vựng
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -9,6 +15,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.GUI
 {
+	// Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị flashcard từ vựng và gọi tầng nghiệp vụ khi người dùng thao tác.
 	public partial class FrmFlashcard : ModuleFormBase
 	{
 		private readonly Random _random = new Random();
@@ -29,6 +36,7 @@ namespace DesktopApp_Project.GUI
 			SetRuntimeContext(services, currentUser);
 		}
 
+		// Đăng ký các hàm xử lý sự kiện cho điều khiển trên biểu mẫu.
 		private void WireEvents()
 		{
 			WireClick(btnLatThe, BtnLatThe_Click);
@@ -40,13 +48,16 @@ namespace DesktopApp_Project.GUI
 			WireSelectedIndexChanged(_cboChuDe, Filter_Changed);
 		}
 
+		// Nạp dữ liệu và thiết lập trạng thái ban đầu khi biểu mẫu được mở.
 		protected override void OnRuntimeLoad()
 		{
 			_isLoading = true;
 			try
 			{
 				UiHelpers.BindLopHoc(_cboLop, Services);
+				// Xóa dữ liệu đang hiển thị trên ô chọn cấp độ khi chưa đủ điều kiện tải.
 				_cboCapDo.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.CefrLevels).ToList();
+				// Xóa dữ liệu đang hiển thị trên ô chọn chủ đề khi chưa đủ điều kiện tải.
 				_cboChuDe.DataSource = new[] { AppConstants.FilterAll }.Concat(AppConstants.VocabularyTopics).ToList();
 			}
 			finally
@@ -58,6 +69,7 @@ namespace DesktopApp_Project.GUI
 			LoadCards();
 		}
 
+		// Lấy thẻ flashcard.
 		private void LoadCards()
 		{
 			if (!CanUseServices || _isLoading)
@@ -65,6 +77,7 @@ namespace DesktopApp_Project.GUI
 				return;
 			}
 
+			// Gọi tầng nghiệp vụ để lấy danh sách flashcard.
 			var result = Services.TuVung.LayDanhSachFlashcard(new TuVungSearchCriteriaDTO
 			{
 				MaLopHoc = UiHelpers.SelectedId(_cboLop),
@@ -89,6 +102,7 @@ namespace DesktopApp_Project.GUI
 			DisplayCard();
 		}
 
+		// Cập nhật phần hiển thị xem trước dựa trên dữ liệu đang chọn.
 		private void DisplayCard()
 		{
 			var hasCards = _cards.Count > 0;
@@ -127,6 +141,7 @@ namespace DesktopApp_Project.GUI
 			lblCardMeta.Text = SafeText(card.TuLoai) + "  |  " + SafeText(card.CapDo) + "  |  " + SafeText(card.ChuDe);
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Lật thẻ.
 		private void BtnLatThe_Click(object sender, EventArgs e)
 		{
 			if (_cards.Count == 0)
@@ -137,6 +152,7 @@ namespace DesktopApp_Project.GUI
 			_showBack = !_showBack;
 			if (_showBack && CurrentUser != null)
 			{
+				// Gọi tầng nghiệp vụ để ghi nhận flashcard đã học.
 				var result = Services.TuVung.GhiNhanFlashcardDaHoc(CurrentUser.MaNguoiDung, _cards[_currentIndex].MaTuVung);
 				if (!result.Success)
 				{
@@ -147,6 +163,7 @@ namespace DesktopApp_Project.GUI
 			DisplayCard();
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Tiếp theo.
 		private void BtnTiepTheo_Click(object sender, EventArgs e)
 		{
 			if (_currentIndex < _cards.Count - 1)
@@ -157,6 +174,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Trước.
 		private void BtnTruoc_Click(object sender, EventArgs e)
 		{
 			if (_currentIndex > 0)
@@ -167,6 +185,7 @@ namespace DesktopApp_Project.GUI
 			}
 		}
 
+		// Xử lý sự kiện người dùng nhấn nút Xáo trộn.
 		private void BtnXaoTron_Click(object sender, EventArgs e)
 		{
 			if (_cards.Count <= 1)
@@ -174,17 +193,20 @@ namespace DesktopApp_Project.GUI
 				return;
 			}
 
+			// Lọc hoặc sắp xếp dữ liệu hiển thị bằng LINQ.
 			_cards = _cards.OrderBy(x => _random.Next()).ToList();
 			_currentIndex = 0;
 			_showBack = false;
 			DisplayCard();
 		}
 
+		// Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
 		private void Filter_Changed(object sender, EventArgs e)
 		{
 			LoadCards();
 		}
 
+		// Cập nhật màu sắc và bố cục của thẻ flashcard hiện tại.
 		private void ApplyFlashcardVisualStyle()
 		{
 			cardPanel.BackColor = UiHelpers.SurfaceAltColor;
@@ -207,12 +229,14 @@ namespace DesktopApp_Project.GUI
 			UiHelpers.EnableDoubleBuffering(cardPanel);
 		}
 
+		// Lấy loại từ vựng đang được chọn trong bộ lọc.
 		private static string SelectedFilter(ComboBox combo)
 		{
 			var value = combo == null ? null : Convert.ToString(combo.SelectedItem);
 			return string.IsNullOrWhiteSpace(value) ? AppConstants.FilterAll : value;
 		}
 
+		// Xử lý tiện ích giao diện và thao tác tệp an toàn cho người dùng.
 		private static string SafeText(string value)
 		{
 			return string.IsNullOrWhiteSpace(value) ? "-" : value.Trim();

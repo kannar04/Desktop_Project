@@ -1,3 +1,9 @@
+// Dịch vụ xử lý nghiệp vụ Thư điện tử thanh toán
+// Chức năng:
+// - Nhận dữ liệu từ giao diện dưới dạng đối tượng truyền dữ liệu hoặc tham số lọc
+// - Kiểm tra nghiệp vụ trước khi gọi tầng dữ liệu
+// - Trả kết quả xử lý hoặc danh sách đối tượng truyền dữ liệu cho giao diện
+
 using System;
 using System.Configuration;
 using MailKit.Net.Smtp;
@@ -6,16 +12,20 @@ using MimeKit;
 
 namespace DesktopApp_Project.BUS
 {
+    // Lớp hỗ trợ lưu trạng thái lỗi gửi Thư điện tử trong quá trình xử lý nghiệp vụ.
     public class EmailSendException : Exception
     {
+        // Khởi tạo ngoại lệ để giữ thông tin lỗi khi gửi Thư điện tử thanh toán thất bại.
         public EmailSendException(string message, Exception innerException)
             : base(message, innerException)
         {
         }
     }
 
+    // Lớp xử lý nghiệp vụ Thư điện tử thanh toán, kiểm tra dữ liệu trước khi gọi kho dữ liệu/tầng dữ liệu.
     public class PaymentEmailService
     {
+        // Gửi thư yêu cầu thanh toán.
         public void SendPaymentRequest(
             string toEmail,
             string studentName,
@@ -56,11 +66,13 @@ namespace DesktopApp_Project.BUS
             }
         }
 
+        // Gửi thư thông báo trạng thái thanh toán.
         public void SendStatusNotification(string toEmail, string invoiceCode, decimal amount, string status)
         {
             SendStatusNotification(toEmail, string.Empty, invoiceCode, amount, status);
         }
 
+        // Gửi thư thông báo trạng thái thanh toán.
         public void SendStatusNotification(string toEmail, string studentName, string invoiceCode, decimal amount, string status)
         {
             try
@@ -86,6 +98,7 @@ namespace DesktopApp_Project.BUS
             }
         }
 
+        // Tạo message.
         private static MimeMessage CreateMessage(SmtpOptions options, string toEmail, string subject)
         {
             if (string.IsNullOrWhiteSpace(toEmail))
@@ -100,6 +113,7 @@ namespace DesktopApp_Project.BUS
             return message;
         }
 
+        // Gửi thư thanh toán.
         private static void Send(SmtpOptions options, MimeMessage message)
         {
             using (var client = new SmtpClient())
@@ -111,6 +125,7 @@ namespace DesktopApp_Project.BUS
             }
         }
 
+        // Lấy smtp options.
         private static SmtpOptions LoadSmtpOptions()
         {
             var host = RequireSmtpConfig("smtp:Host");
@@ -134,6 +149,7 @@ namespace DesktopApp_Project.BUS
             };
         }
 
+        // Xử lý require smtp config.
         private static string RequireSmtpConfig(string key)
         {
             var value = ConfigurationManager.AppSettings[key];
@@ -145,11 +161,13 @@ namespace DesktopApp_Project.BUS
             return value.Trim();
         }
 
+        // Xử lý safe text.
         private static string SafeText(string value)
         {
             return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim();
         }
 
+        // Lớp hỗ trợ lưu cấu hình máy chủ gửi thư trong quá trình xử lý nghiệp vụ.
         private class SmtpOptions
         {
             public string Host { get; set; }

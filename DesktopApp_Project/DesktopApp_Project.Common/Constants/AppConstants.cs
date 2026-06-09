@@ -1,8 +1,14 @@
+// Hằng số dùng chung của ứng dụng
+// Chức năng:
+// - Tập trung vai trò, trạng thái, cấu hình nghiệp vụ và danh mục lựa chọn
+// - Chuẩn hóa giá trị hiển thị giữa giao diện, tầng nghiệp vụ và tầng dữ liệu
+
 using System.Collections.Generic;
 using System.Text;
 
 namespace DesktopApp_Project.Common
 {
+    // Lớp chứa hằng số và danh mục nghiệp vụ dùng chung toàn ứng dụng.
     public static class AppConstants
         {
             public const string RoleAdmin = "Admin";
@@ -37,13 +43,16 @@ namespace DesktopApp_Project.Common
                 AttendanceLate
             };
 
+            // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
             public static readonly string[] AttendancePresentAliases = BuildAliases(AttendancePresent);
+            // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
             public static readonly string[] AttendanceLateAliases = BuildAliases(AttendanceLate);
     
             public const string EnrollmentActive = "Đang học";
             public const string EnrollmentPaused = "Tạm nghỉ";
             public const string EnrollmentStopped = "Đã nghỉ";
     
+            // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
             public static readonly string[] EnrollmentActiveAliases = BuildAliases(EnrollmentActive);
     
             public static readonly string[] StudentStatusFilters =
@@ -104,6 +113,7 @@ namespace DesktopApp_Project.Common
                 ".mkv"
             };
 
+            // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
             public static readonly string[] PaymentPaidAliases = BuildAliases(PaymentPaid);
     
             public static readonly string[] WordTypes =
@@ -152,23 +162,28 @@ namespace DesktopApp_Project.Common
             public const decimal LongTermTuitionDiscountPercent = 20m;
             public const int LongTermTuitionDiscountYears = 2;
     
+            // Chuẩn hóa giá trị dùng chung để các tầng xử lý thống nhất.
             public static string[] GetTextAliases(string value)
             {
+                // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
                 return BuildAliases(value);
             }
 
+            // Chuẩn hóa giá trị dùng chung để các tầng xử lý thống nhất.
             private static string[] BuildAliases(params string[] values)
             {
                 var result = new List<string>();
                 foreach (var value in values)
                 {
                     AddAlias(result, value);
+                    // Chuẩn hóa alias để so khớp dữ liệu tiếng Việt cũ và mới.
                     AddAlias(result, ToLegacyMojibake(value));
                 }
 
                 return result.ToArray();
             }
 
+            // Chuẩn hóa giá trị dùng chung để các tầng xử lý thống nhất.
             private static void AddAlias(List<string> result, string value)
             {
                 if (!string.IsNullOrEmpty(value) && !result.Contains(value))
@@ -177,11 +192,13 @@ namespace DesktopApp_Project.Common
                 }
             }
 
+            // Thực hiện xử lý dùng chung cho hằng số dùng chung.
             private static string ToLegacyMojibake(string value)
             {
                 return Encoding.GetEncoding(1252).GetString(Encoding.UTF8.GetBytes(value));
             }
 
+            // Chuẩn hóa giá trị dùng chung để các tầng xử lý thống nhất.
             public static string GetDisplayRole(string role)
             {
                 if (role == RoleAdmin)

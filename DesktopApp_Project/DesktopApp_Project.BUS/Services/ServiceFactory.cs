@@ -1,4 +1,9 @@
 ﻿using System;
+// Bộ khởi tạo khởi tạo các dịch vụ nghiệp vụ
+// Chức năng:
+// - Tạo kho dữ liệu dùng chung
+// - Cung cấp các tầng nghiệp vụ cho tầng giao diện thông qua bộ khởi tạo dịch vụ
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,15 +14,18 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.BUS
 {
+    // Lớp tập trung khởi tạo và cung cấp các dịch vụ nghiệp vụ cho giao diện.
     public class ServiceFactory
         {
             private readonly IQuanLyIeltsRepository _repository;
     
+            // Khởi tạo bộ dịch vụ và kho dữ liệu dùng chung.
             public ServiceFactory()
                 : this(new QuanLyIeltsRepository(new AppConfigDataContextFactory()))
             {
             }
     
+            // Khởi tạo bộ dịch vụ và kho dữ liệu dùng chung.
             public ServiceFactory(IQuanLyIeltsRepository repository)
             {
                 _repository = repository;

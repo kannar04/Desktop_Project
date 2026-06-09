@@ -1,7 +1,13 @@
+// Thành phần chủ đề giao diện cho giao diện Windows Forms
+// Chức năng:
+// - Khai báo hoặc áp dụng màu sắc, phông chữ và trạng thái giao diện
+// - Hỗ trợ các biểu mẫu dùng chung một phong cách hiển thị
+
 using System.Drawing;
 
 namespace DesktopApp_Project.GUI.Shared.Themes
 {
+    // Hợp đồng mô tả cấu hình chủ đề giao diện để ThemeManager áp dụng cho giao diện.
     public interface ITheme
     {
         string Name { get; }

@@ -1,3 +1,9 @@
+// Biểu mẫu quản lý màn hình đăng nhập
+// Chức năng:
+// - Hiển thị và nhập dữ liệu màn hình đăng nhập
+// - Gọi tầng nghiệp vụ để tải, lưu hoặc xóa dữ liệu
+// - Cập nhật trạng thái giao diện sau thao tác của người dùng
+
 using DesktopApp_Project.BUS;
 using DesktopApp_Project.GUI.Shared.Themes;
 using FontAwesome.Sharp;
@@ -9,6 +15,7 @@ using System.Windows.Forms;
 
 namespace DesktopApp_Project.GUI
 {
+    // Lớp biểu mẫu Windows Forms chịu trách nhiệm hiển thị màn hình đăng nhập và gọi tầng nghiệp vụ khi người dùng thao tác.
     public partial class FrmDangNhap : Form
     {
         private readonly ServiceFactory _services = new ServiceFactory();
@@ -41,6 +48,7 @@ namespace DesktopApp_Project.GUI
             AcceptButton = btnLogin;
         }
 
+        // Áp dụng kiểu nền của màn hình đăng nhập.
         private void ApplyBaseStyle()
         {
             Font = ThemeManager.Current.BodyFont;
@@ -53,17 +61,20 @@ namespace DesktopApp_Project.GUI
             Text = "Đăng nhập - Quản lý lớp IELTS";
         }
 
+        // Xử lý khi màn hình đăng nhập được nạp.
         private void FrmDangNhap_Load(object sender, EventArgs e)
         {
             ApplyLoginTheme();
         }
 
+        // Xử lý khi màn hình đăng nhập đổi kích thước.
         private void FrmDangNhap_Resize(object sender, EventArgs e)
         {
             ApplyLoginTheme();
             Invalidate();
         }
 
+        // Xử lý nền khi vẽ lại biểu mẫu.
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             if (ClientSize.Width == 0 || ClientSize.Height == 0)
@@ -81,11 +92,13 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý nội dung vẽ của màn hình đăng nhập.
         private void FrmDangNhap_Paint(object sender, PaintEventArgs e)
         {
             DrawCardShadow(e.Graphics);
         }
 
+        // Áp dụng chủ đề của màn hình đăng nhập.
         private void ApplyLoginTheme()
         {
             var theme = ThemeManager.Current;
@@ -160,6 +173,7 @@ namespace DesktopApp_Project.GUI
             ResumeLayout();
         }
 
+        // Xử lý kiểu ô nhập đăng nhập.
         private void StyleTextInput(TextBox textBox, Label placeholder, Panel underline, IconPictureBox icon)
         {
             var theme = ThemeManager.Current;
@@ -180,6 +194,7 @@ namespace DesktopApp_Project.GUI
             icon.IconColor = theme.Accent;
         }
 
+        // Xử lý kiểu nút cửa sổ.
         private void StyleWindowButton(Button button)
         {
             button.BackColor = Color.Transparent;
@@ -189,6 +204,7 @@ namespace DesktopApp_Project.GUI
             button.UseVisualStyleBackColor = false;
         }
 
+        // Vẽ bóng đổ cho khung đăng nhập.
         private void DrawCardShadow(Graphics graphics)
         {
             if (pnlLogin == null || !pnlLogin.Visible)
@@ -205,6 +221,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý viền dưới của ô nhập.
         private void InputPanel_Paint(object sender, PaintEventArgs e)
         {
             var panel = sender as Panel;
@@ -221,6 +238,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý bo góc biểu mẫu.
         private void SetRoundedRegion(Control control, int radius)
         {
             if (control.Width <= 0 || control.Height <= 0)
@@ -236,6 +254,7 @@ namespace DesktopApp_Project.GUI
             control.Region = new Region(CreateRoundRectPath(new Rectangle(0, 0, control.Width, control.Height), radius));
         }
 
+        // Tạo đường vẽ hình chữ nhật bo góc.
         private GraphicsPath CreateRoundRectPath(Rectangle bounds, int radius)
         {
             var path = new GraphicsPath();
@@ -248,6 +267,7 @@ namespace DesktopApp_Project.GUI
             return path;
         }
 
+        // Đổi màu nút đăng nhập khi người dùng rê chuột vào.
         private void LoginButton_MouseEnter(object sender, EventArgs e)
         {
             if (!CanUse(btnLogin))
@@ -258,6 +278,7 @@ namespace DesktopApp_Project.GUI
             btnLogin.BackColor = ThemeManager.Current.AccentHover;
         }
 
+        // Khôi phục màu nút đăng nhập khi chuột rời khỏi nút.
         private void LoginButton_MouseLeave(object sender, EventArgs e)
         {
             if (!CanUse(btnLogin))
@@ -268,6 +289,7 @@ namespace DesktopApp_Project.GUI
             btnLogin.BackColor = ThemeManager.Current.Accent;
         }
 
+        // Đổi màu nút đăng nhập khi người dùng nhấn chuột.
         private void LoginButton_MouseDown(object sender, MouseEventArgs e)
         {
             if (!CanUse(btnLogin))
@@ -278,6 +300,7 @@ namespace DesktopApp_Project.GUI
             btnLogin.BackColor = ThemeManager.Current.AccentPressed;
         }
 
+        // Khôi phục trạng thái nút đăng nhập sau khi thả chuột.
         private void LoginButton_MouseUp(object sender, MouseEventArgs e)
         {
             if (!CanUse(btnLogin))
@@ -298,11 +321,14 @@ namespace DesktopApp_Project.GUI
         }
 
         [DllImport("user32.DLL", EntryPoint = "ReleaseCapture")]
+        // Xử lý nhả bắt chuột khi kéo cửa sổ.
         private static extern void ReleaseCapture();
 
         [DllImport("user32.DLL", EntryPoint = "SendMessage")]
+        // Xử lý gửi thông điệp kéo cửa sổ.
         private static extern void SendMessage(IntPtr hWnd, int wMsg, int wParam, int lParam);
 
+        // Xử lý xử lý thông điệp cửa sổ.
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
@@ -360,16 +386,19 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý thao tác bấm trên điều khiển giao diện để cập nhật trạng thái biểu mẫu.
         private void lblUsername_Click(object sender, EventArgs e)
         {
             FocusInput(txtUsername, lblUsername, pnlUnder1, icoUsername);
         }
 
+        // Xử lý khi rời ô tài khoản.
         private void txtUsername_Leave(object sender, EventArgs e)
         {
             LeaveInput(txtUsername, lblUsername, pnlUnder1, icoUsername);
         }
 
+        // Xử lý thao tác bấm trên điều khiển giao diện để cập nhật trạng thái biểu mẫu.
         private void icoShowPass_Click(object sender, EventArgs e)
         {
             if (txtPassword.UseSystemPasswordChar)
@@ -386,26 +415,31 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý thao tác bấm trên điều khiển giao diện để cập nhật trạng thái biểu mẫu.
         private void lblPassword_Click(object sender, EventArgs e)
         {
             FocusInput(txtPassword, lblPassword, pnlUnder2, icoPassword);
         }
 
+        // Xử lý khi rời ô mật khẩu.
         private void txtPassword_Leave(object sender, EventArgs e)
         {
             LeaveInput(txtPassword, lblPassword, pnlUnder2, icoPassword);
         }
 
+        // Làm nổi bật ô tài khoản khi người dùng bắt đầu nhập.
         private void txtUsername_Enter(object sender, EventArgs e)
         {
             FocusInput(txtUsername, lblUsername, pnlUnder1, icoUsername);
         }
 
+        // Làm nổi bật ô mật khẩu khi người dùng bắt đầu nhập.
         private void txtPassword_Enter(object sender, EventArgs e)
         {
             FocusInput(txtPassword, lblPassword, pnlUnder2, icoPassword);
         }
 
+        // Đổi màu nhãn, gạch chân và biểu tượng khi ô nhập được focus.
         private void FocusInput(TextBox textBox, Label placeholder, Panel underline, IconPictureBox icon)
         {
             placeholder.Location = new Point(placeholder.Location.X, 4);
@@ -416,6 +450,7 @@ namespace DesktopApp_Project.GUI
             textBox.Focus();
         }
 
+        // Khôi phục màu nhãn, gạch chân và biểu tượng khi ô nhập mất focus.
         private void LeaveInput(TextBox textBox, Label placeholder, Panel underline, IconPictureBox icon)
         {
             placeholder.ForeColor = ThemeManager.Current.SecondaryText;
@@ -428,6 +463,7 @@ namespace DesktopApp_Project.GUI
             }
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Đăng nhập.
         private void btnLogin_Click(object sender, EventArgs e)
         {
             var result = _services.Auth.DangNhap(txtUsername.Text, txtPassword.Text);
@@ -446,17 +482,20 @@ namespace DesktopApp_Project.GUI
             Close();
         }
 
+        // Xử lý kéo cửa sổ từ thanh tiêu đề tùy biến.
         private void pnlMovingForm_MouseDown(object sender, MouseEventArgs e)
         {
             ReleaseCapture();
             SendMessage(Handle, 0x112, 0xf012, 0);
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Thu nhỏ.
         private void btnMinimize_Click(object sender, EventArgs e)
         {
             WindowState = FormWindowState.Minimized;
         }
 
+        // Xử lý sự kiện người dùng nhấn nút Đóng.
         private void btnClose_Click(object sender, EventArgs e)
         {
             if (!ConfirmExit())
@@ -468,6 +507,7 @@ namespace DesktopApp_Project.GUI
             Application.Exit();
         }
 
+        // Xử lý khi đóng màn hình đăng nhập.
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             if (!_allowClose && e.CloseReason == CloseReason.UserClosing && !ConfirmExit())
@@ -479,6 +519,7 @@ namespace DesktopApp_Project.GUI
             base.OnFormClosing(e);
         }
 
+        // Xử lý xác nhận thoát ứng dụng.
         private bool ConfirmExit()
         {
             return MessageBox.Show(
@@ -488,6 +529,7 @@ namespace DesktopApp_Project.GUI
                 MessageBoxIcon.Question) == DialogResult.Yes;
         }
 
+        // Xử lý điều khiển còn sử dụng được.
         private static bool CanUse(Control control)
         {
             return control != null && !control.IsDisposed && !control.Disposing;

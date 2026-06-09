@@ -1,3 +1,9 @@
+// Dịch vụ xử lý nghiệp vụ thanh toán
+// Chức năng:
+// - Nhận dữ liệu từ giao diện dưới dạng đối tượng truyền dữ liệu hoặc tham số lọc
+// - Kiểm tra nghiệp vụ trước khi gọi tầng dữ liệu
+// - Trả kết quả xử lý hoặc danh sách đối tượng truyền dữ liệu cho giao diện
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -8,6 +14,7 @@ using DesktopApp_Project.DTO;
 
 namespace DesktopApp_Project.BUS
 {
+    // Lớp xử lý nghiệp vụ thanh toán, kiểm tra dữ liệu trước khi gọi kho dữ liệu/tầng dữ liệu.
     public class PaymentService : ServiceBase
     {
         private static readonly Random DemoRandom = new Random();
@@ -21,10 +28,12 @@ namespace DesktopApp_Project.BUS
             _emailService = new PaymentEmailService();
         }
 
+        // Tạo thanh toán.
         public ServiceResult<PaymentResultDTO> TaoThanhToan(PaymentRequestDTO request)
         {
             return Try(() =>
             {
+                // Ràng buộc dữ liệu: Vui lòng chọn phiếu học phí.
                 if (request == null || request.MaThanhToan <= 0)
                 {
                     return ServiceResult<PaymentResultDTO>.Fail("Vui long chon phieu hoc phi.");
@@ -35,6 +44,7 @@ namespace DesktopApp_Project.BUS
                     return ServiceResult<PaymentResultDTO>.Fail("Phuong thuc thanh toan khong hop le.");
                 }
 
+                // Lấy hóa đơn học phí theo mã thanh toán qua tầng dữ liệu.
                 var invoice = Repository.LayHoaDonHocPhi(request.MaThanhToan);
                 if (invoice == null)
                 {
@@ -56,12 +66,15 @@ namespace DesktopApp_Project.BUS
                 var paymentUrl = "https://fake-payment.local/" + prefix.ToLowerInvariant() + "?txn=" + Uri.EscapeDataString(externalId);
                 var qrContent = prefix + "|" + request.MaThanhToan + "|" + request.SoTien.ToString("0") + "|" + externalId;
 
+                // Tạo nhật ký giao dịch thanh toán qua tầng dữ liệu.
                 var result = Repository.TaoNhatKyThanhToan(request, externalId, paymentUrl, qrContent);
+                // Cập nhật trạng thái và phương thức thanh toán học phí qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiHocPhi(request.MaThanhToan, AppConstants.PaymentPending, null, null);
                 return ServiceResult<PaymentResultDTO>.Ok(result, "Da tao thanh toan gia lap.");
             });
         }
 
+        // Xử lý gửi thông tin học phí.
         public ServiceResult<PaymentResultDTO> GuiThongTinHocPhi(int maThanhToan)
         {
             return Try(() =>
@@ -73,6 +86,7 @@ namespace DesktopApp_Project.BUS
             });
         }
 
+        // Xử lý gửi học phí hàng loạt.
         public ServiceResult<BatchSendTuitionResultDTO> GuiHocPhiHangLoat(List<int> hocPhiIds)
         {
             return Try(() =>
@@ -120,6 +134,7 @@ namespace DesktopApp_Project.BUS
             });
         }
 
+        // Gửi thông tin thanh toán học phí cho một hoặc nhiều học viên.
         private TuitionSendOutcome SendTuitionPaymentInfo(int maThanhToan)
         {
             var outcome = new TuitionSendOutcome { TuitionPaymentId = maThanhToan };
@@ -131,6 +146,7 @@ namespace DesktopApp_Project.BUS
                     return outcome;
                 }
 
+                // Lấy hóa đơn học phí theo mã thanh toán qua tầng dữ liệu.
                 var invoice = Repository.LayHoaDonHocPhi(maThanhToan);
                 if (invoice == null)
                 {
@@ -138,6 +154,7 @@ namespace DesktopApp_Project.BUS
                     return outcome;
                 }
 
+                // Lấy thông tin người dùng theo mã qua tầng dữ liệu.
                 var student = Repository.GetNguoiDungById(invoice.MaNguoiDung);
                 outcome.StudentName = student == null ? invoice.HoTen : student.HoTen;
                 outcome.Email = student == null ? string.Empty : student.Email;
@@ -161,6 +178,7 @@ namespace DesktopApp_Project.BUS
                     return outcome;
                 }
 
+                // Lấy các giao dịch của khoản học phí qua tầng dữ liệu.
                 var reusable = Repository.LayGiaoDichTheoThanhToan(maThanhToan)
                     .FirstOrDefault(IsReusablePaymentTransaction);
                 if (reusable == null)
@@ -189,6 +207,7 @@ namespace DesktopApp_Project.BUS
 
                 var detail = BuildPaymentEmailDetail(invoice, student, reusable);
                 var email = TrySendPaymentRequest(detail);
+                // Lấy giao dịch thanh toán theo mã qua tầng dữ liệu.
                 var refreshed = Repository.LayGiaoDichThanhToan(reusable.MaGiaoDich) ?? reusable;
 
                 if (!email.Success)
@@ -210,6 +229,7 @@ namespace DesktopApp_Project.BUS
             }
         }
 
+        // Tạo chi tiết thư thanh toán.
         private static PaymentDebugResultDTO BuildPaymentEmailDetail(
             HoaDonHocPhiDTO invoice,
             NguoiDungDTO student,
@@ -241,6 +261,7 @@ namespace DesktopApp_Project.BUS
             };
         }
 
+        // Xử lý giao dịch thanh toán còn có thể dùng lại.
         private static bool IsReusablePaymentTransaction(PaymentResultDTO transaction)
         {
             return transaction != null
@@ -248,6 +269,7 @@ namespace DesktopApp_Project.BUS
                 && !IsFinalPaymentStatus(transaction.TrangThai);
         }
 
+        // Xử lý trạng thái thanh toán đã kết thúc.
         private static bool IsFinalPaymentStatus(string status)
         {
             return AppConstants.GetTextAliases(AppConstants.PaymentPaid).Contains(status)
@@ -256,18 +278,23 @@ namespace DesktopApp_Project.BUS
                 || AppConstants.GetTextAliases(AppConstants.PaymentCancelled).Contains(status);
         }
 
+        // Xử lý lỗi khi gửi học phí.
         private static ServiceResult<PaymentResultDTO> FailGuiHocPhi(string reason)
         {
             return ServiceResult<PaymentResultDTO>.Fail("Gửi thông tin học phí thất bại: " + SafeReason(reason));
         }
 
+        // Xử lý safe reason.
         private static string SafeReason(string reason)
         {
+            // Ràng buộc dữ liệu: Vui lòng nhập thư điện tử người nhận hợp lệ.
             return string.IsNullOrWhiteSpace(reason) ? "Lỗi không xác định." : reason.Trim();
         }
 
+        // Tạo thanh toán VNPay.
         private ServiceResult<PaymentResultDTO> TaoThanhToanVnpay(PaymentRequestDTO request, HoaDonHocPhiDTO invoice)
         {
+            // Ràng buộc dữ liệu: Vui lòng nhập thư điện tử người nhận hợp lệ.
             if (!ValidationHelper.IsValidEmail(request.EmailNguoiNhan))
             {
                 return ServiceResult<PaymentResultDTO>.Fail("Vui long nhap email nguoi nhan hop le.");
@@ -279,7 +306,9 @@ namespace DesktopApp_Project.BUS
                 request.SoTien,
                 request.NoiDungThanhToan,
                 "127.0.0.1");
+            // Tạo nhật ký giao dịch thanh toán qua tầng dữ liệu.
             var result = Repository.TaoNhatKyThanhToan(request, txnRef, paymentUrl, paymentUrl);
+            // Cập nhật trạng thái và phương thức thanh toán học phí qua tầng dữ liệu.
             Repository.CapNhatTrangThaiHocPhi(request.MaThanhToan, AppConstants.PaymentPending, null, null);
 
             var detail = new PaymentDebugResultDTO
@@ -292,6 +321,7 @@ namespace DesktopApp_Project.BUS
                 PaymentUrl = paymentUrl
             };
             var email = TrySendPaymentRequest(detail);
+            // Lấy giao dịch thanh toán theo mã qua tầng dữ liệu.
             result = Repository.LayGiaoDichThanhToan(result.MaGiaoDich) ?? result;
 
             if (!email.Success)
@@ -302,10 +332,12 @@ namespace DesktopApp_Project.BUS
             return ServiceResult<PaymentResultDTO>.Ok(result, "Da tao thanh toan VNPAY sandbox va gui email.");
         }
 
+        // Lấy giao dịch.
         public ServiceResult<PaymentResultDTO> LayGiaoDich(int maGiaoDich)
         {
             return Try(() =>
             {
+                // Lấy giao dịch thanh toán theo mã qua tầng dữ liệu.
                 var result = Repository.LayGiaoDichThanhToan(maGiaoDich);
                 return result == null
                     ? ServiceResult<PaymentResultDTO>.Fail("Khong tim thay giao dich.")
@@ -313,52 +345,64 @@ namespace DesktopApp_Project.BUS
             });
         }
 
+        // Lấy các giao dịch của khoản học phí.
         public ServiceResult<List<PaymentResultDTO>> LayGiaoDichTheoThanhToan(int maThanhToan)
         {
             return Try(() => ServiceResult<List<PaymentResultDTO>>.Ok(Repository.LayGiaoDichTheoThanhToan(maThanhToan), "OK"));
         }
 
+        // Xử lý xac nhan thanh toán.
         public ServiceResult XacNhanThanhToan(int maGiaoDich)
         {
             return Try(() =>
             {
+                // Lấy giao dịch thanh toán theo mã qua tầng dữ liệu.
                 var giaoDich = Repository.LayGiaoDichThanhToan(maGiaoDich);
                 if (giaoDich == null)
                 {
                     return ServiceResult.Fail("Khong tim thay giao dich.");
                 }
 
+                // Cập nhật trạng thái giao dịch qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiGiaoDich(maGiaoDich, AppConstants.PaymentPaid);
+                // Cập nhật trạng thái và phương thức thanh toán học phí qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiHocPhi(giaoDich.MaThanhToan, AppConstants.PaymentPaid, giaoDich.PhuongThuc, DateTime.Now);
                 return ServiceResult.Ok("Da xac nhan thanh toan.");
             });
         }
 
+        // Xử lý huy thanh toán.
         public ServiceResult HuyThanhToan(int maGiaoDich)
         {
             return Try(() =>
             {
+                // Lấy giao dịch thanh toán theo mã qua tầng dữ liệu.
                 var giaoDich = Repository.LayGiaoDichThanhToan(maGiaoDich);
                 if (giaoDich == null)
                 {
                     return ServiceResult.Fail("Khong tim thay giao dich.");
                 }
 
+                // Cập nhật trạng thái giao dịch qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiGiaoDich(maGiaoDich, AppConstants.PaymentCancelled);
+                // Cập nhật trạng thái và phương thức thanh toán học phí qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiHocPhi(giaoDich.MaThanhToan, AppConstants.PaymentPending, null, null);
                 return ServiceResult.Ok("Da huy thanh toan gia lap.");
             });
         }
 
+        // Xử lý mô phỏng trạng thái thanh toán.
         public ServiceResult<PaymentDebugResultDTO> SimulatePaymentStatus(int transactionId, string fakeStatus, string receiverEmail)
         {
             return Try(() =>
             {
+                // Ràng buộc dữ liệu: Vui lòng tạo hoặc chọn giao dịch trước.
                 if (transactionId <= 0)
                 {
                     return ServiceResult<PaymentDebugResultDTO>.Fail("Vui long tao hoac chon giao dich truoc.");
                 }
 
+                // Lấy chi tiết giao dịch để kiểm thử qua tầng dữ liệu.
                 var detail = Repository.LayChiTietGiaoDichDebug(transactionId);
                 if (detail == null)
                 {
@@ -399,12 +443,16 @@ namespace DesktopApp_Project.BUS
                     return WithData(false, detail, "Trang thai gia lap khong hop le.");
                 }
 
+                // Cập nhật trạng thái giao dịch qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiGiaoDich(transactionId, transactionStatus);
+                // Cập nhật trạng thái và phương thức thanh toán học phí qua tầng dữ liệu.
                 Repository.CapNhatTrangThaiHocPhi(detail.TuitionPaymentId, tuitionStatus, paymentMethod, paidAt);
 
+                // Lấy chi tiết giao dịch để kiểm thử qua tầng dữ liệu.
                 detail = Repository.LayChiTietGiaoDichDebug(transactionId) ?? detail;
                 detail.ReceiverEmail = toEmail;
                 var email = TrySendStatusNotification(detail, transactionStatus);
+                // Lấy chi tiết giao dịch để kiểm thử qua tầng dữ liệu.
                 detail = Repository.LayChiTietGiaoDichDebug(transactionId) ?? detail;
 
                 if (!email.Success)
@@ -416,6 +464,7 @@ namespace DesktopApp_Project.BUS
             });
         }
 
+        // Thử gửi thư yêu cầu thanh toán và trả trạng thái lỗi nếu có.
         private EmailOutcome TrySendPaymentRequest(PaymentDebugResultDTO detail)
         {
             try
@@ -428,16 +477,19 @@ namespace DesktopApp_Project.BUS
                     detail.Amount,
                     detail.PaymentUrl,
                     qrBytes);
+                // Cập nhật trạng thái gửi thư yêu cầu thanh toán qua tầng dữ liệu.
                 Repository.CapNhatEmailThanhToan(detail.TransactionId, true, DateTime.Now, null);
                 return EmailOutcome.Ok();
             }
             catch (Exception ex)
             {
+                // Cập nhật trạng thái gửi thư yêu cầu thanh toán qua tầng dữ liệu.
                 Repository.CapNhatEmailThanhToan(detail.TransactionId, false, null, ex.Message);
                 return EmailOutcome.Fail(ex.Message);
             }
         }
 
+        // Đọc ảnh QR thanh toán cố định từ thư mục tài nguyên.
         private static byte[] LoadStaticPaymentQrBytes()
         {
             var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "Payment", "myQR.png");
@@ -449,6 +501,7 @@ namespace DesktopApp_Project.BUS
             return File.ReadAllBytes(path);
         }
 
+        // Thử gửi thư thông báo trạng thái và trả trạng thái lỗi nếu có.
         private EmailOutcome TrySendStatusNotification(PaymentDebugResultDTO detail, string status)
         {
             try
@@ -459,16 +512,19 @@ namespace DesktopApp_Project.BUS
                     string.IsNullOrWhiteSpace(detail.InvoiceCode) ? detail.ExternalTransactionRef : detail.InvoiceCode,
                     detail.Amount,
                     status);
+                // Cập nhật trạng thái gửi thư thông báo giao dịch qua tầng dữ liệu.
                 Repository.CapNhatEmailTrangThai(detail.TransactionId, true, DateTime.Now, null);
                 return EmailOutcome.Ok();
             }
             catch (Exception ex)
             {
+                // Cập nhật trạng thái gửi thư thông báo giao dịch qua tầng dữ liệu.
                 Repository.CapNhatEmailTrangThai(detail.TransactionId, false, null, ex.Message);
                 return EmailOutcome.Fail(ex.Message);
             }
         }
 
+        // Tạo ma giao dịch demo.
         private static string TaoMaGiaoDichDemo()
         {
             int suffix;
@@ -480,6 +536,7 @@ namespace DesktopApp_Project.BUS
             return "DEMO" + DateTime.Now.ToString("yyyyMMddHHmmss") + suffix;
         }
 
+        // Lấy ma hóa đơn.
         private static string LayMaHoaDon(HoaDonHocPhiDTO invoice)
         {
             return string.IsNullOrWhiteSpace(invoice.MaHoaDon)
@@ -487,6 +544,7 @@ namespace DesktopApp_Project.BUS
                 : invoice.MaHoaDon.Trim();
         }
 
+        // Thực hiện nghiệp vụ thanh toán và trả kết quả cho giao diện.
         private static ServiceResult<T> WithData<T>(bool success, T data, string message)
         {
             return new ServiceResult<T>
@@ -497,22 +555,26 @@ namespace DesktopApp_Project.BUS
             };
         }
 
+        // Lớp hỗ trợ lưu trạng thái kết quả gửi Thư điện tử trong quá trình xử lý nghiệp vụ.
         private class EmailOutcome
         {
             public bool Success { get; private set; }
             public string Error { get; private set; }
 
+            // Xử lý ok.
             public static EmailOutcome Ok()
             {
                 return new EmailOutcome { Success = true, Error = string.Empty };
             }
 
+            // Xử lý fail.
             public static EmailOutcome Fail(string error)
             {
                 return new EmailOutcome { Success = false, Error = error };
             }
         }
 
+        // Lớp hỗ trợ lưu trạng thái kết quả gửi học phí trong quá trình xử lý nghiệp vụ.
         private class TuitionSendOutcome
         {
             public int TuitionPaymentId { get; set; }

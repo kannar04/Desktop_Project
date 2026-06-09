@@ -1,3 +1,8 @@
+// Thành phần chủ đề giao diện cho giao diện Windows Forms
+// Chức năng:
+// - Khai báo hoặc áp dụng màu sắc, phông chữ và trạng thái giao diện
+// - Hỗ trợ các biểu mẫu dùng chung một phong cách hiển thị
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -6,6 +11,7 @@ using FontAwesome.Sharp;
 
 namespace DesktopApp_Project.GUI.Shared.Themes
 {
+    // Lớp quản lý chủ đề giao diện dùng chung cho các biểu mẫu trong ứng dụng.
     public static class ThemeManager
     {
         private static readonly Dictionary<string, Func<ITheme>> _registry =
@@ -23,6 +29,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
         public static ITheme Current { get; private set; }
 
+        // Xử lý chọn chủ đề giao diện.
         public static void SetTheme(string name)
         {
             Func<ITheme> factory;
@@ -39,6 +46,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Áp dụng chủ đề hiện tại cho toàn bộ cây điều khiển.
         public static void ApplyTheme(Control root)
         {
             if (!CanUse(root) || Current == null)
@@ -85,6 +93,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Áp dụng màu sắc và phông chữ phù hợp cho từng điều khiển theo chủ đề hiện tại.
         private static void ApplyControl(Control control)
         {
             if (!CanUse(control))
@@ -97,10 +106,9 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 control.BackColor = Current.BackgroundDark;
                 control.ForeColor = Current.PrimaryText;
 
-                // IMPORTANT: do NOT set form.Font here.
-                // Setting the Form.Font at runtime triggers WinForms AutoScale (AutoScaleMode = Font)
-                // which rescales child controls and causes fonts/sizes to grow on repeated theme changes.
-                // If you want to change fonts for specific controls, set them individually (buttons/labels/inputs).
+                // Không gán phông chữ cho biểu mẫu tại đây vì Windows Forms sẽ kích hoạt AutoScale theo phông chữ.
+                // Khi đổi chủ đề nhiều lần, AutoScale có thể phóng to các điều khiển con và làm sai kích thước giao diện.
+                // Nếu cần đổi phông chữ cho nút, nhãn hoặc ô nhập liệu, hãy gán riêng cho từng điều khiển.
                 // (control.Font = Current.BodyFont);
             }
 
@@ -234,6 +242,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Áp dụng màu nền, màu chữ và phông chữ cho nhãn theo vai trò tiêu đề hoặc nội dung.
         private static void ApplyLabel(Label label)
         {
             if (label == null)
@@ -244,10 +253,10 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                     ? label.Parent.BackColor
                     : Current.PanelDark;
 
-            // Determine label role by name / semantics rather than current font size
+            // Xác định vai trò của nhãn theo tên hoặc ý nghĩa thay vì chỉ dựa vào cỡ phông chữ hiện tại.
             if (IsTitleLabel(label))
             {
-                // only override the font if we will not shrink a deliberately larger font
+                // Chỉ ghi đè phông chữ khi việc này không làm nhỏ phông chữ lớn đã được thiết kế chủ ý.
                 if (ShouldOverrideFont(label.Font, Current.TitleFont))
                 {
                     label.ForeColor = Current.PrimaryText;
@@ -255,13 +264,13 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 }
                 else
                 {
-                    // keep larger designer font but ensure color is theme-correct
+                    // Giữ phông chữ lớn từ Designer nhưng vẫn cập nhật màu theo chủ đề hiện tại.
                     label.ForeColor = Current.PrimaryText;
                 }
             }
             else
             {
-                // only override body font if it won't reduce a custom large font
+                // Chỉ áp dụng phông chữ nội dung khi không làm giảm kích thước phông chữ tùy chỉnh.
                 if (ShouldOverrideFont(label.Font, Current.BodyFont))
                 {
                     label.ForeColor = Current.SecondaryText;
@@ -269,22 +278,23 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 }
                 else
                 {
-                    // preserve the intentionally large font but update color
+                    // Giữ phông chữ lớn có chủ ý nhưng cập nhật màu hiển thị.
                     label.ForeColor = Current.SecondaryText;
                 }
             }
         }
 
-        // New helper: return true when it is safe to override (i.e. we won't shrink an intentionally larger font)
+        // Xác định có thể ghi đè phông chữ mà không làm nhỏ phông chữ lớn đã được thiết kế chủ ý hay không.
         private static bool ShouldOverrideFont(Font current, Font target)
         {
             if (current == null || target == null)
                 return true;
 
-            // preserve larger custom fonts: only override when current font size is <= target font size
+            // Giữ các phông chữ tùy chỉnh lớn; chỉ ghi đè khi phông chữ hiện tại không lớn hơn phông chữ mục tiêu.
             return current.SizeInPoints <= target.SizeInPoints + 0.001f;
         }
 
+        // Xác định nhãn phụ để áp dụng màu chữ và phông chữ nội dung.
         private static bool IsSecondaryLabel(Label label)
         {
             var name = (label.Name ?? string.Empty).TrimStart('_');
@@ -293,8 +303,8 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                    && name.StartsWith("lbl", StringComparison.OrdinalIgnoreCase);
         }
 
-        // Change: do not rely on current label.Font.Size for detection.
-        // Use naming heuristics (designer names) and fall back to font-size only if name is not informative.
+        // Không chỉ dựa vào cỡ phông chữ hiện tại để nhận diện nhãn tiêu đề.
+        // Ưu tiên tên điều khiển từ Designer, chỉ dùng cỡ phông chữ khi tên không đủ thông tin.
         private static bool IsTitleLabel(Label label)
         {
             if (label == null)
@@ -302,23 +312,24 @@ namespace DesktopApp_Project.GUI.Shared.Themes
 
             var name = (label.Name ?? string.Empty);
 
-            // Prefer explicit name hints (lblTitle, lblHeader, lbl...Title, etc.)
+            // Ưu tiên các tên thể hiện rõ vai trò tiêu đề như lblTitle hoặc lblHeader.
             if (name.IndexOf("Title", StringComparison.OrdinalIgnoreCase) >= 0 ||
                 name.IndexOf("Header", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 return true;
             }
 
-            // If control has Tag = "Title" we also treat as title
+            // Nếu nhãn có Tag = "Title" thì cũng xem là nhãn tiêu đề.
             if (label.Tag != null && string.Equals(Convert.ToString(label.Tag), "Title", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            // Fallback: if designer set an explicitly large font (>= 18pt) consider title but do not treat medium sizes (14pt) as authoritative.
+            // Trường hợp dự phòng: phông chữ rất lớn từ Designer được xem là tiêu đề, còn cỡ trung bình thì không đủ chắc chắn.
             return label.Font != null && label.Font.SizeInPoints >= 18f;
         }
 
+        // Áp dụng màu sắc, phông chữ và cách vẽ thủ công cho TabControl theo chủ đề hiện tại.
         private static void ApplyTabControl(TabControl tabControl)
         {
             tabControl.BackColor = Current.BackgroundDark;
@@ -342,6 +353,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Áp dụng kiểu nút chính với màu nhấn và trạng thái hover/click.
         private static void ApplyButton(Button button)
         {
             if (button == null)
@@ -371,6 +383,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 Current.AccentPressed;
         }
 
+        // Áp dụng kiểu nút phụ với viền và nền trung tính theo chủ đề.
         private static void ApplySecondaryButton(Button button)
         {
             if (button == null)
@@ -396,6 +409,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
                 Cursors.Hand;
         }
 
+        // Áp dụng màu sắc cho nút có biểu tượng FontAwesome trong menu và thanh công cụ.
         private static void ApplyIconButton(IconButton button)
         {
             if (!CanUse(button))
@@ -414,13 +428,14 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             button.FlatAppearance.MouseDownBackColor = Current.AccentPressed;
         }
 
+        // Áp dụng giao diện tối và màu chữ cho bảng dữ liệu.
         private static void ApplyGrid(DataGridView grid)
         {
             grid.SuspendLayout();
 
             grid.EnableHeadersVisualStyles = false;
 
-            // Base
+            // Thiết lập giao diện nền của bảng.
             grid.BackgroundColor = Current.BackgroundDark;
             grid.BorderStyle = BorderStyle.None;
             grid.GridColor = Current.BorderColor;
@@ -508,6 +523,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             grid.ResumeLayout();
         }
 
+        // Xử lý khi người dùng thay đổi lựa chọn trên bộ lọc hoặc combobox.
         private static void TabControl_SelectedIndexChanged(object sender, EventArgs e)
         {
             var tabControl = sender as TabControl;
@@ -524,6 +540,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             tabControl.Invalidate();
         }
 
+        // Xử lý vẽ tab đang hiển thị.
         private static void TabControl_DrawItem(object sender, DrawItemEventArgs e)
         {
             var tabControl = sender as TabControl;
@@ -548,6 +565,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Xử lý khi rê chuột vào nút.
         private static void Button_MouseEnter(object sender, EventArgs e)
         {
             var button = sender as Button;
@@ -557,6 +575,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Xử lý khi rời chuột khỏi nút.
         private static void Button_MouseLeave(object sender, EventArgs e)
         {
             var button = sender as Button;
@@ -566,6 +585,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Xử lý khi nhấn chuột xuống nút.
         private static void Button_MouseDown(object sender, MouseEventArgs e)
         {
             var button = sender as Button;
@@ -575,6 +595,7 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Xử lý khi thả chuột trên nút.
         private static void Button_MouseUp(object sender, MouseEventArgs e)
         {
             var button = sender as Button;
@@ -595,11 +616,13 @@ namespace DesktopApp_Project.GUI.Shared.Themes
             }
         }
 
+        // Kiểm tra điều khiển còn sử dụng được trước khi áp dụng chủ đề.
         private static bool CanUse(Control control)
         {
             return control != null && !control.IsDisposed && !control.Disposing;
         }
 
+        // Chọn màu chữ dễ đọc dựa trên độ sáng của màu nền.
         public static Color GetReadableTextColor(Color background)
         {
             double brightness =

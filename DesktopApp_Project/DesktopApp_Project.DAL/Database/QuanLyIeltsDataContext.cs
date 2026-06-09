@@ -1,3 +1,8 @@
+// ngữ cảnh dữ liệu LINQ sang SQL của hệ thống quản lý IELTS
+// Chức năng:
+// - Khai báo các bảng cơ sở dữ liệu dưới dạng Table<T>
+// - Tạo kết nối cơ sở dữ liệu SQL Server từ cấu hình ứng dụng
+
 using System.Configuration;
 using System.Data.Linq;
 using System.IO;
@@ -7,8 +12,10 @@ using System.Xml.Linq;
 
 namespace DesktopApp_Project.DAL
 {
+    // Lớp ngữ cảnh dữ liệu ánh xạ các bảng cơ sở dữ liệu SQL Server sang Table<T> của LINQ sang SQL.
     public class QuanLyIeltsDataContext : DataContext
     {
+        // Khởi tạo đối tượng tầng dữ liệu với cấu hình kết nối hoặc factory dữ liệu.
         public QuanLyIeltsDataContext(string connectionString)
             : base(connectionString)
         {
@@ -38,13 +45,17 @@ namespace DesktopApp_Project.DAL
         public Table<NhatKyBaoCaoEntity> NhatKyBaoCaos { get { return GetTable<NhatKyBaoCaoEntity>(); } }
     }
 
+    // Hợp đồng mô tả các thao tác tầng dữ liệu để tầng nghiệp vụ gọi mà không phụ thuộc lớp cài đặt.
     public interface IDataContextFactory
     {
+        // Thực hiện thao tác dữ liệu kết nối LINQ sang SQL trong tầng dữ liệu.
         QuanLyIeltsDataContext Create();
     }
 
+    // Lớp factory đọc chuỗi kết nối từ cấu hình và tạo ngữ cảnh dữ liệu mới cho mỗi thao tác tầng dữ liệu.
     public class AppConfigDataContextFactory : IDataContextFactory
     {
+        // Thực hiện thao tác dữ liệu kết nối LINQ sang SQL trong tầng dữ liệu.
         public QuanLyIeltsDataContext Create()
         {
             var connection = ConfigurationManager.ConnectionStrings["QuanLyIeltsDb"];
@@ -54,9 +65,11 @@ namespace DesktopApp_Project.DAL
                 connectionString = ReadConnectionStringFromAssemblyConfig();
             }
 
+            // Khởi tạo đối tượng tầng dữ liệu với cấu hình kết nối hoặc factory dữ liệu.
             return new QuanLyIeltsDataContext(connectionString);
         }
 
+        // Thực hiện thao tác dữ liệu kết nối LINQ sang SQL trong tầng dữ liệu.
         private static string ReadConnectionStringFromAssemblyConfig()
         {
             var configPaths = new[]

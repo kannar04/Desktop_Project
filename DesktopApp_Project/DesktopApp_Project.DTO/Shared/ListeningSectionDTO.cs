@@ -1,7 +1,13 @@
+// Đối tượng truyền dữ liệu phần nghe Listening
+// Chức năng:
+// - Truyền dữ liệu giữa giao diện, tầng nghiệp vụ và tầng dữ liệu
+// - Chứa các thuộc tính phục vụ hiển thị hoặc xử lý nghiệp vụ
+
 using System;
 
 namespace DesktopApp_Project.DTO
 {
+    // Lớp đối tượng truyền dữ liệu dùng để truyền dữ liệu phần nghe Listening giữa các tầng giao diện, tầng nghiệp vụ và tầng dữ liệu.
     public class ListeningSectionDTO
     {
         public int SectionId { get; set; }
